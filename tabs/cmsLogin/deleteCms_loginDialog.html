@@ -1,0 +1,17 @@
+
+  <md-dialog-content class="md-dialog-content">
+    <h2 class="md-title">Delete Items</h2>
+    <p>Are you sure you want to delete the selected items?</p>
+    <!-- ngIf: error -->
+    <form class="ng-pristine ng-valid" name="authorize.form" ng-submit="ctrl.authorizeUser()">
+      <md-input-container class="layout-row" layout="row">
+        <label for="input_28">Secret</label>
+        <input aria-invalid="false" id="input_28" class="ng-pristine ng-untouched ng-valid md-input" name="secret" ng-model="authorize.secret" type="password">
+      <div class="md-errors-spacer"></div></md-input-container>
+    </form>
+  </md-dialog-content>
+  <div class="md-dialog-actions">
+    <button aria-label="Delete" ng-click="ctrl.authorizeUser()" class="md-primary md-button md-ink-ripple" type="button"><span>Delete</span></button>
+    <button aria-label="Close" ng-click="ctrl.cancel()" class="md-primary md-button md-ink-ripple" type="button"><span>Close</span></button>
+  </div>
+<div tabindex="0" class="md-dialog-focus-trap"></div>

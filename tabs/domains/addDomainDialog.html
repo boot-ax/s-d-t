@@ -1,0 +1,145 @@
+<md-dialog-content id="dialog_domain" class="md-dialog-content">
+
+
+
+  <!-- ngIf: item.form.$submitted && item.form.$invalid -->
+
+  <form style="" class="ng-invalid ng-invalid-required" name="item.form" ng-submit="ctrl.addItem()">
+
+<h3 class="md-subhead">Domain Information</h3>
+
+    <div layout="row" class="input-row layout-row">
+      <md-input-container class="flex" flex="">
+        <label>Domain Name&#42;</label>
+        <input style="" ng-trim="false" name="domain_name" ng-model="domains_table.domain_name" required="true">
+        <div class="md-errors-spacer">
+          <div class="md-char-counter"></div>
+        </div>
+      </md-input-container>
+
+      <md-input-container class="flex" flex="">
+        <label>IP Address</label>
+        <input style="" aria-invalid="true" id="input_20" class="ng-pristine ng-untouched" name="ip_address" ng-model="domains_table.ip_address">
+        <div class="md-errors-spacer"></div>
+      </md-input-container>
+    </div>
+
+    <h3 class="md-subhead">Name Server Information</h3>
+    <div layout="row" class="input-row layout-row">
+      <md-input-container class="flex" flex="">
+        <label for="input_3">Name Server 1</label>
+        <input style="" aria-invalid="true" name="nameserver_1" ng-model="domains_table.nameserver_1">
+        <div class="md-errors-spacer"></div>
+      </md-input-container>
+
+      <md-input-container class="flex" flex="">
+        <label for="input_4">NS-1 IP Address</label>
+        <input style="" aria-invalid="true" name="ns1_IP" ng-model="domains_table.ns1_IP">
+        <div class="md-errors-spacer"></div>
+      </md-input-container>
+    </div>
+    <div layout="row" class="input-row layout-row">
+      <md-input-container class="flex" flex="">
+        <label for="input_5">Name Server 2</label>
+        <input style="" aria-invalid="true" name="nameserver_2" ng-model="domains_table.nameserver_2">
+        <div class="md-errors-spacer"></div>
+      </md-input-container>
+
+      <md-input-container class="flex" flex="">
+        <label for="input_6">NS-1 IP Address</label>
+        <input style="" aria-invalid="true" name="ns2_IP" ng-model="domains_table.ns2_IP">
+        <div class="md-errors-spacer"></div>
+      </md-input-container>
+    </div>
+
+    <div layout="row" class="input-row layout-row">
+      <md-input-container class="flex" flex="">
+        <label for="input_7">Name Server 3</label>
+        <input style="" aria-invalid="true" name="nameserver_3" ng-model="domains_table.nameserver_3">
+        <div class="md-errors-spacer"></div>
+      </md-input-container>
+
+      <md-input-container class="flex" flex="">
+        <label for="input_8">NS-3 IP Address</label>
+        <input style="" aria-invalid="true" name="ns3_IP" ng-model="domains_table.ns3_IP">
+        <div class="md-errors-spacer"></div>
+      </md-input-container>
+    </div>
+
+    <h3 class="md-subhead">Foreign Keys</h3>
+    <div layout="row" class="input-row layout-row">
+      <md-input-container class="flex" flex="">
+        <md-select class="flex" required md-on-open="getRegistrarsFunc()" ng-model="domains_table.registrar_ID" placeholder="Registrar&#42;" flex="">
+          <md-option ng-value="registrar.registrar_ID" ng-repeat="registrar in getRegistrars.data">{{registrar.registrar_name}}</md-option>
+          </md-select>
+    <button ng-controller="registrarController" class="md-button md-ink-ripple" type="button" ng-click="addItem($event)">
+      <div class="addButtonInModl">+ registar</div>
+    </button>
+      </md-input-container>
+      <md-input-container class="flex" flex="">
+        <div class="md-errors-spacer"></div>
+        <md-select md-on-open="getHostsFunc()" ng-model="domains_table.hosting_ID" placeholder="Host" class="flex" flex="">
+          <md-option ng-value="host.hosting_ID" ng-repeat="host in getHosts.data">{{host.hosting_name}}</md-option>
+          </md-select>
+
+          <button ng-controller="hostingController" class="md-button md-ink-ripple" type="button" ng-click="addItem($event)">
+      <div class="addButtonInModl">+ host</div>
+    </button>
+      </md-input-container>
+    </div>
+
+
+    <h3 class="md-subhead">Other Information</h3>
+
+    <!--Enter Date Here Below-->
+
+    <div layout="row" class="input-row layout-row">
+
+          <div layout="column" flex style="font-size:.8em; color:grey">
+            <label>Date Purchased&#42;</label>
+            <md-datepicker ng-init="domains_table.date_purchased = myDate" ng-model="domains_table.date_purchased" name="datePurchasedField" required></md-datepicker>
+          </div>
+
+
+          <div layout="column" flex style="font-size:.8em; color:grey">
+            <label>Expiration Date&#42;</label>
+            <md-datepicker ng-model="domains_table.expiration_date" ng-init="domains_table.expiration_date = myDate" name="expirationDateField" required></md-datepicker>
+          </div>
+
+  </div>
+<div layout="row" class="input-row layout-row">
+  <md-input-container style="margin-top:40px" class="flex" flex="">
+  <label style="margin-bottom:20px">Whois Protected</label>
+    <md-switch aria-label="active switch" ng-init="domains_table.whois_protected = 'No'" ng-model="domains_table.whois_protected" ng-true-value="'Yes'" ng-false-value="'No'">
+      {{domains_table.whois_protected}}
+</md-switch>
+  </md-input-container>
+</div>
+
+<!--Enter Date Here Above-->
+
+
+    <div layout="row" class="input-row layout-row">
+      <md-input-container class="flex" flex="">
+        <label for="input_14">Registrar 301</label>
+        <input style="" aria-invalid="true" id="input_20" class="ng-pristine ng-untouched md-input" name="registrar_301" ng-model="domains_table.registrar_301">
+        <div class="md-errors-spacer"></div>
+      </md-input-container>
+
+      <md-input-container class="flex" flex="">
+        <label for="input_15">Registrar 301 Target</label>
+        <input style="" aria-invalid="true" id="input_20" class="ng-pristine ng-untouched md-input" name="registrar_301_target" ng-model="domains_table.registrar_301_target">
+        <div class="md-errors-spacer"></div>
+      </md-input-container>
+    </div>
+  </form>
+
+
+
+  <div class="md-dialog-actions">
+    <button disabled="disabled" aria-disabled="true" aria-label="Add Item" ng-click="ctrl.addItem()" ng-disabled="item.form.$invalid" class="md-primary md-button md-ink-ripple" type="button"><span>Add Item</span></button>
+    <button aria-label="Cancel" ng-click="ctrl.cancel()" class="md-primary md-button md-ink-ripple" type="button"><span>Cancel</span></button>
+  </div>
+
+  <div tabindex="0" class="md-dialog-focus-trap"></div>
+</md-dialog-content>

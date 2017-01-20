@@ -1,0 +1,81 @@
+<md-toolbar class="md-table-toolbar md-default" ng-hide="selected.length || filter.show" aria-hidden="false">
+  <div class="md-toolbar-tools">
+    <h2 class="md-title">Hosting</h2>
+    <div flex="" class="flex"></div>
+    <button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="filter.show = true" aria-label="filter_list">
+      <md-icon class="material-icons">search</md-icon>
+    </button>
+    <button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="addItem($event)" aria-label="local_dining">
+      <md-icon class="material-icons">add_circle</md-icon>
+    </button>
+  </div>
+</md-toolbar>
+
+<md-toolbar class="md-table-toolbar md-default ng-hide" ng-show="filter.show && !selected.length" aria-hidden="true">
+  <div class="md-toolbar-tools">
+    <md-icon class="material-icons">search</md-icon>
+    <form flex="" name="filter.form" class="ng-pristine ng-valid flex">
+      <input ng-model="query.filter" ng-model-options="filter.options" placeholder="search" class="ng-pristine ng-untouched ng-valid" aria-invalid="false" type="text">
+    </form>
+    <button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="removeFilter()" aria-label="close">
+      <md-icon class="material-icons">close</md-icon>
+    </button>
+  </div>
+</md-toolbar>
+
+<md-toolbar class="md-table-toolbar alternate ng-hide" ng-show="selected.length" aria-hidden="true">
+  <div class="md-toolbar-tools layout-align-space-between-stretch" layout-align="space-between">
+<div>{{selected.length}} {{selected.length > 1 ? 'items' : 'item'}} selected</div>
+<button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="delete($event)" aria-label="delete">
+      <md-icon class="material-icons">delete</md-icon>
+    </button>
+  </div>
+</md-toolbar>
+
+<!-- exact table from live demo -->
+<md-table-container>
+  <table md-table md-row-select ng-model="selected" md-progress="promise">
+    <thead md-head md-order="query.order" md-on-reorder="getDesserts">
+      <tr md-row>
+        <th md-column md-order-by="hosting_name"><span>Hosting Name</span></th>
+        <th md-column md-numeric md-order-by="login_url"><span>Login URL</span></th>
+        <th md-column md-numeric md-order-by="username"><span>Username</span></th>
+        <th md-column md-numeric md-order-by="password"><span>Password</span></th>
+        <th md-column md-numeric md-order-by="date_started"><span>Date Started</span></th>
+        <th md-column md-numeric md-order-by="expiration_date"><span>Expiration Date</span></th>
+        <th md-column md-numeric md-order-by="creditcard_last_4"><span>Credit Card Last Four</span></th>
+        <th md-column md-numeric md-order-by="setup_domain"><span>Setup Domain</span></th>
+      </tr>
+    </thead>
+    <tbody md-body>
+      <tr md-row md-select="hosting_table" md-select-id="name" ng-repeat="hosting_table in hosting_tables.data">
+        <td md-cell="" ng-click="editHostName($event, hosting_table, 'hosting_name')" placeholder="{{hosting_table.hosting_name}} "
+        aria-label="hosting_table.hosting_name" class="md-cell ng-binding md-clickable" tabindex="0">{{hosting_table.hosting_name}}</td>
+        <td md-cell="" ng-click="editLoginUrl($event, hosting_table, 'login_url')" placeholder="{{hosting_table.login_url}} "
+        class="md-cell ng-binding md-clickable" tabindex="0">{{hosting_table.login_url}}</td>
+        <td md-cell="" ng-click="editUsername($event, hosting_table, 'username')" placeholder="{{hosting_table.username}} "
+        class="md-cell ng-binding md-clickable" tabindex="0">{{hosting_table.username}}</td>
+        <td md-cell="" ng-click="editPassword($event, hosting_table, 'password')" placeholder="{{hosting_table.password}} "
+        class="md-cell ng-binding md-clickable" tabindex="0">{{hosting_table.password}}</td>
+		    <td md-cell>
+            <md-datepicker ng-change="changeDate('date_started',hosting_table)"
+            md-hide-icons="calendar"
+            ng-model="hosting_table.date_started"
+            name="expirationDateField" required=""></md-datepicker>
+        </td>
+        <td md-cell>
+            <md-datepicker ng-change="changeDate('expiration_date',hosting_table)"
+            md-hide-icons="calendar"
+            ng-model="hosting_table.expiration_date"
+            name="expirationDateField" required=""></md-datepicker>
+        </td>
+        <td md-cell="" ng-click="editCreditLastFour($event, hosting_table, 'creditcard_last_4')" placeholder="{{hosting_table.creditcard_last_4}} "
+        class="md-cell ng-binding md-clickable" tabindex="0">{{hosting_table.creditcard_last_4}}</td>
+        <td md-cell="" ng-click="editSetupDomain($event, hosting_table, 'setup_domain')" placeholder="{{hosting_table.setup_domain}} "
+        class="md-cell ng-binding md-clickable" tabindex="0">{{hosting_table.setup_domain}}</td>
+      </tr>
+    </tbody>
+  </table>
+</md-table-container>
+
+<md-table-pagination md-limit="query.limit" md-limit-options="[5, 10, 15]" md-page="query.page" md-total="{{hosting_tables.count}}" md-on-paginate="getDesserts" md-page-select></md-table-pagination>

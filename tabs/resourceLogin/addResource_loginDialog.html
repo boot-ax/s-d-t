@@ -1,0 +1,74 @@
+<md-dialog-content id="dialog_registrar" class="md-dialog-content">
+
+
+
+  <!-- ngIf: item.form.$submitted && item.form.$invalid -->
+
+  <form style="" class="ng-invalid ng-invalid-required" name="item.form" ng-submit="ctrl.addItem()">
+
+<h3 class="md-subhead">Resource Login Information</h3>
+
+    <div layout="row" class="input-row layout-row">
+      <md-input-container class="flex" flex="">
+        <label>Resource URL Login Name&#42;</label>
+        <input style="" ng-trim="false" name="resource_url_name" ng-model="resource_login_table.resource_url_name" required="true">
+        <div class="md-errors-spacer">
+          <div class="md-char-counter"></div>
+        </div>
+      </md-input-container>
+
+      <md-input-container class="flex" flex="">
+        <label>Name of Product</label>
+        <input style="" aria-invalid="true" name="name_of_product" ng-model="resource_login_table.name_of_product">
+        <div class="md-errors-spacer"></div>
+      </md-input-container>
+    </div>
+
+
+    <div layout="row" class="input-row layout-row">
+      <md-input-container class="flex" flex="">
+        <label>Username&#42;</label>
+        <input style="" aria-invalid="true" name="username" ng-model="resource_login_table.username" required="true">
+        <div class="md-errors-spacer"></div>
+      </md-input-container>
+      
+            <md-input-container class="flex" flex="">
+        <label>Password&#42;</label>
+        <input style="" aria-invalid="true" name="password" ng-model="resource_login_table.password" required="true">
+        <div class="md-errors-spacer"></div>
+      </md-input-container>
+      </div>
+
+    <h3 class="md-subhead">Other Information</h3>
+
+
+ 
+
+<md-input-container class="flex" flex="">
+        <md-select md-on-open="getPersonsFunc()" ng-model="resource_login_table.person_ID" placeholder="Person" class="flex" flex="">
+          <md-option ng-value="person.person_ID" ng-repeat="person in getPersons.data">{{person.first_name}}, {{person.last_name}}</md-option>
+          </md-select>
+          
+    <button ng-controller="personController" class="md-button md-ink-ripple" type="button" ng-click="addItem($event)">
+      <div class="addButtonInModl">+ person</div>
+    </button>
+      </md-input-container>
+<div class="md-errors-spacer"></div>
+      <md-input-container class="flex" flex="">
+        <label>Product Description</label>
+        <input style="" name="product_description" ng-model="resource_login_table.product_description">
+        <div class="md-errors-spacer"></div>
+      </md-input-container>
+    
+  </form>
+
+
+
+  <div class="md-dialog-actions">
+    <button disabled="disabled" aria-disabled="true" aria-label="Add Item" ng-click="ctrl.addItem()" ng-disabled="item.form.$invalid" class="md-primary md-button md-ink-ripple" type="button"><span>Add Item</span></button>
+    <button aria-label="Cancel" ng-click="ctrl.cancel()" class="md-primary md-button md-ink-ripple" type="button"><span>Cancel</span></button>
+  </div>
+
+  <div tabindex="0" class="md-dialog-focus-trap"></div>
+</md-dialog-content>
+

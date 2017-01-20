@@ -1,0 +1,78 @@
+<md-dialog-content id="dialog_registrar" class="md-dialog-content">
+  <!-- ngIf: item.form.$submitted && item.form.$invalid -->
+
+  <form style="" class="ng-invalid ng-invalid-required" name="item.form" ng-submit="ctrl.addItem()">
+
+<h3 class="md-subhead">Link Information</h3>
+
+    <div layout="row" class="input-row layout-row">
+      <md-input-container class="flex" flex="">
+        <label>Source URL&#42;</label>
+        <input style="" ng-trim="false" name="source_url" ng-model="links_table.source_url" required="true">
+        <div class="md-errors-spacer">
+          <div class="md-char-counter"></div>
+        </div>
+      </md-input-container>
+
+      <md-input-container class="flex" flex="">
+        <label>Target URL&#42;</label>
+        <input style="" aria-invalid="true" name="target_url" ng-model="links_table.target_url" required="true">
+        <div class="md-errors-spacer"></div>
+      </md-input-container>
+    </div>
+
+
+      <div layout="row" class="input-row layout-row">
+            <md-input-container class="flex" flex="">
+        <label>Anchor Text</label>
+        <input style="" aria-invalid="true" name="anchor_text" ng-model="links_table.anchor_text">
+        <div class="md-errors-spacer"></div>
+      </md-input-container>
+      
+      <md-input-container class="flex" flex="">
+        <label>Alt Text</label>
+        <input style="" name="alt_text" ng-model="links_table.alt_text">
+        <div class="md-errors-spacer"></div>
+      </md-input-container>
+      </div>
+
+
+  <md-input-container class="flex" flex="" style="margin-bottom:20px; margin-right:40px">
+  <label style="margin-bottom:20px">Follow Link</label>
+    <md-switch aria-label="active switch" ng-init="links_table.follow_link = 'No'" ng-model="links_table.follow_link" ng-true-value="'Yes'" ng-false-value="'No'">
+      {{links_table.follow_link}}
+</md-switch>
+  </md-input-container> 
+  
+
+
+   <md-input-container class="flex" flex="">
+        <label>Title</label>
+        <input style="" name="title" ng-model="links_table.title">
+        <div class="md-errors-spacer"></div>
+      </md-input-container>   
+        <div layout="row" class="input-row layout-row">
+        
+        <!--Add Date-->      
+      <md-input-container>
+            <label>Date Created&#42;</label>
+            <md-datepicker ng-init="links_table.date_created = myDate" ng-model="links_table.date_created" name="dateCreatedField" required="true"></md-datepicker>
+          </md-input-container>
+</div>
+<div class="md-errors-spacer"></div>
+<div layout="row" class="input-row layout-row">
+      <md-input-container class="flex" flex="">
+        <label>Comment</label>
+        <input style="" name="comment" ng-model="links_table.comment">
+        <div class="md-errors-spacer"></div>
+      </md-input-container>
+    </div>
+  </form>
+  <div class="md-dialog-actions">
+    <button disabled="disabled" aria-disabled="true" aria-label="Add Item" ng-click="ctrl.addItem()" ng-disabled="item.form.$invalid" class="md-primary md-button md-ink-ripple" type="button"><span>Add Item</span></button>
+    <button aria-label="Cancel" ng-click="ctrl.cancel()" class="md-primary md-button md-ink-ripple" type="button"><span>Cancel</span></button>
+  </div>
+
+  <div tabindex="0" class="md-dialog-focus-trap"></div>
+</md-dialog-content>
+

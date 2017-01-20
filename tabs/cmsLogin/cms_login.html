@@ -1,0 +1,84 @@
+<md-toolbar class="md-table-toolbar md-default" ng-hide="selected.length || filter.show" aria-hidden="false">
+  <div class="md-toolbar-tools">
+    <h2 class="md-title">CMS Login</h2>
+    <div flex="" class="flex"></div>
+    <button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="filter.show = true" aria-label="filter_list">
+      <md-icon class="material-icons">search</md-icon>
+    </button>
+    <button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="addItem($event)" aria-label="local_dining">
+      <md-icon class="material-icons">add_circle</md-icon>
+    </button>
+  </div>
+</md-toolbar>
+
+<md-toolbar class="md-table-toolbar md-default ng-hide" ng-show="filter.show && !selected.length" aria-hidden="true">
+  <div class="md-toolbar-tools">
+    <md-icon class="material-icons">search</md-icon>
+    <form flex="" name="filter.form" class="ng-pristine ng-valid flex">
+      <input ng-model="query.filter" ng-model-options="filter.options" placeholder="search" class="ng-pristine ng-untouched ng-valid" aria-invalid="false" type="text">
+    </form>
+    <button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="removeFilter()" aria-label="close">
+      <md-icon class="material-icons">close</md-icon>
+    </button>
+  </div>
+</md-toolbar>
+
+<md-toolbar class="md-table-toolbar alternate ng-hide" ng-show="selected.length" aria-hidden="true">
+  <div class="md-toolbar-tools layout-align-space-between-stretch" layout-align="space-between">
+<div>{{selected.length}} {{selected.length > 1 ? 'items' : 'item'}} selected</div>
+<button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="delete($event)" aria-label="delete">
+      <md-icon class="material-icons">delete</md-icon>
+    </button>
+  </div>
+</md-toolbar>
+
+<!-- exact table from live demo -->
+<md-table-container>
+  <table md-table md-row-select ng-model="selected" md-progress="promise">
+    <thead md-head md-order="query.order" md-on-reorder="getDesserts">
+      <tr md-row>
+        <th md-column md-order-by="install_site_url_name"><span>Install Site URL Name</span></th>
+        <th md-column md-numeric md-order-by="domain_name"><span>Domain Name</span></th>
+        <th md-column md-numeric md-order-by="login_url"><span>Login URL</span></th>
+        <th md-column md-numeric md-order-by="username"><span>Username</span></th>
+        <th md-column md-numeric md-order-by="password"><span>Password</span></th>
+        <th md-column md-numeric md-order-by="recovery_email"><span>Recovery Email</span></th>
+        <th md-column md-numeric md-order-by="cpanel_url"><span>Cpanel URL</span></th>
+        <th md-column md-numeric md-order-by="cpanel_username"><span>Cpanel Username</span></th>
+		<th md-column md-numeric md-order-by="cpanel_password"><span>Cpanel Password</span></th>
+      </tr>
+    </thead>
+    <tbody md-body>
+      <tr md-row md-select="cms_login_table" md-select-id="name" ng-repeat="cms_login_table in cms_login_tables.data">
+        <td md-cell="" ng-click="editInstallSiteUrlName($event, cms_login_table, 'install_site_url_name')" placeholder="{{cms_login_table.install_site_url_name}} " 
+        aria-label="cms_login_table.install_site_url_name" class="md-cell ng-binding md-clickable" tabindex="0">{{cms_login_table.install_site_url_name}}</td>
+        
+		<td md-cell>  
+  			<md-select md-on-open="getDomainsFunc()" ng-change="changeDomainValue('domain_ID',cms_login_table)" 
+            ng-model="cms_login_table.domain_name" placeholder="{{cms_login_table.domain_name}}">
+    			<md-option ng-value="domain.domain_ID" 
+                ng-repeat="domain in getDomains.data">{{domain.domain_name}}</md-option>
+  			</md-select>
+		</td>  
+     
+              
+        <td md-cell="" ng-click="editLoginUrl($event, cms_login_table, 'login_url')" placeholder="{{cms_login_table.login_url}} " 
+        class="md-cell ng-binding md-clickable" tabindex="0">{{cms_login_table.login_url}}</td>
+        <td md-cell="" ng-click="editUsername($event, cms_login_table, 'username')" placeholder="{{cms_login_table.username}} " 
+        class="md-cell ng-binding md-clickable" tabindex="0">{{cms_login_table.username}}</td>
+        <td md-cell="" ng-click="editPassword($event, cms_login_table, 'password')" placeholder="{{cms_login_table.password}} " 
+        class="md-cell ng-binding md-clickable" tabindex="0">{{cms_login_table.password}}</td>
+        <td md-cell="" ng-click="editEmail($event, cms_login_table, 'recovery_email')" placeholder="{{cms_login_table.recovery_email}} " 
+        class="md-cell ng-binding md-clickable" tabindex="0">{{cms_login_table.recovery_email}}</td>
+        <td md-cell="" ng-click="editCpanelUrl($event, cms_login_table, 'cpanel_url')" placeholder="{{cms_login_table.cpanel_url}} " 
+        class="md-cell ng-binding md-clickable" tabindex="0">{{cms_login_table.cpanel_url}}</td>
+        <td md-cell="" ng-click="editCpanelUsername($event, cms_login_table, 'cpanel_username')" placeholder="{{cms_login_table.cpanel_username}} " 
+        class="md-cell ng-binding md-clickable" tabindex="0">{{cms_login_table.cpanel_username}}</td>
+        <td md-cell="" ng-click="editCpanelPassword($event, cms_login_table, 'cpanel_password')" placeholder="{{cms_login_table.cpanel_password}} " 
+        class="md-cell ng-binding md-clickable" tabindex="0">{{cms_login_table.cpanel_password}}</td>
+      </tr>
+    </tbody>
+  </table>
+</md-table-container>
+
+<md-table-pagination md-limit="query.limit" md-limit-options="[5, 10, 15]" md-page="query.page" md-total="{{cms_login_tables.count}}" md-on-paginate="getDesserts" md-page-select></md-table-pagination>

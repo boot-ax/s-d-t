@@ -1,0 +1,101 @@
+<?php
+$title = "WebWright Data Management";
+include("inc/header.php");
+//include("modals.php");
+?>
+
+    	<!-- Tabs -->
+        <!-- Simple header with scrollable tabs. -->
+	<div class="mdl-layout__tab-bar mdl-js-ripple-effect">
+      <a href="#scroll-tab-1" class="mdl-layout__tab is-active" ng-click="location('domains');">Domains</a>
+      <a href="#scroll-tab-2" class="mdl-layout__tab" ng-click="location('hosting');">Hosting</a>
+      <a href="#scroll-tab-3" class="mdl-layout__tab" ng-click="location('registrars');">Registrar</a>
+      <a href="#scroll-tab-4" class="mdl-layout__tab" ng-click="location('W2_accounts');">W2 Accounts</a>
+      <a href="#scroll-tab-5" class="mdl-layout__tab" ng-click="location('person');">People</a>
+      <a href="#scroll-tab-6" class="mdl-layout__tab" ng-click="location('cms_login');">CMS Login</a>
+      <a href="#scroll-tab-7" class="mdl-layout__tab" ng-click="location('resource_login');">Resource Login</a>
+      <a href="#scroll-tab-8" class="mdl-layout__tab" style="margin-right:25px">Links</a>
+      <a href="" class="mdl-layout__tab"></a>
+    </div>
+  </header>
+  <div class="mdl-layout__drawer">
+    <span class="mdl-layout-title">Choose Wisely</span>
+    <nav class="mdl-navigation">
+      <a class="mdl-navigation__link" href="jordan.php">Jordan's Method</a>
+    </nav>
+  </div>
+  <main class="mdl-layout__content">
+    <section class="mdl-layout__tab-panel is-active" id="scroll-tab-1">
+      <div class="page-content" id='trying1'>
+      <md-card ng-include="'new/domains/domains.html'" ng-controller="domainController"></md-card>
+      </div>
+    </section>
+    <section class="mdl-layout__tab-panel" id="scroll-tab-2">
+      <div class="page-content">
+      <md-card ng-include="'new/hosting/hosting.html'" ng-controller="hostingController"></md-card>
+      </div>
+    </section>
+    <section class="mdl-layout__tab-panel" id="scroll-tab-3">
+      <div class="page-content">
+      <md-card ng-include="'new/registrar/registrar.html'" ng-controller="registrarController"></md-card>
+      </div>
+    </section>
+    <section class="mdl-layout__tab-panel" id="scroll-tab-4">
+      <div class="page-content">
+      <md-card ng-include="'new/w2Accounts/W2_Accounts.html'" ng-controller="W2_accountsController"></md-card>
+      </div>
+    </section>
+    <section class="mdl-layout__tab-panel" id="scroll-tab-5">
+      <div class="page-content">
+      <md-card ng-include="'new/person/person.html'" ng-controller="personController"></md-card>
+      </div>
+    </section>
+    <section class="mdl-layout__tab-panel" id="scroll-tab-6">
+      <div class="page-content">
+      <md-card ng-include="'new/cmsLogin/cms_login.html'" ng-controller="cms_loginController"></md-card>
+      </div>
+    </section>
+    <section class="mdl-layout__tab-panel" id="scroll-tab-7">
+      <div class="page-content">
+      <md-card ng-include="'new/resourceLogin/resource_login.html'" ng-controller="resource_loginController"></md-card>
+      </div>
+    </section>
+    <section class="mdl-layout__tab-panel" id="scroll-tab-8">
+      <div class="page-content">
+      <md-card ng-include="'new/links/links.html'" ng-controller="linksController"></md-card>
+      </div>
+    </section>
+  </main>
+</div>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-animate.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-aria.min.js"></script>
+    <!-- <script src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/t-114/svg-assets-cache.js"></script> -->
+	<script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.1/angular-material.min.js"></script>
+	<script src="bower_components/angular-messages/angular-messages.min.js"></script>
+    <script src="https://code.angularjs.org/1.6.0/angular-resource.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-route.min.js"></script>
+	<script type="text/javascript" src="bower_components/angular-material-data-table/dist/md-data-table.min.js"></script>
+	<script type="text/javascript" src="new/scripts/app.js"></script>
+    <script type="text/javascript" src="new/domains/domainHelpers.js"></script>
+    <script type="text/javascript" src="new/domains/domainController.js"></script>
+    <script type="text/javascript" src="new/hosting/hostingHelpers.js"></script>
+    <script type="text/javascript" src="new/hosting/hostingController.js"></script>
+    <script type="text/javascript" src="new/registrar/registrarHelpers.js"></script>
+    <script type="text/javascript" src="new/registrar/registrarController.js"></script>
+    <script type="text/javascript" src="new/w2Accounts/W2_AccountsHelpers.js"></script>
+    <script type="text/javascript" src="new/w2Accounts/W2_AccountsController.js"></script>
+    <script type="text/javascript" src="new/person/personHelpers.js"></script>
+    <script type="text/javascript" src="new/person/personController.js"></script>
+    <script type="text/javascript" src="new/cmsLogin/cms_loginHelpers.js"></script>
+    <script type="text/javascript" src="new/cmsLogin/cms_loginController.js"></script>
+    <script type="text/javascript" src="new/resourceLogin/resource_loginHelpers.js"></script>
+    <script type="text/javascript" src="new/resourceLogin/resource_loginController.js"></script>
+    <script type="text/javascript" src="new/links/linksHelpers.js"></script>
+    <script type="text/javascript" src="new/links/linksController.js"></script>
+    <script type="text/javascript" src="new/scripts/authorizeResource.js"></script>
+
+
+</body>
+</html>

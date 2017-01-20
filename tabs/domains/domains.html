@@ -1,0 +1,117 @@
+<md-toolbar class="md-table-toolbar md-default" ng-hide="selected.length || filter.show" aria-hidden="false">
+  <div class="md-toolbar-tools">
+    <h2 class="md-title">Domains</h2>
+    <div flex="" class="flex"></div>
+    <button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="filter.show = true" aria-label="filter_list">
+      <md-icon>search</md-icon>
+    </button>
+    <button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="addItem($event)" aria-label="local_dining">
+      <md-icon>add_circle</md-icon>
+    </button>
+  </div>
+</md-toolbar>
+
+<md-toolbar class="md-table-toolbar md-default ng-hide" ng-show="filter.show && !selected.length" aria-hidden="true">
+  <div class="md-toolbar-tools">
+    <md-icon>search</md-icon>
+    <form flex="" name="filter.form" class="ng-pristine ng-valid flex">
+      <input ng-model="query.filter" ng-model-options="filter.options" placeholder="search" class="ng-pristine ng-untouched ng-valid" aria-invalid="false" type="text">
+    </form>
+    <button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="removeFilter()" aria-label="close">
+      <md-icon>close</md-icon>
+    </button>
+  </div>
+</md-toolbar>
+
+<md-toolbar class="md-table-toolbar alternate ng-hide" ng-show="selected.length" aria-hidden="true">
+  <div class="md-toolbar-tools layout-align-space-between-stretch" layout-align="space-between">
+<div>{{selected.length}} {{selected.length > 1 ? 'items' : 'item'}} selected</div>
+<button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="delete($event)" aria-label="delete">
+      <md-icon>delete</md-icon>
+    </button>
+  </div>
+</md-toolbar>
+
+<!-- exact table from live demo -->
+<md-table-container>
+  <table md-table md-row-select ng-model="selected" md-progress="promise">
+    <thead md-head md-order="query.order" md-on-reorder="getDesserts">
+      <tr md-row>
+        <th md-column md-order-by="domain_name"><span>Domain Name</span></th>
+        <th md-column md-numeric md-order-by="ip_address"><span>IP Address</span></th>
+        <th md-column md-numeric md-order-by="nameserver_1"><span>NS-1</span></th>
+        <th md-column md-numeric md-order-by="ns1_IP"><span>NS-1 IP</span></th>
+        <th md-column md-numeric md-order-by="nameserver_2"><span>NS-2</span></th>
+        <th md-column md-numeric md-order-by="ns2_IP"><span>NS-2 IP</span></th>
+        <th md-column md-numeric md-order-by="nameserver_3"><span>NS-3</span></th>
+        <th md-column md-numeric md-order-by="ns3_IP"><span>NS-3 IP</span></th>
+		<th md-column md-numeric md-order-by="date_purchased"><span>Date Purchased</span></th>
+		<th md-column md-numeric md-order-by="expiration_date"><span>Expiration Date</span></th>
+        <th md-column md-numeric md-order-by="registrar_name"><span>Registrar</span></th>
+        <th md-column md-numeric md-order-by="hosting_name"><span>Host</span></th>
+        <th md-column md-numeric md-order-by="registrar_301"><span>Resgistrar 301</span></th>
+        <th md-column md-numeric md-order-by="registrar_301_target"><span>Registrar 301 Target</span></th>
+        <th md-column md-numeric md-order-by="whois_protected"><span>Whois Protected</span></th>
+      </tr>
+    </thead>
+    <tbody md-body>
+      <tr md-row md-select="domains_table" md-select-id="name" ng-repeat="domains_table in domains_tables.data">
+        <td md-cell="" ng-click="changeCellText($event, domains_table, 'domain_name',253)" placeholder="{{domains_table.domain_name}} "
+        aria-label="domains_table.domain_name" class="md-cell ng-binding md-clickable" tabindex="0">{{domains_table.domain_name}}</td>
+        <td md-cell="" ng-click="changeCellText($event, domains_table, 'ip_address',40)" placeholder="{{domains_table.ip_address}} "
+        class="md-cell ng-binding md-clickable" tabindex="0">{{domains_table.ip_address}}</td>
+        <td md-cell="" ng-click="changeCellText($event, domains_table, 'nameserver_1',382)" placeholder="{{domains_table.nameserver_1}} "
+        class="md-cell ng-binding md-clickable" tabindex="0">{{domains_table.nameserver_1}}</td>
+        <td md-cell="" ng-click="changeCellText($event, domains_table, 'ns1_IP',40)" placeholder="{{domains_table.ns1_IP}} "
+        class="md-cell ng-binding md-clickable" tabindex="0">{{domains_table.ns1_IP}}</td>
+        <td md-cell="" ng-click="changeCellText($event, domains_table, 'nameserver_2',382)" placeholder="{{domains_table.nameserver_2}} "
+        class="md-cell ng-binding md-clickable" tabindex="0">{{domains_table.nameserver_2}}</td>
+        <td md-cell="" ng-click="changeCellText($event, domains_table, 'ns2_IP',40)" placeholder="{{domains_table.ns2_IP}} "
+        class="md-cell ng-binding md-clickable" tabindex="0">{{domains_table.ns2_IP}}</td>
+        <td md-cell="" ng-click="changeCellText($event, domains_table, 'nameserver_3',382)" placeholder="{{domains_table.nameserver_3}} "
+        class="md-cell ng-binding md-clickable" tabindex="0">{{domains_table.nameserver_3}}</td>
+        <td md-cell="" ng-click="changeCellText($event, domains_table, 'ns3_IP',40)" placeholder="{{domains_table.ns3_IP}} "
+        class="md-cell ng-binding md-clickable" tabindex="0">{{domains_table.ns3_IP}}</td>
+        <td md-cell>
+            <md-datepicker ng-change="changeDate('date_purchased',domains_table)"
+            ng-model="domains_table.date_purchased"
+            md-hide-icons="calendar"
+            name="datePurchasedField" required=""></md-datepicker>
+      	</td>
+        <td md-cell>
+            <md-datepicker ng-change="changeDate('expiration_date',domains_table)"
+            ng-model="domains_table.expiration_date"
+            md-hide-icons="calendar"
+            name="expirationDateField"></md-datepicker>
+      	</td>
+        <!--<td md-cell>{{domains_table.expiration_date}}</td>-->
+        <td md-cell>
+  			<md-select md-on-open="getRegistrarsFunc()" ng-change="changeDropdown('registrar_ID',domains_table)"
+            ng-model="domains_table.registrar_name" placeholder="{{domains_table.registrar_name}}">
+    			<md-option ng-value="registrar.registrar_ID"
+                ng-repeat="registrar in getRegistrars.data">{{registrar.registrar_name}}</md-option>
+  			</md-select>
+
+		</td>
+		<td md-cell>
+  			<md-select md-on-open="getHostsFunc()" ng-change="changeDropdown('hosting_ID',domains_table)"
+            ng-model="domains_table.hosting_name" placeholder="{{domains_table.hosting_name}}">
+    			<md-option ng-value="host.hosting_ID" ng-repeat="host in getHosts.data">{{host.hosting_name}}</md-option>
+  			</md-select>
+		</td>
+        <td md-cell="" ng-click="changeCellText($event, domains_table, 'registrar_301')" placeholder="{{domains_table.registrar_301}} "
+        class="md-cell ng-binding md-clickable" tabindex="0">{{domains_table.registrar_301}}</td>
+        <td md-cell="" ng-click="changeCellText($event, domains_table, 'registrar_301_target')" placeholder="{{domains_table.registrar_301_target}} "
+        class="md-cell ng-binding md-clickable" tabindex="0">{{domains_table.registrar_301_target}}</td>
+      	<td md-cell>
+    		<md-switch style="margin-left:25px" ng-change="ChangeSwitchValue('whois_protected',domains_table)" aria-label="active switch"
+            ng-init="domains_table.whois_protected = domains_table.whois_protected" ng-model="domains_table.whois_protected"
+            ng-true-value="'Yes'" ng-false-value="'No'">
+      		</md-switch>
+  		</td>
+      </tr>
+    </tbody>
+  </table>
+</md-table-container>
+
+<md-table-pagination md-limit="query.limit" md-limit-options="[5, 10, 15]" md-page="query.page" md-total="{{domains_tables.count}}" md-on-paginate="getDesserts" md-page-select></md-table-pagination>

@@ -1,0 +1,91 @@
+<md-dialog-content id="dialog_hosting" class="md-dialog-content">
+
+
+
+  <!-- ngIf: item.form.$submitted && item.form.$invalid -->
+
+  <form style="" class="ng-invalid ng-invalid-required" name="item.form" ng-submit="ctrl.addItem()">
+
+<h3 class="md-subhead">Hosting Information</h3>
+
+    <div layout="row" class="input-row layout-row">
+      <md-input-container class="flex" flex="">
+        <label>Hosting Name&#42;</label>
+        <input style="" ng-trim="false" name="hosting_name" ng-model="hosting_table.hosting_name" required="true">
+        <div class="md-errors-spacer">
+          <div class="md-char-counter"></div>
+        </div>
+      </md-input-container>
+
+      <md-input-container class="flex" flex="">
+        <label>Login URL&#42;</label>
+        <input style="" aria-invalid="true" name="login_url" ng-model="hosting_table.login_url" required="true">
+        <div class="md-errors-spacer"></div>
+      </md-input-container>
+    </div>
+
+
+    <div layout="row" class="input-row layout-row">
+      <md-input-container class="flex" flex="">
+        <label>Username&#42;</label>
+        <input style="" aria-invalid="true" name="username" ng-model="hosting_table.username" required="true">
+        <div class="md-errors-spacer"></div>
+      </md-input-container>
+      
+            <md-input-container class="flex" flex="">
+        <label>Password&#42;</label>
+        <input style="" aria-invalid="true" name="password" ng-model="hosting_table.password" required="true">
+        <div class="md-errors-spacer"></div>
+      </md-input-container>
+      </div>
+
+    <h3 class="md-subhead">Other Information</h3>
+
+    <!--Enter Date Here Below-->
+    
+    <div layout="row" class="input-row layout-row">
+  
+      <div layout-gt-xs="row">
+        
+          <div layout="column" flex style="font-size:.8em; color:grey">
+            <label>Date Purchased&#42;</label>
+            <md-datepicker ng-init="hosting_table.date_started = myDate" ng-model="hosting_table.date_started" name="dateStartedField" required=""></md-datepicker>
+          </div>
+        
+ 
+          <div layout="column" flex style="font-size:.8em; color:grey">
+            <label>Expiration Date&#42;</label>
+            <md-datepicker ng-model="hosting_table.expiration_date" ng-init="hosting_table.expiration_date = myDate" name="expirationDateField" required=""></md-datepicker>
+          </div>
+       
+  </div>
+  </div>
+
+<!--Enter Date Here Above-->
+
+
+    <div layout="row" class="input-row layout-row">
+      <md-input-container class="flex" flex="">
+        <label>Credit Card Last Four</label>
+        <input style="" name="creditcard_last_4" ng-model="hosting_table.creditcard_last_4">
+        <div class="md-errors-spacer"></div>
+      </md-input-container>
+
+      <md-input-container class="flex" flex="">
+        <label>Setup Domain</label>
+        <input style="" name="setup_domain" ng-model="hosting_table.setup_domain">
+        <div class="md-errors-spacer"></div>
+      </md-input-container>
+    </div>
+  </form>
+
+
+
+  <div class="md-dialog-actions">
+    <button disabled="disabled" aria-disabled="true" aria-label="Add Item" ng-click="ctrl.addItem()" ng-disabled="item.form.$invalid" class="md-primary md-button md-ink-ripple" type="button"><span>Add Item</span></button>
+    <button aria-label="Cancel" ng-click="ctrl.cancel()" class="md-primary md-button md-ink-ripple" type="button"><span>Cancel</span></button>
+  </div>
+
+  <div tabindex="0" class="md-dialog-focus-trap"></div>
+</md-dialog-content>
+

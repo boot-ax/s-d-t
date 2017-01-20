@@ -1,0 +1,24 @@
+
+p{ margin: 0;padding:2px 3px }
+#noscript-warning{font-family:sans-serif;position:fixed;bottom:0;left:0;width:100%;z-index:101;text-align:center;font-weight:bold;font-size:150%;color:#fff;background-color:#AE0000;padding:5px 0 5px 0;}
+#noscript-padding{padding-top:3.5em;}
+input:-moz-placeholder{color:#BBBBBB;}
+input{-webkit-border-radius:5px;-moz-border-radius:5px;border-radius:5px;}
+#wrapper{ width:865px;margin:0 auto 0;padding:0;position: relative }
+textarea{white-space: pre; overflow: auto;word-wrap: normal;}
+input[type="text"]{ width: 80% }
+textarea[disabled] {color: #756969;}
+#shres { width: 100%;margin: 10px 0;}
+#shres, #shres th, #shres td {border: 1px solid #DCDCDC;}
+#shres td{padding: 3px 0px 3px 3px}
+#shres th{background-color: #3EA6DE;color: #fff;text-align:center;padding:5px}
+#urls{width: 98%; height: 200px;margin: 5px 0;font-size: 12px;}
+.thl{width:150px }
+.grey{ color:#00f;background-color:#ddd; }
+.even{background: #E3E5EA;}
+.center{ text-align: center;margin:0 auto;padding:0 }
+#yourAPI{ display: none }
+@media screen and (max-width:800px){
+#wrapper{ width:100%; }
+}
+
