@@ -81,178 +81,35 @@ angular.module('SE_App').controller('linksController', ['$mdDialog','$links', '$
     $scope.getDesserts();
   });
 
-  $scope.editTargetUrl = function (event, links_table, column) {
-    event.stopPropagation();
+  $scope.changeCellText = function (event, table, column, $length) {
+  event.stopPropagation();
 
-    var promise = $mdEditDialog.small({
-      modelValue: links_table.target_url,
+  var promise = $mdEditDialog.small({
+    modelValue: table[column],
 
-      save: function (input) {
-        links_table.target_url = input.$modelValue;
-        var $obj = {};
-        $obj.table = 'links';
-        $obj.column = column;
-        $obj.value = links_table.target_url;
-        $obj.identifier = 'link_ID';
-        $obj.id = links_table.link_ID;
-        $http.post('service/updateItem',$obj);
-      },
-      targetEvent: event,
-      validators: {
-        'md-maxlength': 382
-      },
+    save: function (input) {
+      table[column] = input.$modelValue;
+      var $obj = {};
+      $obj.table = 'links';
+      $obj.column = column;
+      $obj.value = table[column];
+      $obj.identifier = 'link_ID';
+      $obj.id = table.link_ID;
+      $http.post('service/updateItem',$obj);
+    },
+    targetEvent: event,
+    validators: {
+      'md-maxlength': $length
+    },
+  });
+
+  promise.then(function (ctrl) {
+    var input = ctrl.getInput();
+    input.$viewChangeListeners.push(function () {
+      input.$setValidity('test', input.$modelValue !== 'test');
     });
-
-    promise.then(function (ctrl) {
-      var input = ctrl.getInput();
-      input.$viewChangeListeners.push(function () {
-        input.$setValidity('test', input.$modelValue !== 'test');
-      });
-    });
-  };
-
-  $scope.editSourceUrl = function (event, links_table, column) {
-    event.stopPropagation();
-
-    var promise = $mdEditDialog.small({
-      modelValue: links_table.source_url,
-
-      save: function (input) {
-        links_table.source_url = input.$modelValue;
-        var $obj = {};
-        $obj.table = 'links';
-        $obj.column = column;
-        $obj.value = links_table.source_url;
-        $obj.identifier = 'link_ID';
-        $obj.id = links_table.link_ID;
-        $http.post('service/updateItem',$obj);
-      },
-      targetEvent: event,
-      validators: {
-        'md-maxlength': 382
-      },
-    });
-
-    promise.then(function (ctrl) {
-      var input = ctrl.getInput();
-      input.$viewChangeListeners.push(function () {
-        input.$setValidity('test', input.$modelValue !== 'test');
-      });
-    });
-  };
-
-  $scope.editAnchorText = function (event, links_table, column) {
-    event.stopPropagation();
-    var promise = $mdEditDialog.small({
-      modelValue: links_table.anchor_text,
-      save: function (input) {
-        links_table.anchor_text = input.$modelValue;
-        var $obj = {};
-        $obj.table = 'links';
-        $obj.column = column;
-        $obj.value = links_table.anchor_text;
-        $obj.identifier = 'link_ID';
-        $obj.id = links_table.link_ID;
-        $http.post('service/updateItem',$obj);
-      },
-      targetEvent: event,
-      validators: {
-        'md-maxlength': 382
-      },
-    });
-    promise.then(function (ctrl) {
-      var input = ctrl.getInput();
-      input.$viewChangeListeners.push(function () {
-        input.$setValidity('test', input.$modelValue !== 'test');
-      });
-    });
-  };
-
-  $scope.editAltText = function (event, links_table, column) {
-    event.stopPropagation();
-    var promise = $mdEditDialog.small({
-      modelValue: links_table.alt_text,
-      save: function (input) {
-        links_table.alt_text = input.$modelValue;
-        var $obj = {};
-        $obj.table = 'links';
-        $obj.column = column;
-        $obj.value = links_table.alt_text;
-        $obj.identifier = 'link_ID';
-        $obj.id = links_table.link_ID;
-        $http.post('service/updateItem',$obj);
-      },
-      targetEvent: event,
-      validators: {
-        'md-maxlength': 382
-      },
-    });
-
-    promise.then(function (ctrl) {
-      var input = ctrl.getInput();
-      input.$viewChangeListeners.push(function () {
-        input.$setValidity('test', input.$modelValue !== 'test');
-      });
-    });
-  };
-
-  $scope.editTitle = function (event, links_table, column) {
-    event.stopPropagation();
-    var promise = $mdEditDialog.small({
-      modelValue: links_table.title,
-      save: function (input) {
-        links_table.title = input.$modelValue;
-        var $obj = {};
-        $obj.table = 'links';
-        $obj.column = column;
-        $obj.value = links_table.title;
-        $obj.identifier = 'link_ID';
-        $obj.id = links_table.link_ID;
-        $http.post('service/updateItem',$obj);
-      },
-      targetEvent: event,
-      validators: {
-        'md-maxlength': 382
-      },
-    });
-    promise.then(function (ctrl) {
-      var input = ctrl.getInput();
-      input.$viewChangeListeners.push(function () {
-        input.$setValidity('test', input.$modelValue !== 'test');
-      });
-    });
-  };
-
-  $scope.editComment = function (event, links_table, column) {
-    event.stopPropagation();
-    var promise = $mdEditDialog.small({
-      modelValue: links_table.comment,
-      save: function (input) {
-        links_table.comment = input.$modelValue;
-        var $obj = {};
-        $obj.table = 'links';
-        $obj.column = column;
-        $obj.value = links_table.comment;
-        $obj.identifier = 'link_ID';
-        $obj.id = links_table.link_ID;
-        $http.post('service/updateItem',$obj);
-      },
-      targetEvent: event,
-      validators: {
-
-      },
-    });
-
-    promise.then(function (ctrl) {
-      var input = ctrl.getInput();
-      input.$viewChangeListeners.push(function () {
-        input.$setValidity('test', input.$modelValue !== 'test');
-      });
-    });
-  };
-
-
-
+  });
+};
 
   $scope.date_created = function(links_table){
     var dateFromDataBase = links_table.date_created;
@@ -260,26 +117,28 @@ angular.module('SE_App').controller('linksController', ['$mdDialog','$links', '$
     return dateFromDataBase;
   };
 
-  $scope.changeFollowLinkValue = function(column, links_table){
+
+  $scope.switchValue = function(column, table){
     var $obj = {};
     $obj.table = 'links';
     $obj.column = column;
-    $obj.value = links_table.follow_link;
+    $obj.value = table[column];
     $obj.identifier = 'link_ID';
-    $obj.id = links_table.link_ID;
+    $obj.id = table.link_ID;
     $http.post('/service/updateItem', $obj);
   };
 
-  $scope.changeDateCreated = function(column, links_table){
+
+  $scope.changeDate = function(column, table){
     var $obj = {};
     $obj.table = 'links';
     $obj.column = column;
-    $obj.value = links_table.date_created;
-    $obj.value = links_table.date_created.getFullYear()+"-"+
-    ("0"+(links_table.date_created.getMonth()+1)).slice(-2)+"-"+
-    ("0"+links_table.date_created.getDate()).slice(-2);
+    $obj.value = table[column];
+    $obj.value = table[column].getFullYear()+"-"+
+    ("0"+(table[column].getMonth()+1)).slice(-2)+"-"+
+    ("0"+table[column].getDate()).slice(-2);
     $obj.identifier = 'link_ID';
-    $obj.id = links_table.link_ID;
+    $obj.id = table.link_ID;
     $http.post('/service/updateItem', $obj);
   };
 

@@ -141,13 +141,15 @@ angular.module('SE_App').controller('change_logController', ['$mdDialog','$chang
     $http.post('/service/updateItem', $obj);
   };
 
-  $scope.changePerson = function(column, table){
+
+$scope.changeDropdown = function(column, value, table){
 var $obj = {};
 $obj.table = 'change_log';
 	  $obj.column = column;
-	  $obj.value = table[column];
+	  $obj.value = table[value];
 	  $obj.identifier = 'change_log_ID';
 	  $obj.id = table.change_log_ID;
+
 $http.post('/service/updateItem', $obj);
 };
 

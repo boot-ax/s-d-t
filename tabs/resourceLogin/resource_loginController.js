@@ -81,156 +81,48 @@ angular.module('SE_App').controller('resource_loginController', ['$mdDialog','$r
     $scope.getDesserts();
   });
 
-  $scope.editResourceUrlName = function (event, resource_login_table, column) {
-  event.stopPropagation();
+  $scope.changeCellText = function (event, table, column, $length) {
+    event.stopPropagation();
 
-  var promise = $mdEditDialog.small({
-    modelValue: resource_login_table.resource_url_name,
+    var promise = $mdEditDialog.small({
+      modelValue: table[column],
 
-    save: function (input) {
-	  resource_login_table.resource_url_name = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'resource_login';
-	  $obj.column = column;
-	  $obj.value = resource_login_table.resource_url_name;
-	  $obj.identifier = 'resource_url_ID';
-	  $obj.id = resource_login_table.resource_url_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 382
-    },
-  });
-
-  promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
+      save: function (input) {
+        table[column] = input.$modelValue;
+        var $obj = {};
+        $obj.table = 'resource_login';
+        $obj.column = column;
+        $obj.value = table[column];
+        $obj.identifier = 'resource_url_ID';
+        $obj.id = table.resource_url_ID;
+        $http.post('service/updateItem',$obj);
+      },
+      targetEvent: event,
+      validators: {
+        'md-maxlength': $length
+      },
     });
-  });
-};
 
-  $scope.editNameOfProduct = function (event, resource_login_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: resource_login_table.name_of_product,
-    save: function (input) {
-	  resource_login_table.name_of_product = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'resource_login';
-	  $obj.column = column;
-	  $obj.value = resource_login_table.name_of_product;
-	  $obj.identifier = 'resource_url_ID';
-	  $obj.id = resource_login_table.resource_url_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 382
-    },
-  });
     promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
+      var input = ctrl.getInput();
+      input.$viewChangeListeners.push(function () {
+        input.$setValidity('test', input.$modelValue !== 'test');
+      });
     });
-  });
-};
+  };
 
-  $scope.editUsername = function (event, resource_login_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: resource_login_table.username,
-    save: function (input) {
-	  resource_login_table.username = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'resource_login';
-	  $obj.column = column;
-	  $obj.value = resource_login_table.username;
-	  $obj.identifier = 'resource_url_ID';
-	  $obj.id = resource_login_table.resource_url_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 382
-    },
-  });
-
-  promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
-
-$scope.editPassword = function (event, resource_login_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: resource_login_table.password,
-    save: function (input) {
-	  resource_login_table.password = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'resource_login';
-	  $obj.column = column;
-	  $obj.value = resource_login_table.password;
-	  $obj.identifier = 'resource_url_ID';
-	  $obj.id = resource_login_table.resource_url_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 255
-    },
-  });
-    promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
-
-  $scope.editProductDescription = function (event, resource_login_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: resource_login_table.product_description,
-    save: function (input) {
-	  resource_login_table.product_description = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'resource_login';
-	  $obj.column = column;
-	  $obj.value = resource_login_table.product_description;
-	  $obj.identifier = 'resource_url_ID';
-	  $obj.id = resource_login_table.resource_url_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 382
-    },
-  });
-
-  promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
 
 
 //Below is changing the selection and Date Pickers
 
-$scope.changePersonValue = function(column, resource_login_table){
+$scope.changeDropdown = function(column, value, table){
 var $obj = {};
 $obj.table = 'resource_login';
 	  $obj.column = column;
-	  $obj.value = resource_login_table.person_ID;
+	  $obj.value = table[value];
 	  $obj.identifier = 'resource_url_ID';
-	  $obj.id = resource_login_table.resource_url_ID;
+	  $obj.id = table.resource_url_ID;
+
 $http.post('/service/updateItem', $obj);
 };
 

@@ -81,135 +81,25 @@ angular.module('SE_App').controller('W2_accountsController', ['$mdDialog','$W2_a
     $scope.getDesserts();
   });
 
-  $scope.editLoginUrlName = function (event, W2_accounts_table, column) {
+  $scope.changeCellText = function (event, table, column, $length) {
   event.stopPropagation();
 
   var promise = $mdEditDialog.small({
-    modelValue: W2_accounts_table.login_url_name,
+    modelValue: table[column],
 
     save: function (input) {
-	  W2_accounts_table.login_url_name = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'W2_accounts';
-	  $obj.column = column;
-	  $obj.value = W2_accounts_table.login_url_name;
-	  $obj.identifier = 'W2_ID';
-	  $obj.id = W2_accounts_table.W2_ID;
-	  $http.post('service/updateItem',$obj);
+      table[column] = input.$modelValue;
+      var $obj = {};
+      $obj.table = 'W2_accounts';
+      $obj.column = column;
+      $obj.value = table[column];
+      $obj.identifier = 'W2_ID';
+      $obj.id = table.W2_ID;
+      $http.post('service/updateItem',$obj);
     },
     targetEvent: event,
     validators: {
-      'md-maxlength': 382
-    },
-  });
-
-  promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
-
-  $scope.editLogin = function (event, W2_accounts_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: W2_accounts_table.login,
-    save: function (input) {
-	  W2_accounts_table.login = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'W2_accounts';
-	  $obj.column = column;
-	  $obj.value = W2_accounts_table.login;
-	  $obj.identifier = 'W2_ID';
-	  $obj.id = W2_accounts_table.W2_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 382
-    },
-  });
-    promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
-
-  $scope.editPassword = function (event, W2_accounts_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: W2_accounts_table.password,
-    save: function (input) {
-	  W2_accounts_table.password = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'W2_accounts';
-	  $obj.column = column;
-	  $obj.value = W2_accounts_table.password;
-	  $obj.identifier = 'W2_ID';
-	  $obj.id = W2_accounts_table.W2_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 382
-    },
-  });
-
-  promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
-
-$scope.editAccountUrl = function (event, W2_accounts_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: W2_accounts_table.account_url,
-    save: function (input) {
-	  W2_accounts_table.account_url = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'W2_accounts';
-	  $obj.column = column;
-	  $obj.value = W2_accounts_table.account_url;
-	  $obj.identifier = 'W2_ID';
-	  $obj.id = W2_accounts_table.W2_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 255
-    },
-  });
-    promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
-
-  $scope.editAttachedDomain = function (event, W2_accounts_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: W2_accounts_table.attached_domain,
-    save: function (input) {
-	  W2_accounts_table.attached_domain = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'W2_accounts';
-	  $obj.column = column;
-	  $obj.value = W2_accounts_table.attached_domain;
-	  $obj.identifier = 'W2_ID';
-	  $obj.id = W2_accounts_table.W2_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 4
+      'md-maxlength': $length
     },
   });
 
@@ -224,13 +114,14 @@ $scope.editAccountUrl = function (event, W2_accounts_table, column) {
 
 //Below is changing the selection and Date Pickers
 
-$scope.changePersonValue = function(column, W2_accounts_table){
+$scope.changeDropdown = function(column, value, table){
 var $obj = {};
 $obj.table = 'W2_accounts';
 	  $obj.column = column;
-	  $obj.value = W2_accounts_table.person_ID;
+	  $obj.value = table[value];
 	  $obj.identifier = 'W2_ID';
-	  $obj.id = W2_accounts_table.W2_ID;
+	  $obj.id = table.W2_ID;
+
 $http.post('/service/updateItem', $obj);
 };
 

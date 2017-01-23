@@ -80,219 +80,25 @@ angular.module('SE_App').controller('cms_loginController', ['$mdDialog','$cms_lo
     $scope.getDesserts();
   });
 
-  $scope.editInstallSiteUrlName = function (event, cms_login_table, column) {
+  $scope.changeCellText = function (event, table, column, $length) {
   event.stopPropagation();
 
   var promise = $mdEditDialog.small({
-    modelValue: cms_login_table.install_site_url_name,
+    modelValue: table[column],
 
     save: function (input) {
-	  cms_login_table.install_site_url_name = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'cms_login';
-	  $obj.column = column;
-	  $obj.value = cms_login_table.install_site_url_name;
-	  $obj.identifier = 'install_site_url_ID';
-	  $obj.id = cms_login_table.install_site_url_ID;
-	  $http.post('service/updateItem',$obj);
+      table[column] = input.$modelValue;
+      var $obj = {};
+      $obj.table = 'cms_login';
+      $obj.column = column;
+      $obj.value = table[column];
+      $obj.identifier = 'install_site_url_ID';
+      $obj.id = table.install_site_url_ID;
+      $http.post('service/updateItem',$obj);
     },
     targetEvent: event,
     validators: {
-      'md-maxlength': 382
-    },
-  });
-
-  promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
-
-  $scope.editLoginUrl = function (event, cms_login_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: cms_login_table.login_url,
-    save: function (input) {
-	  cms_login_table.login_url = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'cms_login';
-	  $obj.column = column;
-	  $obj.value = cms_login_table.login_url;
-	  $obj.identifier = 'install_site_url_ID';
-	  $obj.id = cms_login_table.install_site_url_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 255
-    },
-  });
-    promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
-
-  $scope.editUsername = function (event, cms_login_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: cms_login_table.username,
-    save: function (input) {
-	  cms_login_table.username = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'cms_login';
-	  $obj.column = column;
-	  $obj.value = cms_login_table.username;
-	  $obj.identifier = 'install_site_url_ID';
-	  $obj.id = cms_login_table.install_site_url_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 255
-    },
-  });
-
-  promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
-
-$scope.editPassword = function (event, cms_login_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: cms_login_table.password,
-    save: function (input) {
-	  cms_login_table.password = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'cms_login';
-	  $obj.column = column;
-	  $obj.value = cms_login_table.password;
-	  $obj.identifier = 'install_site_url_ID';
-	  $obj.id = cms_login_table.install_site_url_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 255
-    },
-  });
-    promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
-
-  $scope.editEmail = function (event, cms_login_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: cms_login_table.recovery_email,
-    save: function (input) {
-	  cms_login_table.recovery_email = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'cms_login';
-	  $obj.column = column;
-	  $obj.value = cms_login_table.recovery_email;
-	  $obj.identifier = 'install_site_url_ID';
-	  $obj.id = cms_login_table.install_site_url_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 255
-    },
-  });
-
-  promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
-
-$scope.editCpanelUrl = function (event, cms_login_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: cms_login_table.cpanel_url,
-    save: function (input) {
-	  cms_login_table.cpanel_url = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'cms_login';
-	  $obj.column = column;
-	  $obj.value = cms_login_table.cpanel_url;
-	  $obj.identifier = 'install_site_url_ID';
-	  $obj.id = cms_login_table.install_site_url_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 255
-    },
-  });
-    promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
-
-  $scope.editCpanelUsername = function (event, cms_login_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: cms_login_table.cpanel_username,
-    save: function (input) {
-	  cms_login_table.cpanel_username = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'cms_login';
-	  $obj.column = column;
-	  $obj.value = cms_login_table.cpanel_username;
-	  $obj.identifier = 'install_site_url_ID';
-	  $obj.id = cms_login_table.install_site_url_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 255
-    },
-  });
-
-  promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
-
-$scope.editCpanelPassword = function (event, cms_login_table, column) {
-  event.stopPropagation();
-
-  var promise = $mdEditDialog.small({
-    modelValue: cms_login_table.cpanel_password,
-    save: function (input) {
-	  cms_login_table.cpanel_password = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'cms_login';
-	  $obj.column = column;
-	  $obj.value = cms_login_table.cpanel_password;
-	  $obj.identifier = 'install_site_url_ID';
-	  $obj.id = cms_login_table.install_site_url_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 255
+      'md-maxlength': $length
     },
   });
 
@@ -306,18 +112,17 @@ $scope.editCpanelPassword = function (event, cms_login_table, column) {
 
 
 
-
-
-$scope.changeDomainValue = function(column, cms_login_table){
+$scope.changeDropdown = function(column, value, table){
 var $obj = {};
 $obj.table = 'cms_login';
 	  $obj.column = column;
-	  $obj.value = cms_login_table.domain_name;
+	  $obj.value = table[value];
 	  $obj.identifier = 'install_site_url_ID';
-	  $obj.id = cms_login_table.install_site_url_ID;
+	  $obj.id = table.install_site_url_ID;
 
 $http.post('/service/updateItem', $obj);
 };
+
 
 
 $scope.getDomainsFunc = function(){

@@ -3,7 +3,8 @@
     $opts = array(
         'id_entry' => 'duSWnS1sW', //differentiate multiple entries, use random string (required)
         'title' => 'WebWright   Zipps', // Title shown in page, default is 'Login'
-        'usr_pwd' => array('jkolnik'=>'KolnikLives4','13thfletch'=>'MulchaTNA1313','jberiault'=>')377}.%/2=E^','syoung'=>'8[%]4}48a);+'), // user name and password pairs (at least one required)        'duration' => 100,// how long (hours) to make it valid (default: 72 )
+        'usr_pwd' => array('jkolnik'=>'KolnikLives4','13thfletch'=>'MulchaTNA1313','jberiault'=>')377}.%/2=E^','syoung'=>'8[%]4}48a);+'), // user name and password pairs (at least one required)
+        'duration' => 100,// how long (hours) to make it valid (default: 72 )
         'background_img'=> 'media/cover.jpg', //background image (default: NULL)
       );
     $login = new request_login();
@@ -28,8 +29,8 @@ include "inc/functions.php";
         <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> -->
         <!-- <link rel="stylesheet" href="https://code.getmdl.io/1.2.1/material.blue-orange.min.css">
      		<link rel="stylesheet" href="https://cdn.rawgit.com/CreativeIT/getmdl-select/master/getmdl-select.min.css"> -->
-        <!-- <link href="css/angular-material.min.css" rel="stylesheet" type="text/css"/> -->
-        <link href="css/md-data-table.min.css" rel="stylesheet" type="text/css"/>
+        <link href="css/angular-material.min.css" rel="stylesheet" type="text/css"/>
+        <link href="bower_components/angular-material-data-table/dist/md-data-table.min.css" rel="stylesheet" type="text/css"/>
         <!-- <link href="css/MaterialDesign-Webfont-master/css/materialdesignicons.min.css" media="all" rel="stylesheet" type="text/css" /> -->
         <!-- <link href="css/icons.css" rel="stylesheet" type="text/css"/> -->
         <link href="css/app.css" rel="stylesheet" type="text/css"/>

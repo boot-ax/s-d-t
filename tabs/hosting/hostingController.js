@@ -93,171 +93,36 @@ angular.module('SE_App').controller('hostingController', ['$mdDialog','$hosting'
     $scope.getDesserts();
   });
 
-  $scope.editHostName = function (event, hosting_table, column) {
-  event.stopPropagation();
 
-  var promise = $mdEditDialog.small({
-    modelValue: hosting_table.hosting_name,
 
-    save: function (input) {
-	  hosting_table.hosting_name = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'hosting';
-	  $obj.column = column;
-	  $obj.value = hosting_table.hosting_name;
-	  $obj.identifier = 'hosting_ID';
-	  $obj.id = hosting_table.hosting_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 382
-    },
-  });
+$scope.changeCellText = function (event, table, column, $length) {
+event.stopPropagation();
 
-  promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
+var promise = $mdEditDialog.small({
+  modelValue: table[column],
 
-  $scope.editLoginUrl = function (event, hosting_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: hosting_table.login_url,
-    save: function (input) {
-	  hosting_table.login_url = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'hosting';
-	  $obj.column = column;
-	  $obj.value = hosting_table.login_url;
-	  $obj.identifier = 'hosting_ID';
-	  $obj.id = hosting_table.hosting_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 382
-    },
-  });
-    promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
+  save: function (input) {
+    table[column] = input.$modelValue;
+    var $obj = {};
+    $obj.table = 'hosting';
+    $obj.column = column;
+    $obj.value = table[column];
+    $obj.identifier = 'hosting_ID';
+    $obj.id = table.hosting_ID;
+    $http.post('service/updateItem',$obj);
+  },
+  targetEvent: event,
+  validators: {
+    'md-maxlength': $length
+  },
+});
 
-  $scope.editUsername = function (event, hosting_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: hosting_table.username,
-    save: function (input) {
-	  hosting_table.username = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'hosting';
-	  $obj.column = column;
-	  $obj.value = hosting_table.username;
-	  $obj.identifier = 'hosting_ID';
-	  $obj.id = hosting_table.hosting_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 382
-    },
+promise.then(function (ctrl) {
+  var input = ctrl.getInput();
+  input.$viewChangeListeners.push(function () {
+    input.$setValidity('test', input.$modelValue !== 'test');
   });
-
-  promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
-
-$scope.editPassword = function (event, hosting_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: hosting_table.password,
-    save: function (input) {
-	  hosting_table.password = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'hosting';
-	  $obj.column = column;
-	  $obj.value = hosting_table.password;
-	  $obj.identifier = 'hosting_ID';
-	  $obj.id = hosting_table.hosting_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 255
-    },
-  });
-    promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
-
-  $scope.editCreditLastFour = function (event, hosting_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: hosting_table.creditcard_last_4,
-    save: function (input) {
-	  hosting_table.creditcard_last_4 = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'hosting';
-	  $obj.column = column;
-	  $obj.value = hosting_table.creditcard_last_4;
-	  $obj.identifier = 'hosting_ID';
-	  $obj.id = hosting_table.hosting_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 4
-    },
-  });
-
-  promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
-
-$scope.editSetupDomain = function (event, hosting_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: hosting_table.setup_domain,
-    save: function (input) {
-	  hosting_table.setup_domain = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'hosting';
-	  $obj.column = column;
-	  $obj.value = hosting_table.setup_domain;
-	  $obj.identifier = 'hosting_ID';
-	  $obj.id = hosting_table.hosting_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 382
-    },
-  });
-    promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
+});
 };
 
 //Below is changing the selection and Date Pickers
@@ -274,16 +139,18 @@ $scope.expiration_date = function(hosting_table){
 	return dateFromDataBase;
 	};
 
-$scope.changeDate = function(column, hosting_table){
-var $obj = {};
-$obj.table = 'hosting';
-	  $obj.column = column;
-    $obj.value = hosting_table[column].getFullYear()+"-"+
-          ("0"+(hosting_table[column].getMonth()+1)).slice(-2)+"-"+
-          ("0"+hosting_table[column].getDate()).slice(-2);
-	  $obj.identifier = 'hosting_ID';
-	  $obj.id = hosting_table.hosting_ID;
-$http.post('/service/updateItem', $obj);
+
+$scope.changeDate = function(column, table){
+  var $obj = {};
+  $obj.table = 'hosting';
+  $obj.column = column;
+  $obj.value = table[column];
+  $obj.value = table[column].getFullYear()+"-"+
+  ("0"+(table[column].getMonth()+1)).slice(-2)+"-"+
+  ("0"+table[column].getDate()).slice(-2);
+  $obj.identifier = 'hosting_ID';
+  $obj.id = table.hosting_ID;
+  $http.post('/service/updateItem', $obj);
 };
 
 
