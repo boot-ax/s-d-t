@@ -82,230 +82,35 @@ angular.module('SE_App').controller('personController', ['$mdDialog','$person', 
     $scope.getDesserts();
   });
 
-  $scope.editFirstName = function (event, person_table, column) {
-  event.stopPropagation();
+  $scope.changeCellText = function (event, table, column, $length) {
+    event.stopPropagation();
 
-  var promise = $mdEditDialog.small({
-    modelValue: person_table.first_name,
+    var promise = $mdEditDialog.small({
+      modelValue: table[column],
 
-    save: function (input) {
-	  person_table.first_name = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'person';
-	  $obj.column = column;
-	  $obj.value = person_table.first_name;
-	  $obj.identifier = 'person_ID';
-	  $obj.id = person_table.person_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 382
-    },
-  });
-
-  promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
+      save: function (input) {
+        table[column] = input.$modelValue;
+        var $obj = {};
+        $obj.table = 'person';
+        $obj.column = column;
+        $obj.value = table[column];
+        $obj.identifier = 'person_ID';
+        $obj.id = table.person_ID;
+        $http.post('service/updateItem',$obj);
+      },
+      targetEvent: event,
+      validators: {
+        'md-maxlength': $length
+      },
     });
-  });
-};
 
-  $scope.editLastName = function (event, person_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: person_table.last_name,
-    save: function (input) {
-	  person_table.last_name = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'person';
-	  $obj.column = column;
-	  $obj.value = person_table.last_name;
-	  $obj.identifier = 'person_ID';
-	  $obj.id = person_table.person_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 382
-    },
-  });
     promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
+      var input = ctrl.getInput();
+      input.$viewChangeListeners.push(function () {
+        input.$setValidity('test', input.$modelValue !== 'test');
+      });
     });
-  });
-};
-
-  $scope.editEmail = function (event, person_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: person_table.email,
-    save: function (input) {
-	  person_table.email = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'person';
-	  $obj.column = column;
-	  $obj.value = person_table.email;
-	  $obj.identifier = 'person_ID';
-	  $obj.id = person_table.person_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 382
-    },
-  });
-
-  promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
-
-$scope.editStreetAddress = function (event, person_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: person_table.street_address,
-    save: function (input) {
-	  person_table.street_address = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'person';
-	  $obj.column = column;
-	  $obj.value = person_table.street_address;
-	  $obj.identifier = 'person_ID';
-	  $obj.id = person_table.person_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 382
-    },
-  });
-    promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
-
-  $scope.editCity = function (event, person_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: person_table.city,
-    save: function (input) {
-	  person_table.city = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'person';
-	  $obj.column = column;
-	  $obj.value = person_table.city;
-	  $obj.identifier = 'person_ID';
-	  $obj.id = person_table.person_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 382
-    },
-  });
-
-  promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
-
- $scope.editState = function (event, person_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: person_table.state,
-    save: function (input) {
-	  person_table.state = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'person';
-	  $obj.column = column;
-	  $obj.value = person_table.state;
-	  $obj.identifier = 'person_ID';
-	  $obj.id = person_table.person_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 382
-    },
-  });
-
-  promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
-
- $scope.editPhoneNumber = function (event, person_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: person_table.phone_number,
-    save: function (input) {
-	  person_table.phone_number = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'person';
-	  $obj.column = column;
-	  $obj.value = person_table.phone_number;
-	  $obj.identifier = 'person_ID';
-	  $obj.id = person_table.person_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-
-    },
-  });
-
-  promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
-
- $scope.editZipCode = function (event, person_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: person_table.zip_code,
-    save: function (input) {
-	  person_table.zip_code = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'person';
-	  $obj.column = column;
-	  $obj.value = person_table.zip_code;
-	  $obj.identifier = 'person_ID';
-	  $obj.id = person_table.person_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 5
-    },
-  });
-
-  promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
-
+  };
 
 
 }]);

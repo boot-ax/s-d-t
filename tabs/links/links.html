@@ -49,18 +49,18 @@
     </thead>
     <tbody md-body>
       <tr md-row md-select="links_table" md-select-id="name" ng-repeat="links_table in links_tables.data">
-        <td md-cell="" ng-click="editSourceUrl($event, links_table, 'source_url')" placeholder="{{links_table.source_url}} "
+        <td md-cell="" ng-click="changeCellText($event, links_table, 'source_url')" placeholder="{{links_table.source_url}} "
         aria-label="links_table.source_url" class="md-cell ng-binding md-clickable" tabindex="0">{{links_table.source_url}}</td>
-        <td md-cell="" ng-click="editTargetUrl($event, links_table, 'target_url')" placeholder="{{links_table.target_url}} "
+        <td md-cell="" ng-click="changeCellText($event, links_table, 'target_url')" placeholder="{{links_table.target_url}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{links_table.target_url}}</td>
-        <td md-cell="" ng-click="editAnchorText($event, links_table, 'anchor_text')" placeholder="{{links_table.anchor_text}} "
+        <td md-cell="" ng-click="changeCellText($event, links_table, 'anchor_text',382)" placeholder="{{links_table.anchor_text}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{links_table.anchor_text}}</td>
-        <td md-cell="" ng-click="editAltText($event, links_table, 'alt_text')" placeholder="{{links_table.alt_text}} "
+        <td md-cell="" ng-click="changeCellText($event, links_table, 'alt_text',382)" placeholder="{{links_table.alt_text}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{links_table.alt_text}}</td>
         <!--need slide button-->
 
         <td md-cell>
-    		<md-switch ng-change="changeFollowLinkValue('follow_link',links_table)" aria-label="active switch"
+    		<md-switch ng-change="switchValue('follow_link',links_table)" aria-label="active switch"
             ng-init="links_table.follow_link = links_table.follow_link" ng-model="links_table.follow_link"
             ng-true-value="'Yes'" ng-false-value="'No'" style="margin:0" tabindex="0">
       		</md-switch>
@@ -68,17 +68,17 @@
 
         <!--need Date -->
         <td md-cell>
-            <md-datepicker ng-change="changeDateCreated('date_created',links_table)"
+            <md-datepicker ng-change="changeDate('date_created',links_table)"
             md-hide-icons="calendar"
             ng-model="links_table.date_created"
             name="dateCreatedField" required=""></md-datepicker>
       	</td>
 
-        <td md-cell="" ng-click="editTitle($event, links_table, 'title')" placeholder="{{links_table.title}} "
+        <td md-cell="" ng-click="changeCellText($event, links_table, 'title',382)" placeholder="{{links_table.title}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{links_table.title}}</td>
 
         <!--need Comment -->
-        <td md-cell="" ng-click="editComment($event, links_table, 'comment')" placeholder="{{links_table.comment}} "
+        <td md-cell="" ng-click="changeCellText($event, links_table, 'comment')" placeholder="{{links_table.comment}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{links_table.comment}}</td>
       </tr>
     </tbody>

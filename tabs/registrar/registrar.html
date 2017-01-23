@@ -47,23 +47,23 @@
     </thead>
     <tbody md-body>
       <tr md-row md-select="registrar_table" md-select-id="name" ng-repeat="registrar_table in registrar_tables.data">
-        <td md-cell="" ng-click="editRegistrarName($event, registrar_table, 'registrar_name')" placeholder="{{registrar_table.registrar_name}} " 
+        <td md-cell="" ng-click="editRegistrarName($event, registrar_table, 'registrar_name')" placeholder="{{registrar_table.registrar_name}} "
         aria-label="registrar_table.registrar_name" class="md-cell ng-binding md-clickable" tabindex="0">{{registrar_table.registrar_name}}</td>
-        <td md-cell="" ng-click="editLoginUrl($event, registrar_table, 'login_url')" placeholder="{{registrar_table.login_url}} " 
+        <td md-cell="" ng-click="editLoginUrl($event, registrar_table, 'login_url')" placeholder="{{registrar_table.login_url}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{registrar_table.login_url}}</td>
-        <td md-cell="" ng-click="editUsername($event, registrar_table, 'login_username')" placeholder="{{registrar_table.login_username}} " 
+        <td md-cell="" ng-click="editUsername($event, registrar_table, 'login_username')" placeholder="{{registrar_table.login_username}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{registrar_table.login_username}}</td>
-        <td md-cell="" ng-click="editPassword($event, registrar_table, 'login_password')" placeholder="{{registrar_table.login_password}} " 
+        <td md-cell="" ng-click="editPassword($event, registrar_table, 'login_password')" placeholder="{{registrar_table.login_password}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{registrar_table.login_password}}</td>
-        <td md-cell>  
-  			<md-select md-on-open="getPersonsFunc()" ng-change="changePersonValue('person_ID',registrar_table)" 
+        <td md-cell>
+  			<md-select md-on-open="getPersonsFunc()" ng-change="changeDropdown('person_ID','person_ID',registrar_table)" 
             ng-model="registrar_table.person_ID" placeholder="{{registrar_table.first_name}}, {{registrar_table.last_name}}">
-    			<md-option ng-value="registrar.person_ID" 
+    			<md-option ng-value="registrar.person_ID"
                 ng-repeat="registrar in getPersons.data">{{registrar.first_name}}, {{registrar.last_name}}</md-option>
   			</md-select>
 
 		</td>
-        <td md-cell="" ng-click="editCreditLastFour($event, registrar_table, 'credit_card_last_4')" placeholder="{{registrar_table.credit_card_last_4}} " 
+        <td md-cell="" ng-click="editCreditLastFour($event, registrar_table, 'credit_card_last_4')" placeholder="{{registrar_table.credit_card_last_4}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{registrar_table.credit_card_last_4}}</td>
       </tr>
     </tbody>

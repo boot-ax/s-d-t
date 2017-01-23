@@ -47,23 +47,23 @@
     </thead>
     <tbody md-body>
       <tr md-row md-select="W2_accounts_table" md-select-id="name" ng-repeat="W2_accounts_table in W2_accounts_tables.data">
-        <td md-cell="" ng-click="editLoginUrlName($event, W2_accounts_table, 'login_url_name')" placeholder="{{W2_accounts_table.login_url_name}} " 
+        <td md-cell="" ng-click="changeCellText($event, W2_accounts_table, 'login_url_name')" placeholder="{{W2_accounts_table.login_url_name}} "
         aria-label="W2_accounts_table.login_url_name" class="md-cell ng-binding md-clickable" tabindex="0">{{W2_accounts_table.login_url_name}}</td>
-        <td md-cell="" ng-click="editLogin($event, W2_accounts_table, 'login')" placeholder="{{W2_accounts_table.login}} " 
+        <td md-cell="" ng-click="changeCellText($event, W2_accounts_table, 'login',382)" placeholder="{{W2_accounts_table.login}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{W2_accounts_table.login}}</td>
-        <td md-cell="" ng-click="editPassword($event, W2_accounts_table, 'password')" placeholder="{{W2_accounts_table.password}} " 
+        <td md-cell="" ng-click="changeCellText($event, W2_accounts_table, 'password',382)" placeholder="{{W2_accounts_table.password}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{W2_accounts_table.password}}</td>
-        <td md-cell="" ng-click="editAccountUrl($event, W2_accounts_table, 'account_url')" placeholder="{{W2_accounts_table.account_url}} " 
+        <td md-cell="" ng-click="changeCellText($event, W2_accounts_table, 'account_url')" placeholder="{{W2_accounts_table.account_url}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{W2_accounts_table.account_url}}</td>
-        <td md-cell>  
-  			<md-select md-on-open="getPersonsFunc()" ng-change="changePersonValue('person_ID',W2_accounts_table)" 
+        <td md-cell>
+  			<md-select md-on-open="getPersonsFunc()" ng-change="changeDropdown('person_ID','person_ID',W2_accounts_table)" 
             ng-model="W2_accounts_table.person_ID" placeholder="{{W2_accounts_table.first_name}}, {{W2_accounts_table.last_name}}">
-    			<md-option ng-value="registrar.person_ID" 
+    			<md-option ng-value="registrar.person_ID"
                 ng-repeat="registrar in getPersons.data">{{registrar.first_name}}, {{registrar.last_name}}</md-option>
   			</md-select>
 
 		</td>
-        <td md-cell="" ng-click="editAttachedDomain($event, W2_accounts_table, 'attached_domain')" placeholder="{{W2_accounts_table.attached_domain}} " 
+        <td md-cell="" ng-click="changeCellText($event, W2_accounts_table, 'attached_domain',253)" placeholder="{{W2_accounts_table.attached_domain}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{W2_accounts_table.attached_domain}}</td>
       </tr>
     </tbody>

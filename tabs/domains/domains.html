@@ -86,7 +86,7 @@
       	</td>
         <!--<td md-cell>{{domains_table.expiration_date}}</td>-->
         <td md-cell>
-  			<md-select md-on-open="getRegistrarsFunc()" ng-change="changeDropdown('registrar_ID',domains_table)"
+  			<md-select md-on-open="getRegistrarsFunc()" ng-change="changeDropdown('registrar_ID','registrar_name',domains_table)"
             ng-model="domains_table.registrar_name" placeholder="{{domains_table.registrar_name}}">
     			<md-option ng-value="registrar.registrar_ID"
                 ng-repeat="registrar in getRegistrars.data">{{registrar.registrar_name}}</md-option>
@@ -94,7 +94,7 @@
 
 		</td>
 		<td md-cell>
-  			<md-select md-on-open="getHostsFunc()" ng-change="changeDropdown('hosting_ID',domains_table)"
+  			<md-select md-on-open="getHostsFunc()" ng-change="changeDropdown('hosting_ID','hosting_name',domains_table)"
             ng-model="domains_table.hosting_name" placeholder="{{domains_table.hosting_name}}">
     			<md-option ng-value="host.hosting_ID" ng-repeat="host in getHosts.data">{{host.hosting_name}}</md-option>
   			</md-select>

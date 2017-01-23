@@ -139,16 +139,18 @@ $scope.expiration_date = function(domains_table){
 	return dateFromDataBase;
 	};
 
-$scope.changeDropdown = function(column, table){
-var $obj = {};
-$obj.table = 'domains';
-	  $obj.column = column;
-	  $obj.value = table[column];
-	  $obj.identifier = 'domain_ID';
-	  $obj.id = table.domain_ID;
+  $scope.changeDropdown = function(column, value, table){
+  var $obj = {};
+  $obj.table = 'domains';
+  	  $obj.column = column;
+  	  $obj.value = table[value];
+  	  $obj.identifier = 'domain_ID';
+  	  $obj.id = table.domain_ID;
 
-$http.post('/service/updateItem', $obj);
-};
+  $http.post('/service/updateItem', $obj);
+  };
+
+
 
  $scope.ChangeSwitchValue = function(column, table){
  	  var $obj = {};

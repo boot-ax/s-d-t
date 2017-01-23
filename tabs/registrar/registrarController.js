@@ -227,13 +227,15 @@ $scope.editPassword = function (event, registrar_table, column) {
 
 //Below is changing the selection and Date Pickers
 
-$scope.changePersonValue = function(column, registrar_table){
+
+$scope.changeDropdown = function(column, value, table){
 var $obj = {};
 $obj.table = 'registrar';
 	  $obj.column = column;
-	  $obj.value = registrar_table.person_ID;
+	  $obj.value = table[value];
 	  $obj.identifier = 'registrar_ID';
-	  $obj.id = registrar_table.registrar_ID;
+	  $obj.id = table.registrar_ID;
+
 $http.post('/service/updateItem', $obj);
 };
 

@@ -47,14 +47,14 @@
       <tr md-row md-select="change_log_table" md-select-id="name" ng-repeat="change_log_table in change_log_tables.data">
         <td md-cell="" ng-click="changeCellText($event, change_log_table, 'issue')" placeholder="{{change_log_table.issue}} "
         aria-label="change_log_table.issue" class="md-cell ng-binding md-clickable" tabindex="0">{{change_log_table.issue}}</td>
-        
+
         <td md-cell>
             <md-datepicker ng-change="changeDate('date_entered',change_log_table)"
             md-hide-icons="calendar"
             ng-model="change_log_table.date_entered"
             name="dateEnteredField" required=""></md-datepicker>
       	</td>
-        
+
         <!--need slide button-->
 
         <td md-cell>
@@ -65,12 +65,12 @@
   		</td>
 
         <!--need Date -->
-        
 
-        <td md-cell>  
-  			<md-select md-on-open="getPersonsFunc()" ng-change="changePerson('person_ID',change_log_table)" 
+
+        <td md-cell>
+  			<md-select md-on-open="getPersonsFunc()" ng-change="changeDropdown('person_ID','person_ID',change_log_table)" 
             ng-model="change_log_table.person_ID" placeholder="{{change_log_table.first_name}}, {{change_log_table.last_name}}">
-    			<md-option ng-value="change_log_table.person_ID" 
+    			<md-option ng-value="change_log_table.person_ID"
                 ng-repeat="change_log_table in getPersons.data">{{change_log_table.first_name}}, {{change_log_table.last_name}}</md-option>
   			</md-select>
 

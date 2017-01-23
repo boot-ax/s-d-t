@@ -49,13 +49,13 @@
     </thead>
     <tbody md-body>
       <tr md-row md-select="hosting_table" md-select-id="name" ng-repeat="hosting_table in hosting_tables.data">
-        <td md-cell="" ng-click="editHostName($event, hosting_table, 'hosting_name')" placeholder="{{hosting_table.hosting_name}} "
+        <td md-cell="" ng-click="changeCellText($event, hosting_table, 'hosting_name',382)" placeholder="{{hosting_table.hosting_name}} "
         aria-label="hosting_table.hosting_name" class="md-cell ng-binding md-clickable" tabindex="0">{{hosting_table.hosting_name}}</td>
-        <td md-cell="" ng-click="editLoginUrl($event, hosting_table, 'login_url')" placeholder="{{hosting_table.login_url}} "
+        <td md-cell="" ng-click="changeCellText($event, hosting_table, 'login_url')" placeholder="{{hosting_table.login_url}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{hosting_table.login_url}}</td>
-        <td md-cell="" ng-click="editUsername($event, hosting_table, 'username')" placeholder="{{hosting_table.username}} "
+        <td md-cell="" ng-click="changeCellText($event, hosting_table, 'username',382)" placeholder="{{hosting_table.username}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{hosting_table.username}}</td>
-        <td md-cell="" ng-click="editPassword($event, hosting_table, 'password')" placeholder="{{hosting_table.password}} "
+        <td md-cell="" ng-click="changeCellText($event, hosting_table, 'password',382)" placeholder="{{hosting_table.password}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{hosting_table.password}}</td>
 		    <td md-cell>
             <md-datepicker ng-change="changeDate('date_started',hosting_table)"
@@ -69,9 +69,9 @@
             ng-model="hosting_table.expiration_date"
             name="expirationDateField" required=""></md-datepicker>
         </td>
-        <td md-cell="" ng-click="editCreditLastFour($event, hosting_table, 'creditcard_last_4')" placeholder="{{hosting_table.creditcard_last_4}} "
+        <td md-cell="" ng-click="changeCellText($event, hosting_table, 'creditcard_last_4',4)" placeholder="{{hosting_table.creditcard_last_4}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{hosting_table.creditcard_last_4}}</td>
-        <td md-cell="" ng-click="editSetupDomain($event, hosting_table, 'setup_domain')" placeholder="{{hosting_table.setup_domain}} "
+        <td md-cell="" ng-click="changeCellText($event, hosting_table, 'setup_domain',282)" placeholder="{{hosting_table.setup_domain}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{hosting_table.setup_domain}}</td>
       </tr>
     </tbody>
