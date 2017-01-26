@@ -1,4 +1,4 @@
-angular.module('SE_App').controller('personController', ['$mdDialog','$person', '$scope', '$mdEditDialog', '$http',function ($mdDialog, $person, $scope, $mdEditDialog, $http) {
+angular.module('SE_App').controller('personController', ['$mdDialog','$person', '$scope', '$mdEditDialog', '$http','$q',function ($mdDialog, $person, $scope, $mdEditDialog, $http,$q) {
   'use strict';
 
   var bookmark;

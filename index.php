@@ -83,7 +83,7 @@ include "inc/functions.php";
 		<script type="text/javascript" src="scripts/angular-messages.min.js"></script>
 		<script src="https://code.angularjs.org/1.6.0/angular-resource.min.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-route.min.js"></script>
-		<script type="text/javascript" src="scripts/md-data-table.min.js"></script>
+		<script type="text/javascript" src="scripts/md-data-table.js"></script>
 		<script type="text/javascript" src="scripts/app.js"></script>
     <script type="text/javascript" src="tabs/domains/domainHelpers.js"></script>
     <script type="text/javascript" src="tabs/domains/domainController.js"></script>

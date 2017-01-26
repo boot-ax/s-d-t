@@ -1,4 +1,4 @@
-angular.module('SE_App').controller('change_logController', ['$mdDialog','$change_log', '$scope', '$mdEditDialog', '$http',function ($mdDialog, $change_log, $scope, $mdEditDialog, $http) {
+angular.module('SE_App').controller('change_logController', ['$mdDialog','$change_log', '$scope', '$mdEditDialog', '$http','$q',function ($mdDialog, $change_log, $scope, $mdEditDialog, $http,$q) {
   'use strict';
 
   var bookmark;

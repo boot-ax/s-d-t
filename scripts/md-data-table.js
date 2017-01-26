@@ -104,59 +104,59 @@ function mdBody() {
 angular.module('md.data.table').directive('mdCell', mdCell);
 
 function mdCell() {
-  
+
   function compile(tElement) {
     var select = tElement.find('md-select');
-    
+
     if(select.length) {
       select.addClass('md-table-select').attr('md-container-class', 'md-table-select');
     }
-    
+
     tElement.addClass('md-cell');
-    
+
     return postLink;
   }
-  
+
   // empty controller to be bind properties to in postLink function
   function Controller() {
-    
+
   }
-  
+
   function postLink(scope, element, attrs, ctrls) {
     var select = element.find('md-select');
     var cellCtrl = ctrls.shift();
     var tableCtrl = ctrls.shift();
-    
+
     if(attrs.ngClick) {
       element.addClass('md-clickable');
     }
-    
+
     if(select.length) {
       select.on('click', function (event) {
         event.stopPropagation();
       });
-      
+
       element.addClass('md-clickable').on('click', function (event) {
         event.stopPropagation();
         select[0].click();
       });
     }
-    
+
     cellCtrl.getTable = tableCtrl.getElement;
-    
+
     function getColumn() {
       return tableCtrl.$$columns[getIndex()];
     }
-    
+
     function getIndex() {
       return Array.prototype.indexOf.call(element.parent().children(), element[0]);
     }
-    
+
     scope.$watch(getColumn, function (column) {
       if(!column) {
         return;
       }
-      
+
       if(column.numeric) {
         element.addClass('md-numeric');
       } else {
@@ -164,7 +164,7 @@ function mdCell() {
       }
     });
   }
-  
+
   return {
     controller: Controller,
     compile: compile,
@@ -322,15 +322,15 @@ function controllerDecorator($delegate) {
 }
 
 controllerDecorator.$inject = ['$delegate'];
-  
+
 function mdEditDialog($compile, $controller, $document, $mdUtil, $q, $rootScope, $templateCache, $templateRequest, $window) {
   /* jshint validthis: true */
-  
+
   var ESCAPE = 27;
-  
+
   var busy = false;
   var body = angular.element($document.prop('body'));
-  
+
   /*
    * bindToController
    * controller
@@ -348,73 +348,73 @@ function mdEditDialog($compile, $controller, $document, $mdUtil, $q, $rootScope,
     escToClose: true,
     focusOnOpen: true
   };
-  
+
   function build(template, options) {
     var scope = $rootScope.$new();
     var element = $compile(template)(scope);
     var backdrop = $mdUtil.createBackdrop(scope, 'md-edit-dialog-backdrop');
     var controller;
-    
+
     if(options.controller) {
       controller = getController(options, scope, {$element: element, $scope: scope});
     } else {
       angular.extend(scope, options.scope);
     }
-    
+
     if(options.disableScroll) {
       disableScroll(element);
     }
-    
+
     body.prepend(backdrop).append(element.addClass('md-whiteframe-1dp'));
-    
+
     positionDialog(element, options.target);
-    
+
     if(options.focusOnOpen) {
       focusOnOpen(element);
     }
-    
+
     if(options.clickOutsideToClose) {
       backdrop.on('click', function () {
         element.remove();
       });
     }
-    
+
     if(options.escToClose) {
       escToClose(element);
     }
-    
+
     element.on('$destroy', function () {
       busy = false;
       backdrop.remove();
     });
-    
+
     return controller;
   }
-  
+
   function disableScroll(element) {
     var restoreScroll = $mdUtil.disableScrollAround(element, body);
-    
+
     element.on('$destroy', function () {
       restoreScroll();
     });
   }
-  
+
   function getController(options, scope, inject) {
     if(!options.controller) {
       return;
     }
-    
+
     if(options.resolve) {
       angular.extend(inject, options.resolve);
     }
-    
+
     if(options.locals) {
       angular.extend(inject, options.locals);
     }
-    
+
     if(options.controllerAs) {
       scope[options.controllerAs] = {};
-      
+
       if(options.bindToController) {
         angular.extend(scope[options.controllerAs], options.scope);
       } else {
@@ -423,62 +423,62 @@ function mdEditDialog($compile, $controller, $document, $mdUtil, $q, $rootScope,
     } else {
       angular.extend(scope, options.scope);
     }
-    
+
     if(options.bindToController) {
       return $controller(options.controller, inject, scope[options.controllerAs]);
     } else {
       return $controller(options.controller, inject);
     }
   }
-  
+
   function getTemplate(options) {
     return $q(function (resolve, reject) {
       var template = options.template;
-      
+
       function illegalType(type) {
         reject('Unexpected template value. Expected a string; received a ' + type + '.');
       }
-      
+
       if(template) {
         return angular.isString(template) ? resolve(template) : illegalType(typeof template);
       }
-      
+
       if(options.templateUrl) {
         template = $templateCache.get(options.templateUrl);
-        
+
         if(template) {
           return resolve(template);
         }
-        
+
         var success = function (template) {
           return resolve(template);
         };
-        
+
         var error = function () {
           return reject('Error retrieving template from URL.');
         };
-        
+
         return $templateRequest(options.templateUrl).then(success, error);
       }
-      
+
       reject('Template not provided.');
     });
   }
-  
+
   function logError(error) {
     busy = false;
     console.error(error);
   }
-  
+
   function escToClose(element) {
     var keyup = function (event) {
       if(event.keyCode === ESCAPE) {
         element.remove();
       }
     };
-    
+
     body.on('keyup', keyup);
-    
+
     element.on('$destroy', function () {
       body.off('keyup', keyup);
     });
@@ -487,7 +487,7 @@ function mdEditDialog($compile, $controller, $document, $mdUtil, $q, $rootScope,
   function focusOnOpen(element) {
     $mdUtil.nextTick(function () {
       var autofocus = $mdUtil.findFocusTarget(element);
-      
+
       if(autofocus) {
         autofocus.focus();
       }
@@ -496,101 +496,101 @@ function mdEditDialog($compile, $controller, $document, $mdUtil, $q, $rootScope,
 
   function positionDialog(element, target) {
     var table = angular.element(target).controller('mdCell').getTable();
-    
+
     var getHeight = function () {
       return element.prop('clientHeight');
     };
-    
+
     var getSize = function () {
       return {
         width: getWidth(),
         height: getHeight()
       };
     };
-    
+
     var getTableBounds = function () {
       var parent = table.parent();
-      
+
       if(parent.prop('tagName') === 'MD-TABLE-CONTAINER') {
         return parent[0].getBoundingClientRect();
       } else {
         return table[0].getBoundingClientRect();
       }
     };
-    
+
     var getWidth = function () {
       return element.prop('clientWidth');
     };
-    
+
     var reposition = function () {
       var size = getSize();
       var cellBounds = target.getBoundingClientRect();
       var tableBounds = getTableBounds();
-      
+
       if(size.width > tableBounds.right - cellBounds.left) {
         element.css('left', tableBounds.right - size.width + 'px');
       } else {
         element.css('left', cellBounds.left + 'px');
       }
-      
+
       if(size.height > tableBounds.bottom - cellBounds.top) {
         element.css('top', tableBounds.bottom - size.height + 'px');
       } else {
         element.css('top', cellBounds.top + 1 + 'px');
       }
-      
+
       element.css('minWidth', cellBounds.width + 'px');
     };
-    
+
     var watchWidth = $rootScope.$watch(getWidth, reposition);
     var watchHeight = $rootScope.$watch(getHeight, reposition);
-    
+
     $window.addEventListener('resize', reposition);
-    
+
     element.on('$destroy', function () {
       watchWidth();
       watchHeight();
-      
+
       $window.removeEventListener('resize', reposition);
     });
   }
-  
+
   function preset(size, options) {
-    
+
     function getAttrs() {
       var attrs = 'type="' + (options.type || 'text') + '"';
-      
+
       for(var attr in options.validators) {
         attrs += ' ' + attr + '="' + options.validators[attr] + '"';
       }
-      
+
       return attrs;
     }
-    
+
     return {
       controller: ['$element', '$q', 'save', '$scope', function ($element, $q, save, $scope) {
         function update() {
           if($scope.editDialog.$invalid) {
             return $q.reject();
           }
-          
+
           if(angular.isFunction(save)) {
             return $q.when(save($scope.editDialog.input));
           }
-          
+
           return $q.resolve();
         }
-        
+
         this.dismiss = function () {
           $element.remove();
         };
-        
+
         this.getInput = function () {
           return $scope.editDialog.input;
         };
-        
+
         $scope.dismiss = this.dismiss;
-        
+
         $scope.submit = function () {
           update().then(function () {
             $scope.dismiss();
@@ -616,6 +616,7 @@ function mdEditDialog($compile, $controller, $document, $mdUtil, $q, $rootScope,
             '<form name="editDialog" layout="column" ng-submit="submit(model)">' +
               '<md-input-container md-no-float>' +
                 '<input name="input" ng-model="model" md-autofocus placeholder="{{placeholder}} "' + getAttrs() + '>' +
+                '<div class="copy-button" ng-click="dismiss()">copy</div>' +
                 '<div ng-messages="editDialog.input.$error">' +
                   '<div ng-repeat="(key, message) in messages" ng-message="{{key}}">{{message}}</div>' +
                 '</div>' +
@@ -629,60 +630,60 @@ function mdEditDialog($compile, $controller, $document, $mdUtil, $q, $rootScope,
         '</md-edit-dialog>'
     };
   }
-  
+
   this.show = function (options) {
     if(busy) {
       return $q.reject();
     }
-    
+
     busy = true;
     options = angular.extend({}, defaultOptions, options);
-    
+
     if(!options.targetEvent) {
       return logError('options.targetEvent is required to align the dialog with the table cell.');
     }
-    
+
     if(!options.targetEvent.currentTarget.classList.contains('md-cell')) {
       return logError('The event target must be a table cell.');
     }
-    
+
     if(options.bindToController && !options.controllerAs) {
       return logError('You must define options.controllerAs when options.bindToController is true.');
     }
-    
+
     options.target = options.targetEvent.currentTarget;
-    
+
     var promise = getTemplate(options);
     var promises = [promise];
-    
+
     for(var prop in options.resolve) {
       promise = options.resolve[prop];
       promises.push($q.when(angular.isFunction(promise) ? promise() : promise));
     }
-    
+
     promise = $q.all(promises);
-    
+
     promise['catch'](logError);
-    
+
     return promise.then(function (results) {
       var template = results.shift();
-      
+
       for(var prop in options.resolve) {
         options.resolve[prop] = results.shift();
       }
-      
+
       return build(template, options);
     });
   };
-  
+
   this.small = function (options) {
     return this.show(angular.extend({}, options, preset('small', options)));
   }.bind(this);
-  
+
   this.large = function (options) {
     return this.show(angular.extend({}, options, preset('large', options)));
   }.bind(this);
-  
+
   return this;
 }
 
@@ -711,24 +712,24 @@ function mdHead($compile) {
     tElement.addClass('md-head');
     return postLink;
   }
-  
+
   // empty controller to be bind scope properties to
   function Controller() {
-    
+
   }
-  
+
   function postLink(scope, element, attrs, tableCtrl) {
     // because scope.$watch is unpredictable
     var oldValue = new Array(2);
-    
+
     function addCheckboxColumn() {
       element.children().prepend('<th class="md-column md-checkbox-column">');
     }
-    
+
     function attatchCheckbox() {
       element.prop('lastElementChild').firstElementChild.appendChild($compile(createCheckBox())(scope)[0]);
     }
-    
+
     function createCheckBox() {
       return angular.element('<md-checkbox>').attr({
         'aria-label': 'Select All',
@@ -737,43 +738,43 @@ function mdHead($compile) {
         'ng-disabled': '!getSelectableRows().length'
       });
     }
-    
+
     function detachCheckbox() {
       var cell = element.prop('lastElementChild').firstElementChild;
-      
+
       if(cell.classList.contains('md-checkbox-column')) {
         angular.element(cell).empty();
       }
     }
-    
+
     function enableRowSelection() {
       return tableCtrl.$$rowSelect;
     }
-    
+
     function mdSelectCtrl(row) {
       return angular.element(row).controller('mdSelect');
     }
-    
+
     function removeCheckboxColumn() {
       Array.prototype.some.call(element.find('th'), function (cell) {
         return cell.classList.contains('md-checkbox-column') && cell.remove();
       });
     }
-    
+
     scope.allSelected = function () {
       var rows = scope.getSelectableRows();
-      
+
       return rows.length && rows.every(function (row) {
         return row.isSelected();
       });
     };
-    
+
     scope.getSelectableRows = function () {
       return tableCtrl.getBodyRows().map(mdSelectCtrl).filter(function (ctrl) {
         return ctrl && !ctrl.disabled;
       });
     };
-    
+
     scope.selectAll = function () {
       tableCtrl.getBodyRows().map(mdSelectCtrl).forEach(function (ctrl) {
         if(ctrl && !ctrl.isSelected()) {
@@ -781,11 +782,11 @@ function mdHead($compile) {
         }
       });
     };
-    
+
     scope.toggleAll = function () {
       return scope.allSelected() ? scope.unSelectAll() : scope.selectAll();
     };
-    
+
     scope.unSelectAll = function () {
       tableCtrl.getBodyRows().map(mdSelectCtrl).forEach(function (ctrl) {
         if(ctrl && ctrl.isSelected()) {
@@ -793,12 +794,12 @@ function mdHead($compile) {
         }
       });
     };
-    
+
     scope.$watchGroup([enableRowSelection, tableCtrl.enableMultiSelect], function (newValue) {
       if(newValue[0] !== oldValue[0]) {
         if(newValue[0]) {
           addCheckboxColumn();
-          
+
           if(newValue[1]) {
             attatchCheckbox();
           }
@@ -812,11 +813,11 @@ function mdHead($compile) {
           detachCheckbox();
         }
       }
-      
+
       angular.copy(newValue, oldValue);
     });
   }
-  
+
   return {
     bindToController: true,
     compile: compile,
@@ -841,23 +842,23 @@ function mdRow() {
     tElement.addClass('md-row');
     return postLink;
   }
-  
+
   function postLink(scope, element, attrs, tableCtrl) {
     function enableRowSelection() {
       return tableCtrl.$$rowSelect;
     }
-    
+
     function isBodyRow() {
       return tableCtrl.getBodyRows().indexOf(element[0]) !== -1;
     }
-    
+
     function isChild(node) {
       return element[0].contains(node[0]);
     }
-    
+
     if(isBodyRow()) {
       var cell = angular.element('<td class="md-cell">');
-      
+
       scope.$watch(enableRowSelection, function (enable) {
         // if a row is not selectable, prepend an empty cell to it
         if(enable && !attrs.mdSelect) {
@@ -866,7 +867,7 @@ function mdRow() {
           }
           return;
         }
-        
+
         if(isChild(cell)) {
           cell.remove();
         }
@@ -1098,7 +1099,7 @@ angular.module('md.data.table').directive('mdTable', mdTable);
 
 function Hash() {
   var keys = {};
-  
+
   this.equals = function (key, item) {
     return keys[key] === item;
   };
@@ -1106,7 +1107,7 @@ function Hash() {
   this.get = function (key) {
     return keys[key];
   };
-  
+
   this.has = function (key) {
     return keys.hasOwnProperty(key);
   };
@@ -1114,145 +1115,145 @@ function Hash() {
   this.purge = function (key) {
     delete keys[key];
   };
-  
+
   this.update = function (key, item) {
     keys[key] = item;
   };
 }
 
 function mdTable() {
-  
+
   function compile(tElement, tAttrs) {
     tElement.addClass('md-table');
-    
+
     if(tAttrs.hasOwnProperty('mdProgress')) {
       var body = tElement.find('tbody')[0];
       var progress = angular.element('<thead class="md-table-progress" md-table-progress>');
-      
+
       if(body) {
         tElement[0].insertBefore(progress[0], body);
       }
     }
   }
-  
+
   function Controller($attrs, $element, $q, $scope) {
     var self = this;
     var queue = [];
     var watchListener;
     var modelChangeListeners = [];
-    
+
     self.$$hash = new Hash();
     self.$$columns = {};
-    
+
     function enableRowSelection() {
       self.$$rowSelect = true;
-      
+
       watchListener = $scope.$watchCollection('$mdTable.selected', function (selected) {
         modelChangeListeners.forEach(function (listener) {
           listener(selected);
         });
       });
-      
+
       $element.addClass('md-row-select');
     }
-    
+
     function disableRowSelection() {
       self.$$rowSelect = false;
-      
+
       if(angular.isFunction(watchListener)) {
         watchListener();
       }
-      
+
       $element.removeClass('md-row-select');
     }
-    
+
     function resolvePromises() {
       if(!queue.length) {
         return $scope.$applyAsync();
       }
-      
+
       queue[0]['finally'](function () {
         queue.shift();
         resolvePromises();
       });
     }
-    
+
     function rowSelect() {
       return $attrs.mdRowSelect === '' || self.rowSelect;
     }
-    
+
     function validateModel() {
       if(!self.selected) {
         return console.error('Row selection: ngModel is not defined.');
       }
-      
+
       if(!angular.isArray(self.selected)) {
         return console.error('Row selection: Expected an array. Recived ' + typeof self.selected + '.');
       }
-      
+
       return true;
     }
-    
+
     self.columnCount = function () {
       return self.getRows($element[0]).reduce(function (count, row) {
         return row.cells.length > count ? row.cells.length : count;
       }, 0);
     };
-    
+
     self.getRows = function (element) {
       return Array.prototype.filter.call(element.rows, function (row) {
         return !row.classList.contains('ng-leave');
       });
     };
-    
+
     self.getBodyRows = function () {
       return Array.prototype.reduce.call($element.prop('tBodies'), function (result, tbody) {
         return result.concat(self.getRows(tbody));
       }, []);
     };
-    
+
     self.getElement = function () {
       return $element;
     };
-    
+
     self.getHeaderRows = function () {
       return self.getRows($element.prop('tHead'));
     };
-    
+
     self.enableMultiSelect = function () {
       return $attrs.multiple === '' || $scope.$eval($attrs.multiple);
     };
-    
+
     self.waitingOnPromise = function () {
       return !!queue.length;
     };
-    
+
     self.queuePromise = function (promise) {
       if(!promise) {
         return;
       }
-      
+
       if(queue.push(angular.isArray(promise) ? $q.all(promise) : $q.when(promise)) === 1) {
         resolvePromises();
       }
     };
-    
+
     self.registerModelChangeListener = function (listener) {
       modelChangeListeners.push(listener);
     };
-    
+
     self.removeModelChangeListener = function (listener) {
       var index = modelChangeListeners.indexOf(listener);
-      
+
       if(index !== -1) {
         modelChangeListeners.splice(index, 1);
       }
     };
-    
+
     if($attrs.hasOwnProperty('mdProgress')) {
       $scope.$watch('$mdTable.progress', self.queuePromise);
     }
-    
+
     $scope.$watch(rowSelect, function (enable) {
       if(enable && !!validateModel()) {
         enableRowSelection();
@@ -1261,9 +1262,9 @@ function mdTable() {
       }
     });
   }
-  
+
   Controller.$inject = ['$attrs', '$element', '$q', '$scope'];
-  
+
   return {
     bindToController: true,
     compile: compile,

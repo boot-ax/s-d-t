@@ -31,6 +31,11 @@ $scope.getRegistrarsFunc = function(){
   this.cancel = $mdDialog.cancel;
 
   function success(domains_table) {
+    $mdToast.show(
+        $mdToast.simple()
+          .textContent('New Content Added')
+          .hideDelay(3000)
+      );
     $mdDialog.hide(domains_table);
   }
 
