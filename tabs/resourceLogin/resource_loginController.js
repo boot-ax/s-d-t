@@ -1,4 +1,4 @@
-angular.module('SE_App').controller('resource_loginController', ['$mdDialog','$resource_login', '$scope', '$mdEditDialog', '$http',function ($mdDialog, $resource_login, $scope, $mdEditDialog, $http) {
+angular.module('SE_App').controller('resource_loginController', ['$mdDialog','$resource_login', '$scope', '$mdEditDialog', '$http','$q',function ($mdDialog, $resource_login, $scope, $mdEditDialog, $http,$q) {
   'use strict';
 
   var bookmark;

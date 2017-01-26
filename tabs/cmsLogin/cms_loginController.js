@@ -1,4 +1,4 @@
-angular.module('SE_App').controller('cms_loginController', ['$mdDialog','$cms_login', '$scope', '$mdEditDialog', '$http',function ($mdDialog, $cms_login, $scope, $mdEditDialog, $http) {
+angular.module('SE_App').controller('cms_loginController', ['$mdDialog','$cms_login', '$scope', '$mdEditDialog', '$http','$q',function ($mdDialog, $cms_login, $scope, $mdEditDialog, $http,$q) {
   'use strict';
 
   var bookmark;

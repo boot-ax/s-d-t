@@ -3,7 +3,7 @@ width:100%;
 }
 
 .scroll {
-overflow: scroll;	
+overflow: scroll;
 }
 
 .mdl-card__supporting-text{
@@ -39,7 +39,7 @@ label { float:right;}
 	color:blue;
 	text-transform: lowercase;}
 
-
-
-
-
+	.copy-button{
+		font-size: .9em;
+		margin-top: 4px;
+	}

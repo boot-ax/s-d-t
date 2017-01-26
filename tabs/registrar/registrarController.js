@@ -1,7 +1,7 @@
 
 
 
-angular.module('SE_App').controller('registrarController', ['$mdDialog','$registrar', '$scope', '$mdEditDialog', '$http',function ($mdDialog, $registrar, $scope, $mdEditDialog, $http) {
+angular.module('SE_App').controller('registrarController', ['$mdDialog','$registrar', '$scope', '$mdEditDialog', '$http','$q',function ($mdDialog, $registrar, $scope, $mdEditDialog, $http,$q) {
   'use strict';
 
   var bookmark;
