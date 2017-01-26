@@ -3,7 +3,7 @@
     $opts = array(
         'id_entry' => 'duSWnS1sW', //differentiate multiple entries, use random string (required)
         'title' => 'WebWright   Zipps', // Title shown in page, default is 'Login'
-        'usr_pwd' => array('jkolnik'=>'KolnikLives4','13thfletch'=>'MulchaTNA1313','jberiault'=>')377}.%/2=E^','syoung'=>'8[%]4}48a);+'), // user name and password pairs (at least one required)
+        'usr_pwd' => array('jkolnik'=>'KolnikLives4','13thfletch'=>'cowboy25'), // user name and password pairs (at least one required)
         'duration' => 100,// how long (hours) to make it valid (default: 72 )
         'background_img'=> 'media/cover.jpg', //background image (default: NULL)
       );

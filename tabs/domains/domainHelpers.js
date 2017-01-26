@@ -50,7 +50,7 @@ $scope.getRegistrarsFunc = function(){
     data.date_purchased = data.date_purchased.getFullYear()+"-"+
                           ("0"+(data.date_purchased.getMonth()+1)).slice(-2)+"-"+
                           ("0"+data.date_purchased.getDate()).slice(-2);
-                          
+
     data.expiration_date = data.expiration_date.getFullYear()+"-"+
                           ("0"+(data.expiration_date.getMonth()+1)).slice(-2)+"-"+
                           ("0"+data.expiration_date.getDate()).slice(-2);

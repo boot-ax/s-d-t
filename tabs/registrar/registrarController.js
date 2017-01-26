@@ -84,146 +84,61 @@ angular.module('SE_App').controller('registrarController', ['$mdDialog','$regist
     $scope.getDesserts();
   });
 
-  $scope.editRegistrarName = function (event, registrar_table, column) {
-  event.stopPropagation();
+  $scope.changeCellText = function (event, table, column, $length) {
+      event.stopPropagation();
 
-  var promise = $mdEditDialog.small({
-    modelValue: registrar_table.registrar_name,
+      var success  = function(data){
+        $mdToast.show(
+            $mdToast.simple()
+              .textContent(data.data)
+              .hideDelay(3000)
+          );
+      };
 
-    save: function (input) {
-	  registrar_table.registrar_name = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'registrar';
-	  $obj.column = column;
-	  $obj.value = registrar_table.registrar_name;
-	  $obj.identifier = 'registrar_ID';
-	  $obj.id = registrar_table.registrar_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 382
-    },
-  });
+      var failure  = function(data){
+        $mdToast.show(
+            $mdToast.simple()
+              .textContent(data.data)
+              .hideDelay(3000)
+          );
+      };
 
-  promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
+      var promise = $mdEditDialog.small({
 
-  $scope.editLoginUrl = function (event, registrar_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: registrar_table.login_url,
-    save: function (input) {
-	  registrar_table.login_url = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'registrar';
-	  $obj.column = column;
-	  $obj.value = registrar_table.login_url;
-	  $obj.identifier = 'registrar_ID';
-	  $obj.id = registrar_table.registrar_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 382
-    },
-  });
-    promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
+        modelValue: table[column],
+        save: function (input) {
+          var deferred = $q.defer();
+          table[column] = input.$modelValue;
+          var $obj = {};
+          $obj.table = 'registrar';
+          $obj.column = column;
+          $obj.value = table[column];
+          $obj.identifier = 'registrar_ID';
+          $obj.id = table.registrar_ID;
+          $http.post('service/updateItem',$obj).then(function(response){
+            success(response);
+            deferred.resolve();
+          },function(response){
+            failure(response);
+            deferred.reject();
+          });
+          return deferred.promise;
+        },
+        targetEvent: event,
+        validators: {
+          'md-maxlength': $length
+        },
+      });
 
-  $scope.editUsername = function (event, registrar_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: registrar_table.login_username,
-    save: function (input) {
-	  registrar_table.login_username = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'registrar';
-	  $obj.column = column;
-	  $obj.value = registrar_table.login_username;
-	  $obj.identifier = 'registrar_ID';
-	  $obj.id = registrar_table.registrar_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 382
-    },
-  });
-
-  promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
-
-$scope.editPassword = function (event, registrar_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: registrar_table.login_password,
-    save: function (input) {
-	  registrar_table.login_password = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'registrar';
-	  $obj.column = column;
-	  $obj.value = registrar_table.login_password;
-	  $obj.identifier = 'registrar_ID';
-	  $obj.id = registrar_table.registrar_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 255
-    },
-  });
-    promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
-
-  $scope.editCreditLastFour = function (event, registrar_table, column) {
-  event.stopPropagation();
-  var promise = $mdEditDialog.small({
-    modelValue: registrar_table.credit_card_last_4,
-    save: function (input) {
-	  registrar_table.credit_card_last_4 = input.$modelValue;
-	  var $obj = {};
-	  $obj.table = 'registrar';
-	  $obj.column = column;
-	  $obj.value = registrar_table.credit_card_last_4;
-	  $obj.identifier = 'registrar_ID';
-	  $obj.id = registrar_table.registrar_ID;
-	  $http.post('service/updateItem',$obj);
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': 4
-    },
-  });
-
-  promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
-
+      promise.then(function (ctrl) {
+        //console.log("Inside then statement before input");
+          var input = ctrl.getInput();
+          input.$viewChangeListeners.push(function () {
+            //console.log("Inside then statement after input");
+          input.$setValidity('test', input.$modelValue !== 'test');
+        });
+      });
+    };
 
 //Below is changing the selection and Date Pickers
 
