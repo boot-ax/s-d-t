@@ -1,5 +1,5 @@
 
-angular.module('SE_App').controller('domainController', ['$mdDialog','$domains', '$scope', '$mdEditDialog', '$http',function ($mdDialog, $domains, $scope, $mdEditDialog, $http) {
+angular.module('SE_App').controller('domainController', ['$mdDialog','$domains', '$scope', '$mdEditDialog', '$http','$mdToast','$q',function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q) {
   'use strict';
 
   var bookmark;
@@ -85,43 +85,68 @@ angular.module('SE_App').controller('domainController', ['$mdDialog','$domains',
     if(newValue !== oldValue) {
       $scope.query.page = 1;
     }
-
     if(!newValue) {
       $scope.query.page = bookmark;
     }
-
     $scope.getDesserts();
   });
 
-    $scope.changeCellText = function (event, table, column, $length) {
-    event.stopPropagation();
 
-    var promise = $mdEditDialog.small({
-      modelValue: table[column],
+  $scope.changeCellText = function (event, table, column, $length) {
+      event.stopPropagation();
 
-      save: function (input) {
-        table[column] = input.$modelValue;
-        var $obj = {};
-        $obj.table = 'domains';
-        $obj.column = column;
-        $obj.value = table[column];
-        $obj.identifier = 'domain_ID';
-        $obj.id = table.domain_ID;
-        $http.post('service/updateItem',$obj);
-      },
-      targetEvent: event,
-      validators: {
-        'md-maxlength': $length
-      },
-    });
+      var success  = function(data){
+        $mdToast.show(
+            $mdToast.simple()
+              .textContent(data.data)
+              .hideDelay(3000)
+          );
+      };
 
-    promise.then(function (ctrl) {
-      var input = ctrl.getInput();
-      input.$viewChangeListeners.push(function () {
-        input.$setValidity('test', input.$modelValue !== 'test');
+      var failure  = function(data){
+        $mdToast.show(
+            $mdToast.simple()
+              .textContent(data.data)
+              .hideDelay(3000)
+          );
+      };
+
+      var promise = $mdEditDialog.small({
+
+        modelValue: table[column],
+        save: function (input) {
+          var deferred = $q.defer();
+          table[column] = input.$modelValue;
+          var $obj = {};
+          $obj.table = 'domains';
+          $obj.column = column;
+          $obj.value = table[column];
+          $obj.identifier = 'domain_ID';
+          $obj.id = table.domain_ID;
+          $http.post('service/updateItem',$obj).then(function(response){
+            success(response);
+            deferred.resolve();
+          },function(response){
+            failure(response);
+            deferred.reject();
+          });
+          return deferred.promise;
+        },
+        targetEvent: event,
+        validators: {
+          'md-maxlength': $length
+        },
       });
-    });
-  };
+
+      promise.then(function (ctrl) {
+        //console.log("Inside then statement before input");
+          var input = ctrl.getInput();
+          input.$viewChangeListeners.push(function () {
+            //console.log("Inside then statement after input");
+          input.$setValidity('test', input.$modelValue !== 'test');
+        });
+      });
+    };
 
 
 

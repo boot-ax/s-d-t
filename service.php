@@ -22,20 +22,22 @@ exit();
 	$entityBody2 = json_decode($entityBody,true);
 
 
-	// build query...
+ // build query...
    $sql  = "INSERT INTO cms_login";
    // implode keys of $array...
    $sql .= " (`".implode("`, `", array_keys($entityBody2['cms_login_table']))."`)";
    // implode values of $array...
-   $sql .= " VALUES ('".implode("', '", $entityBody2['cms_login_table'])."');";
+   $sql .= " VALUES (''".implode("'', ''", mysqli_real_escape_string($con,$entityBody2['cms_login_table']))."'');";
 
- // execute query...
+ //execute query...
+
   $qry_result = mysqli_query($con, $sql);
+
   if($qry_result){
-	  Flight::halt(200,"Registrar added.");
+   Flight::halt(200,"CMS Info Added.");
   }else{
-	  Flight::halt(500,mysqli_error($con));
-	  //die(mysqli_error($con));
+   Flight::halt(500,mysqli_error($con));
+   //die(mysqli_error($con));
   }
 	}
 });
@@ -56,27 +58,17 @@ exit();
 	$entityBody = str_replace('\\u0000', '', $entityBody);
 	$entityBody2 = json_decode($entityBody,true);
 
-
-
-// 	function alter(&$value, $key){
-//     if($key == 'date_purchased' OR $key == 'expiration_date'){
-// 	$value = date('Y-m-d',strtotime($value));
-// 	} else {$value;}
-// }
-
-	// array_walk($entityBody2['domains_table'],'alter');
-
 	// build query...
    $sql  = "INSERT INTO domains";
    // implode keys of $array...
    $sql .= " (`".implode("`, `", array_keys($entityBody2['domains_table']))."`)";
    // implode values of $array...
-   $sql .= " VALUES ('".implode("', '", $entityBody2['domains_table'])."');";
+   $sql .= " VALUES (''".implode("'', ''", mysqli_real_escape_string($con,$entityBody2['domains_table']))."'');";
 
    // execute query...
   $qry_result = mysqli_query($con, $sql);
   if($qry_result){
-	  Flight::halt(200,"Registrar added.");
+	  Flight::halt(200,"Domain Added.");
   }else{
 	  Flight::halt(500,mysqli_error($con));
 	  //die(mysqli_error($con));
@@ -105,12 +97,12 @@ exit();
    // implode keys of $array...
    $sql .= " (`".implode("`, `", array_keys($entityBody2['resource_login_table']))."`)";
    // implode values of $array...
-   $sql .= " VALUES ('".implode("', '", $entityBody2['resource_login_table'])."');";
+	 $sql .= " VALUES ('".implode("', '", mysqli_real_escape_string($con,$entityBody2['resource_login_table']))."');";
 
  // execute query...
   $qry_result = mysqli_query($con, $sql);
   if($qry_result){
-	  Flight::halt(200,"Registrar added.");
+	  Flight::halt(200,"Resource login Added.");
   }else{
 	  Flight::halt(500,mysqli_error($con));
 	  //die(mysqli_error($con));
@@ -135,26 +127,17 @@ exit();
 	$entityBody2 = json_decode($entityBody,true);
 
 
-//
-// 	function alter(&$value, $key){
-//     if($key == 'date_purchased' OR $key == 'expiration_date'){
-// 	$value = date('Y-m-d',strtotime($value));
-// 	} else {$value;}
-// }
-
-	//array_walk($entityBody2['W2_accounts_table'],'alter');
-
 	// build query...
    $sql  = "INSERT INTO W2_accounts";
    // implode keys of $array...
    $sql .= " (`".implode("`, `", array_keys($entityBody2['W2_accounts_table']))."`)";
    // implode values of $array...
-   $sql .= " VALUES ('".implode("', '", $entityBody2['W2_accounts_table'])."');";
+	 $sql .= " VALUES ('".implode("', '", mysqli_real_escape_string($con,$entityBody2['W2_accounts_table']))."');";
 
  // execute query...
   $qry_result = mysqli_query($con, $sql);
   if($qry_result){
-	  Flight::halt(200,"Registrar added.");
+	  Flight::halt(200,"W2 Account Added.");
   }else{
 	  Flight::halt(500,mysqli_error($con));
 	  //die(mysqli_error($con));
@@ -179,26 +162,17 @@ exit();
 	$entityBody2 = json_decode($entityBody,true);
 
 
-
-// 	function alter(&$value, $key){
-//     if($key == 'date_started' OR $key == 'expiration_date'){
-// 	$value = date('Y-m-d',strtotime($value));
-// 	} else {$value;}
-// }
-
-	//array_walk($entityBody2['hosting_table'],'alter');
-
 	// build query...
    $sql  = "INSERT INTO hosting";
    // implode keys of $array...
    $sql .= " (`".implode("`, `", array_keys($entityBody2['hosting_table']))."`)";
    // implode values of $array...
-   $sql .= " VALUES ('".implode("', '", $entityBody2['hosting_table'])."');";
+	 $sql .= " VALUES ('".implode("', '", mysqli_real_escape_string($con,$entityBody2['hosting_table']))."');";
 
  // execute query...
   $qry_result = mysqli_query($con, $sql);
   if($qry_result){
-	  Flight::halt(200,"Registrar added.");
+	  Flight::halt(200,"Host Added.");
   }else{
 	  Flight::halt(500,mysqli_error($con));
 	  //die(mysqli_error($con));
@@ -219,25 +193,18 @@ exit();
 	$entityBody = str_replace('\\u0000', '', $entityBody);
 	$entityBody2 = json_decode($entityBody,true);
 
-// 	function alter(&$value, $key){
-//     if($key == 'date_started' OR $key == 'expiration_date'){
-// 	$value = date('Y-m-d',strtotime($value));
-// 	} else {$value;}
-// }
-
-	//array_walk($entityBody2['person_table'],'alter');
 
 	// build query...
    $sql  = "INSERT INTO person";
    // implode keys of $array...
    $sql .= " (`".implode("`, `", array_keys($entityBody2['person_table']))."`)";
    // implode values of $array...
-   $sql .= " VALUES ('".implode("', '", $entityBody2['person_table'])."');";
+	 $sql .= " VALUES ('".implode("', '", mysqli_real_escape_string($con,$entityBody2['person_table']))."');";
 
   // execute query...
   $qry_result = mysqli_query($con, $sql);
   if($qry_result){
-	  Flight::halt(200,"Registrar added.");
+	  Flight::halt(200,"Person Added.");
   }else{
 	  Flight::halt(500,mysqli_error($con));
 	  //die(mysqli_error($con));
@@ -259,25 +226,17 @@ exit();
 	var_dump($entityBody);
 	$entityBody2 = json_decode($entityBody,true);
 
-// 	function alter(&$value, $key){
-//     if($key == 'date_created'){
-// 	$value = date('Y-m-d',strtotime($value));
-// 	} else {$value;}
-// }
-
-	//array_walk($entityBody2['links_table'],'alter');
-
 	// build query...
    $sql  = "INSERT INTO links";
    // implode keys of $array...
    $sql .= " (`".implode("`, `", array_keys($entityBody2['links_table']))."`)";
    // implode values of $array...
-   $sql .= " VALUES ('".implode("', '", $entityBody2['links_table'])."');";
+	 $sql .= " VALUES ('".implode("', '", mysqli_real_escape_string($con,$entityBody2['links_table']))."');";
 
  // execute query...
   $qry_result = mysqli_query($con, $sql);
   if($qry_result){
-	  Flight::halt(200,"Registrar added.");
+	  Flight::halt(200,"Link Added.");
   }else{
 	  Flight::halt(500,mysqli_error($con));
 	  //die(mysqli_error($con));
@@ -299,20 +258,12 @@ exit();
 	var_dump($entityBody);
 	$entityBody2 = json_decode($entityBody,true);
 
-// 	function alter(&$value, $key){
-//     if($key == 'date_created'){
-// 	$value = date('Y-m-d',strtotime($value));
-// 	} else {$value;}
-// }
-
-	//array_walk($entityBody2['links_table'],'alter');
-
 	// build query...
    $sql  = "INSERT INTO change_log";
    // implode keys of $array...
    $sql .= " (`".implode("`, `", array_keys($entityBody2['change_log_table']))."`)";
    // implode values of $array...
-   $sql .= " VALUES ('".implode("', '", $entityBody2['change_log_table'])."');";
+	 $sql .= " VALUES ('".implode("', '", mysqli_real_escape_string($con,$entityBody2['change_log_table']))."');";
 
  // execute query...
   $qry_result = mysqli_query($con, $sql);
@@ -341,25 +292,18 @@ exit();
 	$entityBody = str_replace('\\u0000', '', $entityBody);
 	$entityBody2 = json_decode($entityBody,true);
 
-// 	function alter(&$value, $key){
-//     if($key == 'date_started' OR $key == 'expiration_date'){
-// 	$value = date('Y-m-d',strtotime($value));
-// 	} else {$value;}
-// }
-
-	//array_walk($entityBody2['registrar_table'],'alter');
 
 	// build query...
    $sql  = "INSERT INTO registrar";
    // implode keys of $array...
    $sql .= " (`".implode("`, `", array_keys($entityBody2['registrar_table']))."`)";
    // implode values of $array...
-   $sql .= " VALUES ('".implode("', '", $entityBody2['registrar_table'])."');";
+	 $sql .= " VALUES ('".implode("', '", mysqli_real_escape_string($con,$entityBody2['registrar_table']))."');";
 
    // execute query...
   $qry_result = mysqli_query($con, $sql);
   if($qry_result){
-	  Flight::halt(200,"Registrar added.");
+	  Flight::halt(200,"Registrar Added.");
   }else{
 	  Flight::halt(500,mysqli_error($con));
 	  //die(mysqli_error($con));
@@ -390,7 +334,7 @@ Flight::route('GET /service/hosting', function(){
 
 	$start_from = ($page-1) * $limit;
 
-	
+
 
 	$sql_query = "SELECT SQL_CALC_FOUND_ROWS hosting_name,login_url,username,password,date_started,expiration_date,creditcard_last_4,setup_domain,hosting_ID FROM hosting
 
@@ -416,7 +360,7 @@ Flight::route('GET /service/hosting', function(){
 		$qry_result = mysqli_query($con, "SELECT FOUND_ROWS()");
 		$num_rows = mysqli_fetch_array($qry_result);
 		$newArray = array('page'=>$page,'count'=>$num_rows[0],'data'=>$rows);
-		
+
 
 
 	Flight::json($newArray);
@@ -472,7 +416,7 @@ Flight::route('GET /service/person', function(){
 		$qry_result = mysqli_query($con, "SELECT FOUND_ROWS()");
 		$num_rows = mysqli_fetch_array($qry_result);
 		$newArray = array('page'=>$page,'count'=>$num_rows[0],'data'=>$rows);
-		
+
 
 
 	Flight::json($newArray);
@@ -528,7 +472,7 @@ Flight::route('GET /service/links', function(){
 		$qry_result = mysqli_query($con, "SELECT FOUND_ROWS()");
 		$num_rows = mysqli_fetch_array($qry_result);
 		$newArray = array('page'=>$page,'count'=>$num_rows[0],'data'=>$rows);
-		
+
 
 
 	Flight::json($newArray);
@@ -564,8 +508,8 @@ Flight::route('GET /service/change_log', function(){
 
 
 					LEFT JOIN `person` ON change_log.person_ID = person.person_ID
-					
-					
+
+
 					WHERE (`issue` LIKE '%".$filter."%')
 					OR (`date_entered` LIKE '%".$filter."%')
 					OR (`completed` LIKE '%".$filter."%')
@@ -585,7 +529,7 @@ Flight::route('GET /service/change_log', function(){
 		$qry_result = mysqli_query($con, "SELECT FOUND_ROWS()");
 		$num_rows = mysqli_fetch_array($qry_result);
 		$newArray = array('page'=>$page,'count'=>$num_rows[0],'data'=>$rows);
-		
+
 
 
 	Flight::json($newArray);
@@ -643,7 +587,7 @@ Flight::route('GET /service/registrar', function(){
 		$qry_result = mysqli_query($con, "SELECT FOUND_ROWS()");
 		$num_rows = mysqli_fetch_array($qry_result);
 		$newArray = array('page'=>$page,'count'=>$num_rows[0],'data'=>$rows);
-		
+
 
 
 	Flight::json($newArray);
@@ -701,7 +645,7 @@ Flight::route('GET /service/resource_login', function(){
 		$qry_result = mysqli_query($con, "SELECT FOUND_ROWS()");
 		$num_rows = mysqli_fetch_array($qry_result);
 		$newArray = array('page'=>$page,'count'=>$num_rows[0],'data'=>$rows);
-		
+
 
 
 	Flight::json($newArray);
@@ -759,7 +703,7 @@ Flight::route('GET /service/W2_accounts', function(){
 		$qry_result = mysqli_query($con, "SELECT FOUND_ROWS()");
 		$num_rows = mysqli_fetch_array($qry_result);
 		$newArray = array('page'=>$page,'count'=>$num_rows[0],'data'=>$rows);
-		
+
 
 
 	Flight::json($newArray);
@@ -878,7 +822,7 @@ Flight::route('GET /service/cms_login', function(){
 		$qry_result = mysqli_query($con, "SELECT FOUND_ROWS()");
 		$num_rows = mysqli_fetch_array($qry_result);
 		$newArray = array('page'=>$page,'count'=>$num_rows[0],'data'=>$rows);
-		
+
 
 
 	Flight::json($newArray);
@@ -1094,28 +1038,17 @@ Flight::route('/service/updateItem', function(){
 	$entityBody = str_replace('\\u0000', '', $entityBody);
 	$entityBody2 = json_decode($entityBody,true);
 
-// 	function alter(&$value, $key){
-//     if($key == 'expiration_date'){
-// 	$value = date('y-m-d',strtotime($value));
-// 	} else {$value;}
-// }
-//
-//
-
-	// if($entityBody2["column"] == 'date_purchased' OR $entityBody2["column"] == 'expiration_date'){
-	// 	$entityBody2['value']= date('Y-m-d',strtotime($entityBody2['value']));
-	// 	};
-
 
 
 	// build query...
-   $sql  = "UPDATE " . $entityBody2['table'] . " SET " . $entityBody2['column'] . "='" . $entityBody2['value'] . "'";
+   $sql  = "UPDATE " . $entityBody2['table'] . " SET " . $entityBody2['column'] . "=\"" . $entityBody2['value'] . "\"";
+  //$sql  = "UPDATE " . $entityBody2['table'] . " SET " . $entityBody2['column'] . "='" . mysqli_real_escape_string($con,$entityBody2['value']) . "'";
    $sql .= " WHERE " . $entityBody2['identifier']. "=" . $entityBody2['id'];
 
  // execute query...
   $qry_result = mysqli_query($con, $sql);
   if($qry_result){
-	  Flight::halt(200,"Registrar added.");
+	  Flight::halt(200,$entityBody2['column'] . ": Updated");
   }else{
 	  Flight::halt(500,mysqli_error($con));
 	  //die(mysqli_error($con));

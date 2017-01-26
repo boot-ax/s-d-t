@@ -85,6 +85,22 @@ angular.module('SE_App').controller('personController', ['$mdDialog','$person', 
   $scope.changeCellText = function (event, table, column, $length) {
     event.stopPropagation();
 
+    var success  = function(data){
+      $mdToast.show(
+          $mdToast.simple()
+            .textContent(data.data)
+            .hideDelay(3000)
+        );
+    };
+
+    var failure  = function(data){
+      $mdToast.show(
+          $mdToast.simple()
+            .textContent(data.data)
+            .hideDelay(3000)
+        );
+    };
+
     var promise = $mdEditDialog.small({
       modelValue: table[column],
 
@@ -96,7 +112,14 @@ angular.module('SE_App').controller('personController', ['$mdDialog','$person', 
         $obj.value = table[column];
         $obj.identifier = 'person_ID';
         $obj.id = table.person_ID;
-        $http.post('service/updateItem',$obj);
+        $http.post('service/updateItem',$obj).then(function(response){
+          success(response);
+          deferred.resolve();
+        },function(response){
+          failure(response);
+          deferred.reject();
+        });
+        return deferred.promise;
       },
       targetEvent: event,
       validators: {
@@ -105,8 +128,8 @@ angular.module('SE_App').controller('personController', ['$mdDialog','$person', 
     });
 
     promise.then(function (ctrl) {
-      var input = ctrl.getInput();
-      input.$viewChangeListeners.push(function () {
+        var input = ctrl.getInput();
+        input.$viewChangeListeners.push(function () {
         input.$setValidity('test', input.$modelValue !== 'test');
       });
     });
