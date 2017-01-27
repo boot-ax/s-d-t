@@ -1,5 +1,7 @@
 
-angular.module('SE_App').controller('domainController', ['$mdDialog','$domains', '$scope', '$mdEditDialog', '$http','$mdToast','$q',function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q) {
+angular.module('SE_App').controller('domainController', ['$mdDialog','$domains', '$scope', '$mdEditDialog', '$http','$mdToast',
+'$q','changeCellServices',
+function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q,changeCellServices) {
   'use strict';
 
   var bookmark;
@@ -71,7 +73,6 @@ angular.module('SE_App').controller('domainController', ['$mdDialog','$domains',
   $scope.removeFilter = function () {
     $scope.filter.show = false;
     $scope.query.filter = '';
-
     if($scope.filter.form.$dirty) {
       $scope.filter.form.$setPristine();
     }
@@ -81,7 +82,6 @@ angular.module('SE_App').controller('domainController', ['$mdDialog','$domains',
     if(!oldValue) {
       bookmark = $scope.query.page;
     }
-
     if(newValue !== oldValue) {
       $scope.query.page = 1;
     }
@@ -91,64 +91,13 @@ angular.module('SE_App').controller('domainController', ['$mdDialog','$domains',
     $scope.getDesserts();
   });
 
+$scope.changeCellText = changeCellServices.changeCellText;
 
-  $scope.changeCellText = function (event, table, column, $length) {
-      event.stopPropagation();
+$scope.changeDate = changeCellServices.changeDate;
 
-      var success  = function(data){
-        $mdToast.show(
-            $mdToast.simple()
-              .textContent(data.data)
-              .hideDelay(3000)
-          );
-      };
+$scope.changeDropdown = changeCellServices.changeDropdown;
 
-      var failure  = function(data){
-        $mdToast.show(
-            $mdToast.simple()
-              .textContent(data.data)
-              .hideDelay(3000)
-          );
-      };
-
-      var promise = $mdEditDialog.small({
-
-        modelValue: table[column],
-        save: function (input) {
-          var deferred = $q.defer();
-          table[column] = input.$modelValue;
-          var $obj = {};
-          $obj.table = 'domains';
-          $obj.column = column;
-          $obj.value = table[column];
-          $obj.identifier = 'domain_ID';
-          $obj.id = table.domain_ID;
-          $http.post('service/updateItem',$obj).then(function(response){
-            success(response);
-            deferred.resolve();
-          },function(response){
-            failure(response);
-            deferred.reject();
-          });
-          return deferred.promise;
-        },
-        targetEvent: event,
-        validators: {
-          'md-maxlength': $length
-        },
-      });
-
-      promise.then(function (ctrl) {
-        //console.log("Inside then statement before input");
-          var input = ctrl.getInput();
-          input.$viewChangeListeners.push(function () {
-            //console.log("Inside then statement after input");
-          input.$setValidity('test', input.$modelValue !== 'test');
-        });
-      });
-    };
-
-
+$scope.changeSwitchValue = changeCellServices.changeSwitchValue;
 
 //Below is changing the selection and Date Pickers
 
@@ -164,43 +113,6 @@ $scope.expiration_date = function(domains_table){
 	return dateFromDataBase;
 	};
 
-  $scope.changeDropdown = function(column, value, table){
-  var $obj = {};
-  $obj.table = 'domains';
-  	  $obj.column = column;
-  	  $obj.value = table[value];
-  	  $obj.identifier = 'domain_ID';
-  	  $obj.id = table.domain_ID;
-
-  $http.post('/service/updateItem', $obj);
-  };
-
-
-
- $scope.ChangeSwitchValue = function(column, table){
- 	  var $obj = {};
-    $obj.table = 'domains';
-    $obj.column = column;
-    $obj.value = table[column];
-    $obj.identifier = 'domain_ID';
-    $obj.id = table.domain_ID;
-    $http.post('/service/updateItem', $obj);
-  };
-
-$scope.changeDate = function(column, table){
-    var $obj = {};
-    $obj.table = 'domains';
-    $obj.column = column;
-    $obj.value = table[column];
-    $obj.value = table[column].getFullYear()+"-"+
-    ("0"+(table[column].getMonth()+1)).slice(-2)+"-"+
-    ("0"+table[column].getDate()).slice(-2);
-    $obj.identifier = 'domain_ID';
-    $obj.id = table.domain_ID;
-    $http.post('/service/updateItem', $obj);
-  };
-
-
 $scope.getHostsFunc = function(){
 	$http.get('service/gethosts')
 .then(function(response){
@@ -211,7 +123,6 @@ $scope.getHostsFunc = function(){
 $scope.getRegistrarsFunc = function(){
 	$http.get('service/getregistrars')
 		.then(function(response){
-
 	$scope.getRegistrars = response.data;
 	});
 };
