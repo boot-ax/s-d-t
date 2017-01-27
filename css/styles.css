@@ -39,7 +39,14 @@ label { float:right;}
 	color:blue;
 	text-transform: lowercase;}
 
-	.copy-button{
-		font-size: .9em;
-		margin-top: 4px;
+	.md-content .copy-button{
+		font-size: 1em;
+		margin-top: 8px;
+		color:#4286f4;
+		-webkit-transition: font-size 0.3s; /* For Safari 3.1 to 6.0 */
+    transition: font-size 0.3s;
 	}
+
+	.md-content .copy-button:hover{
+		font-size:1.5em;
+		text-shadow: .3px .3px grey;}

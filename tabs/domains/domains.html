@@ -56,37 +56,37 @@
     </thead>
     <tbody md-body>
       <tr md-row md-select="domains_table" md-select-id="name" ng-repeat="domains_table in domains_tables.data">
-        <td md-cell="" ng-click="changeCellText($event, domains_table, 'domain_name',253)" placeholder="{{domains_table.domain_name}} "
+        <td md-cell="" ng-click="changeCellText($event, domains_table, 'domain_name','domains','domain_ID',253)" placeholder="{{domains_table.domain_name}} "
         aria-label="domains_table.domain_name" class="md-cell ng-binding md-clickable" tabindex="0">{{domains_table.domain_name}}</td>
-        <td md-cell="" ng-click="changeCellText($event, domains_table, 'ip_address',40)" placeholder="{{domains_table.ip_address}} "
+        <td md-cell="" ng-click="changeCellText($event, domains_table, 'ip_address','domains','domain_ID',40)" placeholder="{{domains_table.ip_address}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{domains_table.ip_address}}</td>
-        <td md-cell="" ng-click="changeCellText($event, domains_table, 'nameserver_1',382)" placeholder="{{domains_table.nameserver_1}} "
+        <td md-cell="" ng-click="changeCellText($event, domains_table, 'nameserver_1','domains','domain_ID',382)" placeholder="{{domains_table.nameserver_1}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{domains_table.nameserver_1}}</td>
-        <td md-cell="" ng-click="changeCellText($event, domains_table, 'ns1_IP',40)" placeholder="{{domains_table.ns1_IP}} "
+        <td md-cell="" ng-click="changeCellText($event, domains_table, 'ns1_IP','domains','domain_ID',40)" placeholder="{{domains_table.ns1_IP}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{domains_table.ns1_IP}}</td>
-        <td md-cell="" ng-click="changeCellText($event, domains_table, 'nameserver_2',382)" placeholder="{{domains_table.nameserver_2}} "
+        <td md-cell="" ng-click="changeCellText($event, domains_table, 'nameserver_2','domains','domain_ID',382)" placeholder="{{domains_table.nameserver_2}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{domains_table.nameserver_2}}</td>
-        <td md-cell="" ng-click="changeCellText($event, domains_table, 'ns2_IP',40)" placeholder="{{domains_table.ns2_IP}} "
+        <td md-cell="" ng-click="changeCellText($event, domains_table, 'ns2_IP','domains','domain_ID',40)" placeholder="{{domains_table.ns2_IP}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{domains_table.ns2_IP}}</td>
-        <td md-cell="" ng-click="changeCellText($event, domains_table, 'nameserver_3',382)" placeholder="{{domains_table.nameserver_3}} "
+        <td md-cell="" ng-click="changeCellText($event, domains_table, 'nameserver_3','domains','domain_ID',382)" placeholder="{{domains_table.nameserver_3}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{domains_table.nameserver_3}}</td>
-        <td md-cell="" ng-click="changeCellText($event, domains_table, 'ns3_IP',40)" placeholder="{{domains_table.ns3_IP}} "
+        <td md-cell="" ng-click="changeCellText($event, domains_table, 'ns3_IP','domains','domain_ID',40)" placeholder="{{domains_table.ns3_IP}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{domains_table.ns3_IP}}</td>
         <td md-cell>
-            <md-datepicker ng-change="changeDate('date_purchased',domains_table)"
+            <md-datepicker ng-change="changeDate('date_purchased',domains_table,'domains','domain_ID')"
             ng-model="domains_table.date_purchased"
             md-hide-icons="calendar"
             name="datePurchasedField" required=""></md-datepicker>
       	</td>
         <td md-cell>
-            <md-datepicker ng-change="changeDate('expiration_date',domains_table)"
+            <md-datepicker ng-change="changeDate('expiration_date',domains_table,'domains','domain_ID')"
             ng-model="domains_table.expiration_date"
             md-hide-icons="calendar"
             name="expirationDateField"></md-datepicker>
       	</td>
         <!--<td md-cell>{{domains_table.expiration_date}}</td>-->
         <td md-cell>
-  			<md-select md-on-open="getRegistrarsFunc()" ng-change="changeDropdown('registrar_ID','registrar_name',domains_table)"
+  			<md-select md-on-open="getRegistrarsFunc()" ng-change="changeDropdown('registrar_ID','registrar_name',domains_table,'domains','domain_ID')"
             ng-model="domains_table.registrar_name" placeholder="{{domains_table.registrar_name}}">
     			<md-option ng-value="registrar.registrar_ID"
                 ng-repeat="registrar in getRegistrars.data">{{registrar.registrar_name}}</md-option>
@@ -94,17 +94,17 @@
 
 		</td>
 		<td md-cell>
-  			<md-select md-on-open="getHostsFunc()" ng-change="changeDropdown('hosting_ID','hosting_name',domains_table)"
+  			<md-select md-on-open="getHostsFunc()" ng-change="changeDropdown('hosting_ID','hosting_name',domains_table,'domains','domain_ID')"
             ng-model="domains_table.hosting_name" placeholder="{{domains_table.hosting_name}}">
     			<md-option ng-value="host.hosting_ID" ng-repeat="host in getHosts.data">{{host.hosting_name}}</md-option>
   			</md-select>
 		</td>
-        <td md-cell="" ng-click="changeCellText($event, domains_table, 'registrar_301')" placeholder="{{domains_table.registrar_301}} "
+        <td md-cell="" ng-click="changeCellText($event, domains_table,'registrar_301','domains','domain_ID')" placeholder="{{domains_table.registrar_301}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{domains_table.registrar_301}}</td>
-        <td md-cell="" ng-click="changeCellText($event, domains_table, 'registrar_301_target')" placeholder="{{domains_table.registrar_301_target}} "
+        <td md-cell="" ng-click="changeCellText($event, domains_table, 'registrar_301_target','domains','domain_ID')" placeholder="{{domains_table.registrar_301_target}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{domains_table.registrar_301_target}}</td>
       	<td md-cell>
-    		<md-switch style="margin-left:25px" ng-change="ChangeSwitchValue('whois_protected',domains_table)" aria-label="active switch"
+    		<md-switch style="margin-left:25px" ng-change="ChangeSwitchValue('whois_protected',domains_table,'domains','domain_ID')" aria-label="active switch"
             ng-init="domains_table.whois_protected = domains_table.whois_protected" ng-model="domains_table.whois_protected"
             ng-true-value="'Yes'" ng-false-value="'No'">
       		</md-switch>

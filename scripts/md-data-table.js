@@ -612,11 +612,11 @@ function mdEditDialog($compile, $controller, $document, $mdUtil, $q, $rootScope,
       template:
         '<md-edit-dialog>' +
           '<div layout="column" class="md-content">' +
-            '<div ng-if="size === \'large\'" class="md-title">{{title || \'Edit\'}}</div>' +
+            // '<div ng-if="size === \'large\'" class="md-title">{{title || \'Edit\'}}</div>' +
             '<form name="editDialog" layout="column" ng-submit="submit(model)">' +
               '<md-input-container md-no-float>' +
-                '<input name="input" ng-model="model" md-autofocus placeholder="{{placeholder}} "' + getAttrs() + '>' +
-                '<div class="copy-button" ng-click="dismiss()">copy</div>' +
+                '<input id="copy-input" name="input" ng-model="model" md-autofocus placeholder="{{placeholder}} "' + getAttrs() + '>' +
+                '<span class="copy-button" ngclipboard data-clipboard-target="#copy-input" ng-click="dismiss()">copy</span>' +
                 '<div ng-messages="editDialog.input.$error">' +
                   '<div ng-repeat="(key, message) in messages" ng-message="{{key}}">{{message}}</div>' +
                 '</div>' +

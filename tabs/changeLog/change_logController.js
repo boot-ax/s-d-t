@@ -1,4 +1,4 @@
-angular.module('SE_App').controller('change_logController', ['$mdDialog','$change_log', '$scope', '$mdEditDialog', '$http','$q',function ($mdDialog, $change_log, $scope, $mdEditDialog, $http,$q) {
+angular.module('SE_App').controller('change_logController', ['$mdDialog','$change_log', '$scope', '$mdEditDialog', '$http','$q','changeCellServices',function ($mdDialog, $change_log, $scope, $mdEditDialog, $http,$q,changeCellServices) {
   'use strict';
 
   var bookmark;
@@ -81,58 +81,13 @@ angular.module('SE_App').controller('change_logController', ['$mdDialog','$chang
     $scope.getDesserts();
   });
 
-  $scope.changeCellText = function (event, table, column, $length) {
-    event.stopPropagation();
+  $scope.changeCellText = changeCellServices.changeCellText;
 
-    var success  = function(data){
-      $mdToast.show(
-          $mdToast.simple()
-            .textContent(data.data)
-            .hideDelay(3000)
-        );
-    };
+  $scope.changeDate = changeCellServices.changeDate;
 
-    var failure  = function(data){
-      $mdToast.show(
-          $mdToast.simple()
-            .textContent(data.data)
-            .hideDelay(3000)
-        );
-    };
+  $scope.changeDropdown = changeCellServices.changeDropdown;
 
-    var promise = $mdEditDialog.small({
-      modelValue: table[column],
-
-      save: function (input) {
-        table[column] = input.$modelValue;
-        var $obj = {};
-        $obj.table = 'change_log';
-        $obj.column = column;
-        $obj.value = table[column];
-        $obj.identifier = 'change_log_ID';
-        $obj.id = table.change_log_ID;
-        $http.post('service/updateItem',$obj).then(function(response){
-          success(response);
-          deferred.resolve();
-        },function(response){
-          failure(response);
-          deferred.reject();
-        });
-        return deferred.promise;
-      },
-      targetEvent: event,
-      validators: {
-        'md-maxlength': $length
-      },
-    });
-
-    promise.then(function (ctrl) {
-        var input = ctrl.getInput();
-        input.$viewChangeListeners.push(function () {
-        input.$setValidity('test', input.$modelValue !== 'test');
-      });
-    });
-  };
+  $scope.changeSwitchValue = changeCellServices.changeSwitchValue;
 
 
   $scope.date_entered = function(change_log_table){
@@ -140,41 +95,6 @@ angular.module('SE_App').controller('change_logController', ['$mdDialog','$chang
     dateFromDataBase = new Date(dateFromDataBase);
     return dateFromDataBase;
   };
-
-  $scope.switchValue = function(column, table){
-    var $obj = {};
-    $obj.table = 'change_log';
-    $obj.column = column;
-    $obj.value = table[column];
-    $obj.identifier = 'change_log_ID';
-    $obj.id = table.change_log_ID;
-    $http.post('/service/updateItem', $obj);
-  };
-
-  $scope.changeDate = function(column, table){
-    var $obj = {};
-    $obj.table = 'change_log';
-    $obj.column = column;
-    $obj.value = table[column];
-    $obj.value = table[column].getFullYear()+"-"+
-    ("0"+(table[column].getMonth()+1)).slice(-2)+"-"+
-    ("0"+table[column].getDate()).slice(-2);
-    $obj.identifier = 'change_log_ID';
-    $obj.id = table.change_log_ID;
-    $http.post('/service/updateItem', $obj);
-  };
-
-
-$scope.changeDropdown = function(column, value, table){
-var $obj = {};
-$obj.table = 'change_log';
-	  $obj.column = column;
-	  $obj.value = table[value];
-	  $obj.identifier = 'change_log_ID';
-	  $obj.id = table.change_log_ID;
-
-$http.post('/service/updateItem', $obj);
-};
 
 
 $scope.getPersonsFunc = function(){
