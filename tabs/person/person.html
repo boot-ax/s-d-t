@@ -49,21 +49,21 @@
     </thead>
     <tbody md-body>
       <tr md-row md-select="person_table" md-select-id="name" ng-repeat="person_table in person_tables.data">
-        <td md-cell="" ng-click="changeCellText($event, person_table, 'first_name',382)" placeholder="{{person_table.first_name}} "
+        <td md-cell="" ng-click="changeCellText($event, person_table, 'first_name',dbTableInfo.db_table,dbTableInfo.db_ID,382)" placeholder="{{person_table.first_name}} "
         aria-label="person_table.first_name" class="md-cell ng-binding md-clickable" tabindex="0">{{person_table.first_name}}</td>
-        <td md-cell="" ng-click="changeCellText($event, person_table, 'last_name',382)" placeholder="{{person_table.last_name}} "
+        <td md-cell="" ng-click="changeCellText($event, person_table, 'last_name',dbTableInfo.db_table,dbTableInfo.db_ID,382)" placeholder="{{person_table.last_name}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{person_table.last_name}}</td>
-        <td md-cell="" ng-click="changeCellText($event, person_table, 'email',382)" placeholder="{{person_table.email}} "
+        <td md-cell="" ng-click="changeCellText($event, person_table, 'email',dbTableInfo.db_table,dbTableInfo.db_ID,382)" placeholder="{{person_table.email}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{person_table.email}}</td>
-        <td md-cell="" ng-click="changeCellText($event, person_table, 'street_address',382)" placeholder="{{person_table.street_address}} "
+        <td md-cell="" ng-click="changeCellText($event, person_table, 'street_address',dbTableInfo.db_table,dbTableInfo.db_ID,382)" placeholder="{{person_table.street_address}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{person_table.street_address}}</td>
-        <td md-cell="" ng-click="changeCellText($event, person_table, 'city',382)" placeholder="{{person_table.city}} "
+        <td md-cell="" ng-click="changeCellText($event, person_table, 'city',dbTableInfo.db_table,dbTableInfo.db_ID,382)" placeholder="{{person_table.city}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{person_table.city}}</td>
-        <td md-cell="" ng-click="changeCellText($event, person_table, 'state',382)" placeholder="{{person_table.state}} "
+        <td md-cell="" ng-click="changeCellText($event, person_table, 'state',dbTableInfo.db_table,dbTableInfo.db_ID,382)" placeholder="{{person_table.state}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{person_table.state}}</td>
-        <td md-cell="" ng-click="changeCellText($event, person_table, 'phone_number',382)" placeholder="{{person_table.phone_number}} "
+        <td md-cell="" ng-click="changeCellText($event, person_table, 'phone_number',dbTableInfo.db_table,dbTableInfo.db_ID)" placeholder="{{person_table.phone_number}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{person_table.phone_number}}</td>
-        <td md-cell="" ng-click="changeCellText($event, person_table, 'zip_code',382)" placeholder="{{person_table.zip_code}} " 
+        <td md-cell="" ng-click="changeCellText($event, person_table, 'zip_code',dbTableInfo.db_table,dbTableInfo.db_ID,8)" placeholder="{{person_table.zip_code}} " 
         class="md-cell ng-binding md-clickable" tabindex="0">{{person_table.zip_code}}</td>
       </tr>
     </tbody>

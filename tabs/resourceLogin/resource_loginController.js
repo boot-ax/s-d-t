@@ -1,4 +1,4 @@
-angular.module('SE_App').controller('resource_loginController', ['$mdDialog','$resource_login', '$scope', '$mdEditDialog', '$http','$q',function ($mdDialog, $resource_login, $scope, $mdEditDialog, $http,$q) {
+angular.module('SE_App').controller('resource_loginController', ['$mdDialog','$resource_login', '$scope', '$mdEditDialog', '$http','$q','changeCellServices',function ($mdDialog, $resource_login, $scope, $mdEditDialog, $http,$q,changeCellServices) {
   'use strict';
 
   var bookmark;
@@ -23,6 +23,12 @@ angular.module('SE_App').controller('resource_loginController', ['$mdDialog','$r
     limit: '5',
     order: 'resource_url_name',
     page: 1
+  };
+
+  $scope.dbTableInfo = {
+    db_table:'resource_login',
+    db_ID:'resource_url_ID',
+    //table:hosting_table,
   };
 
   function success(resource_login_tables) {
@@ -81,73 +87,12 @@ angular.module('SE_App').controller('resource_loginController', ['$mdDialog','$r
     $scope.getDesserts();
   });
 
-  $scope.changeCellText = function (event, table, column, $length) {
-    event.stopPropagation();
+  $scope.changeCellText = changeCellServices.changeCellText;
 
-    var success  = function(data){
-      $mdToast.show(
-          $mdToast.simple()
-            .textContent(data.data)
-            .hideDelay(3000)
-        );
-    };
-
-    var failure  = function(data){
-      $mdToast.show(
-          $mdToast.simple()
-            .textContent(data.data)
-            .hideDelay(3000)
-        );
-    };
-
-    var promise = $mdEditDialog.small({
-      modelValue: table[column],
-
-      save: function (input) {
-        table[column] = input.$modelValue;
-        var $obj = {};
-        $obj.table = 'resource_login';
-        $obj.column = column;
-        $obj.value = table[column];
-        $obj.identifier = 'resource_url_ID';
-        $obj.id = table.resource_url_ID;
-        $http.post('service/updateItem',$obj).then(function(response){
-          success(response);
-          deferred.resolve();
-        },function(response){
-          failure(response);
-          deferred.reject();
-        });
-        return deferred.promise;
-      },
-      targetEvent: event,
-      validators: {
-        'md-maxlength': $length
-      },
-    });
-
-    promise.then(function (ctrl) {
-        var input = ctrl.getInput();
-        input.$viewChangeListeners.push(function () {
-        input.$setValidity('test', input.$modelValue !== 'test');
-      });
-    });
-  };
-
+  $scope.changeDropdown = changeCellServices.changeDropdown;
 
 
 //Below is changing the selection and Date Pickers
-
-$scope.changeDropdown = function(column, value, table){
-var $obj = {};
-$obj.table = 'resource_login';
-	  $obj.column = column;
-	  $obj.value = table[value];
-	  $obj.identifier = 'resource_url_ID';
-	  $obj.id = table.resource_url_ID;
-
-$http.post('/service/updateItem', $obj);
-};
 
 
 $scope.getPersonsFunc = function(){

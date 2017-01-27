@@ -18,6 +18,12 @@ angular.module('SE_App').controller('change_logController', ['$mdDialog','$chang
     page: 1
   };
 
+  $scope.dbTableInfo = {
+    db_table:'change_log',
+    db_ID:'change_log_ID',
+    //table:hosting_table,
+  };
+
   function success(change_log_tables) {
     angular.forEach(change_log_tables.data,function(row){
       // row.d

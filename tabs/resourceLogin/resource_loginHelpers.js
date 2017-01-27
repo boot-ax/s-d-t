@@ -8,7 +8,7 @@ angular.module('SE_App').factory('$resource_login', ['$resource', function ($res
 
 //===========================================================
 
-angular.module('SE_App').controller('addResource_loginController', ['$mdDialog', '$resource_login', '$scope' , '$http', function ($mdDialog, $resource_login, $scope, $http) {
+angular.module('SE_App').controller('addResource_loginController', ['$mdDialog', '$resource_login', '$scope' , '$http', '$mdToast',function ($mdDialog, $resource_login, $scope, $http,$mdToast) {
   'use strict';
 
 $scope.myDate = new Date();

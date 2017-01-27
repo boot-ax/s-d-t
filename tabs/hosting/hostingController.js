@@ -1,4 +1,4 @@
-angular.module('SE_App').controller('hostingController', ['$mdDialog','$hosting', '$scope', '$mdEditDialog', '$http','$q',function ($mdDialog, $hosting, $scope, $mdEditDialog, $http,$q) {
+angular.module('SE_App').controller('hostingController', ['$mdDialog','$hosting', '$scope', '$mdEditDialog', '$http','$q','changeCellServices',function ($mdDialog, $hosting, $scope, $mdEditDialog, $http,$q,changeCellServices) {
   'use strict';
 
   var bookmark;
@@ -23,6 +23,12 @@ angular.module('SE_App').controller('hostingController', ['$mdDialog','$hosting'
     limit: '5',
     order: 'hosting_name',
     page: 1
+  };
+
+  $scope.dbTableInfo = {
+    db_table:'hosting',
+    db_ID:'hosting_ID',
+    //table:hosting_table,
   };
 
   function success(hosting_tables) {
@@ -93,60 +99,14 @@ angular.module('SE_App').controller('hostingController', ['$mdDialog','$hosting'
     $scope.getDesserts();
   });
 
+  $scope.changeCellText = changeCellServices.changeCellText;
 
+  $scope.changeDate = changeCellServices.changeDate;
 
-$scope.changeCellText = function (event, table, column, $length) {
-event.stopPropagation();
+  $scope.changeDropdown = changeCellServices.changeDropdown;
 
-var success  = function(data){
-  $mdToast.show(
-      $mdToast.simple()
-        .textContent(data.data)
-        .hideDelay(3000)
-    );
-};
+  $scope.changeSwitchValue = changeCellServices.changeSwitchValue;
 
-var failure  = function(data){
-  $mdToast.show(
-      $mdToast.simple()
-        .textContent(data.data)
-        .hideDelay(3000)
-    );
-};
-
-var promise = $mdEditDialog.small({
-  modelValue: table[column],
-
-  save: function (input) {
-    table[column] = input.$modelValue;
-    var $obj = {};
-    $obj.table = 'hosting';
-    $obj.column = column;
-    $obj.value = table[column];
-    $obj.identifier = 'hosting_ID';
-    $obj.id = table.hosting_ID;
-    $http.post('service/updateItem',$obj).then(function(response){
-      success(response);
-      deferred.resolve();
-    },function(response){
-      failure(response);
-      deferred.reject();
-    });
-    return deferred.promise;
-  },
-  targetEvent: event,
-  validators: {
-    'md-maxlength': $length
-  },
-});
-
-promise.then(function (ctrl) {
-    var input = ctrl.getInput();
-    input.$viewChangeListeners.push(function () {
-    input.$setValidity('test', input.$modelValue !== 'test');
-  });
-});
-};
 
 //Below is changing the selection and Date Pickers
 
@@ -161,20 +121,6 @@ $scope.expiration_date = function(hosting_table){
 	dateFromDataBase = new Date(dateFromDataBase);
 	return dateFromDataBase;
 	};
-
-
-$scope.changeDate = function(column, table){
-  var $obj = {};
-  $obj.table = 'hosting';
-  $obj.column = column;
-  $obj.value = table[column];
-  $obj.value = table[column].getFullYear()+"-"+
-  ("0"+(table[column].getMonth()+1)).slice(-2)+"-"+
-  ("0"+table[column].getDate()).slice(-2);
-  $obj.identifier = 'hosting_ID';
-  $obj.id = table.hosting_ID;
-  $http.post('/service/updateItem', $obj);
-};
 
 
 }]);

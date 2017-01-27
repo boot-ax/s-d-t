@@ -27,6 +27,12 @@ function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q,changeCe
     page: 1
   };
 
+  $scope.dbTableInfo = {
+    db_table:'domains',
+    db_ID:'domain_ID',
+    //table:hosting_table,
+  };
+
   function success(domains_tables) {
     angular.forEach(domains_tables.data,function(row){
       // row.d

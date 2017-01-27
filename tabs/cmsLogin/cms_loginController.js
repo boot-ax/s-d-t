@@ -1,4 +1,4 @@
-angular.module('SE_App').controller('cms_loginController', ['$mdDialog','$cms_login', '$scope', '$mdEditDialog', '$http','$q',function ($mdDialog, $cms_login, $scope, $mdEditDialog, $http,$q) {
+angular.module('SE_App').controller('cms_loginController', ['$mdDialog','$cms_login', '$scope', '$mdEditDialog', '$http','$q','changeCellServices',function ($mdDialog, $cms_login, $scope, $mdEditDialog, $http,$q,changeCellServices) {
   'use strict';
 
   var bookmark;
@@ -22,6 +22,12 @@ angular.module('SE_App').controller('cms_loginController', ['$mdDialog','$cms_lo
     limit: '5',
     order: 'install_site_url_name',
     page: 1
+  };
+
+  $scope.dbTableInfo = {
+    db_table:'cms_login',
+    db_ID:'install_site_url_ID',
+    //table:hosting_table,
   };
 
   function success(cms_login_tables) {
@@ -80,73 +86,9 @@ angular.module('SE_App').controller('cms_loginController', ['$mdDialog','$cms_lo
     $scope.getDesserts();
   });
 
-  $scope.changeCellText = function (event, table, column, $length) {
-  event.stopPropagation();
+  $scope.changeCellText = changeCellServices.changeCellText;
 
-  var success  = function(data){
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent(data.data)
-          .hideDelay(3000)
-      );
-  };
-
-  var failure  = function(data){
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent(data.data)
-          .hideDelay(3000)
-      );
-  };
-
-  var promise = $mdEditDialog.small({
-    modelValue: table[column],
-
-    save: function (input) {
-      table[column] = input.$modelValue;
-      var $obj = {};
-      $obj.table = 'cms_login';
-      $obj.column = column;
-      $obj.value = table[column];
-      $obj.identifier = 'install_site_url_ID';
-      $obj.id = table.install_site_url_ID;
-      $http.post('service/updateItem',$obj).then(function(response){
-        success(response);
-        deferred.resolve();
-      },function(response){
-        failure(response);
-        deferred.reject();
-      });
-      return deferred.promise;
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': $length
-    },
-  });
-
-  promise.then(function (ctrl) {
-      var input = ctrl.getInput();
-      input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
-
-
-
-$scope.changeDropdown = function(column, value, table){
-var $obj = {};
-$obj.table = 'cms_login';
-	  $obj.column = column;
-	  $obj.value = table[value];
-	  $obj.identifier = 'install_site_url_ID';
-	  $obj.id = table.install_site_url_ID;
-
-$http.post('/service/updateItem', $obj);
-};
-
-
+  $scope.changeDropdown = changeCellServices.changeDropdown;
 
 $scope.getDomainsFunc = function(){
 	$http.get('service/getdomains')

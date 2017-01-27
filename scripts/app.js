@@ -115,7 +115,7 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
       };
 
 
-      this.changeDate = function(column, table){
+      this.changeDate = function(column, table,db_table,db_ID){
         var success  = function(data){
           $mdToast.show(
               $mdToast.simple()

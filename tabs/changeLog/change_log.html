@@ -45,11 +45,11 @@
     </thead>
     <tbody md-body>
       <tr md-row md-select="change_log_table" md-select-id="name" ng-repeat="change_log_table in change_log_tables.data">
-        <td md-cell="" ng-click="changeCellText($event, change_log_table, 'issue','change_log','change_log_ID')" placeholder="{{change_log_table.issue}} "
+        <td md-cell="" ng-click="changeCellText($event, change_log_table, 'issue',dbTableInfo.db_table,dbTableInfo.db_ID)" placeholder="{{change_log_table.issue}} "
         aria-label="change_log_table.issue" class="md-cell ng-binding md-clickable" tabindex="0">{{change_log_table.issue}}</td>
 
         <td md-cell>
-            <md-datepicker ng-change="changeDate('date_entered',change_log_table,'change_log','change_log_ID')"
+            <md-datepicker ng-change="changeDate('date_entered',change_log_table,dbTableInfo.db_table,dbTableInfo.db_ID)"
             md-hide-icons="calendar"
             ng-model="change_log_table.date_entered"
             name="dateEnteredField" required=""></md-datepicker>
@@ -58,7 +58,7 @@
         <!--need slide button-->
 
         <td md-cell>
-    		<md-switch ng-change="changeSwitchValue('completed',change_log_table,'change_log','change_log_ID')" aria-label="active switch"
+    		<md-switch ng-change="changeSwitchValue('completed',change_log_table,dbTableInfo.db_table,dbTableInfo.db_ID)" aria-label="active switch"
             ng-init="change_log_table.completed = change_log_table.completed" ng-model="change_log_table.completed"
             ng-true-value="'Yes'" ng-false-value="'No'" style="margin:0" tabindex="0">
       		</md-switch>
@@ -68,7 +68,7 @@
 
 
         <td md-cell>
-  			<md-select md-on-open="getPersonsFunc()" ng-change="changeDropdown('person_ID','person_ID',change_log_table,'change_log','change_log_ID')"
+  			<md-select md-on-open="getPersonsFunc()" ng-change="changeDropdown('person_ID','person_ID',change_log_table,dbTableInfo.db_table,dbTableInfo.db_ID)"
             ng-model="change_log_table.person_ID" placeholder="{{change_log_table.first_name}}, {{change_log_table.last_name}}">
     			<md-option ng-value="change_log_table.person_ID"
                 ng-repeat="change_log_table in getPersons.data">{{change_log_table.first_name}}, {{change_log_table.last_name}}</md-option>

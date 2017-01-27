@@ -1,4 +1,4 @@
-angular.module('SE_App').controller('personController', ['$mdDialog','$person', '$scope', '$mdEditDialog', '$http','$q',function ($mdDialog, $person, $scope, $mdEditDialog, $http,$q) {
+angular.module('SE_App').controller('personController', ['$mdDialog','$person', '$scope', '$mdEditDialog', '$http','$q','changeCellServices',function ($mdDialog, $person, $scope, $mdEditDialog, $http,$q,changeCellServices) {
   'use strict';
 
   var bookmark;
@@ -23,6 +23,12 @@ angular.module('SE_App').controller('personController', ['$mdDialog','$person', 
     limit: '5',
     order: 'last_name',
     page: 1
+  };
+
+  $scope.dbTableInfo = {
+    db_table:'person',
+    db_ID:'person_ID',
+    //table:hosting_table,
   };
 
   function success(person_tables) {
@@ -82,58 +88,7 @@ angular.module('SE_App').controller('personController', ['$mdDialog','$person', 
     $scope.getDesserts();
   });
 
-  $scope.changeCellText = function (event, table, column, $length) {
-    event.stopPropagation();
-
-    var success  = function(data){
-      $mdToast.show(
-          $mdToast.simple()
-            .textContent(data.data)
-            .hideDelay(3000)
-        );
-    };
-
-    var failure  = function(data){
-      $mdToast.show(
-          $mdToast.simple()
-            .textContent(data.data)
-            .hideDelay(3000)
-        );
-    };
-
-    var promise = $mdEditDialog.small({
-      modelValue: table[column],
-
-      save: function (input) {
-        table[column] = input.$modelValue;
-        var $obj = {};
-        $obj.table = 'person';
-        $obj.column = column;
-        $obj.value = table[column];
-        $obj.identifier = 'person_ID';
-        $obj.id = table.person_ID;
-        $http.post('service/updateItem',$obj).then(function(response){
-          success(response);
-          deferred.resolve();
-        },function(response){
-          failure(response);
-          deferred.reject();
-        });
-        return deferred.promise;
-      },
-      targetEvent: event,
-      validators: {
-        'md-maxlength': $length
-      },
-    });
-
-    promise.then(function (ctrl) {
-        var input = ctrl.getInput();
-        input.$viewChangeListeners.push(function () {
-        input.$setValidity('test', input.$modelValue !== 'test');
-      });
-    });
-  };
+  $scope.changeCellText = changeCellServices.changeCellText;
 
 
 }]);

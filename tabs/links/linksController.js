@@ -1,4 +1,4 @@
-angular.module('SE_App').controller('linksController', ['$mdDialog','$links', '$scope', '$mdEditDialog', '$http','$q',function ($mdDialog, $links, $scope, $mdEditDialog, $http,$q) {
+angular.module('SE_App').controller('linksController', ['$mdDialog','$links', '$scope', '$mdEditDialog', '$http','$q','changeCellServices',function ($mdDialog, $links, $scope, $mdEditDialog, $http,$q,changeCellServices) {
   'use strict';
 
   var bookmark;
@@ -16,6 +16,12 @@ angular.module('SE_App').controller('linksController', ['$mdDialog','$links', '$
     limit: '5',
     order: 'source_url',
     page: 1
+  };
+
+  $scope.dbTableInfo = {
+    db_table:'links',
+    db_ID:'link_ID',
+    //table:hosting_table,
   };
 
   function success(links_tables) {
@@ -81,58 +87,12 @@ angular.module('SE_App').controller('linksController', ['$mdDialog','$links', '$
     $scope.getDesserts();
   });
 
-  $scope.changeCellText = function (event, table, column, $length) {
-  event.stopPropagation();
+  $scope.changeCellText = changeCellServices.changeCellText;
 
-  var success  = function(data){
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent(data.data)
-          .hideDelay(3000)
-      );
-  };
+  $scope.changeDate = changeCellServices.changeDate;
 
-  var failure  = function(data){
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent(data.data)
-          .hideDelay(3000)
-      );
-  };
+  $scope.changeSwitchValue = changeCellServices.changeSwitchValue;
 
-  var promise = $mdEditDialog.small({
-    modelValue: table[column],
-
-    save: function (input) {
-      table[column] = input.$modelValue;
-      var $obj = {};
-      $obj.table = 'links';
-      $obj.column = column;
-      $obj.value = table[column];
-      $obj.identifier = 'link_ID';
-      $obj.id = table.link_ID;
-      $http.post('service/updateItem',$obj).then(function(response){
-        success(response);
-        deferred.resolve();
-      },function(response){
-        failure(response);
-        deferred.reject();
-      });
-      return deferred.promise;
-    },
-    targetEvent: event,
-    validators: {
-      'md-maxlength': $length
-    },
-  });
-
-  promise.then(function (ctrl) {
-      var input = ctrl.getInput();
-      input.$viewChangeListeners.push(function () {
-      input.$setValidity('test', input.$modelValue !== 'test');
-    });
-  });
-};
 
   $scope.date_created = function(links_table){
     var dateFromDataBase = links_table.date_created;
@@ -140,29 +100,5 @@ angular.module('SE_App').controller('linksController', ['$mdDialog','$links', '$
     return dateFromDataBase;
   };
 
-
-  $scope.switchValue = function(column, table){
-    var $obj = {};
-    $obj.table = 'links';
-    $obj.column = column;
-    $obj.value = table[column];
-    $obj.identifier = 'link_ID';
-    $obj.id = table.link_ID;
-    $http.post('/service/updateItem', $obj);
-  };
-
-
-  $scope.changeDate = function(column, table){
-    var $obj = {};
-    $obj.table = 'links';
-    $obj.column = column;
-    $obj.value = table[column];
-    $obj.value = table[column].getFullYear()+"-"+
-    ("0"+(table[column].getMonth()+1)).slice(-2)+"-"+
-    ("0"+table[column].getDate()).slice(-2);
-    $obj.identifier = 'link_ID';
-    $obj.id = table.link_ID;
-    $http.post('/service/updateItem', $obj);
-  };
 
 }]);
