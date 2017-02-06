@@ -1,10 +1,13 @@
 
 angular.module('SE_App').controller('domainController', ['$mdDialog','$domains', '$scope', '$mdEditDialog', '$http','$mdToast',
-'$q','changeCellServices',
-function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q,changeCellServices) {
+'$q','changeCellServices','upDownloadService',
+function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q,changeCellServices,upDownloadService) {
   'use strict';
 
   var bookmark;
+  $scope.$file = 'domains.csv';
+  $scope.$header = ['domain_name','ip_address','nameserver_1','ns1_IP','nameserver_2','ns2_IP','nameserver_3','ns3_IP','date_purchased','expiration_date','registrar_ID','hosting_ID','registrar_301','registrar_301_target','whois_protected','domain_ID','registrar_name','hosting_name'];
+    $scope.$location = '/service/domains';
 
     $scope.$on('locationUpdate', function (event, data) {
 	  if(data.location == 'domains'){
@@ -68,7 +71,7 @@ function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q,changeCe
       focusOnOpen: false,
       targetEvent: event,
       locals: { domains_tables: $scope.selected },
-      templateUrl: 'tabs/domains/deleteDomainDialog.html',
+      templateUrl: 'inc/delete.html',
     }).then($scope.getDesserts);
   };
 
@@ -104,6 +107,7 @@ $scope.changeDate = changeCellServices.changeDate;
 $scope.changeDropdown = changeCellServices.changeDropdown;
 
 $scope.changeSwitchValue = changeCellServices.changeSwitchValue;
+  $scope.bulkDownload = upDownloadService.bulkDownload;
 
 //Below is changing the selection and Date Pickers
 

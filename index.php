@@ -41,7 +41,7 @@ include "inc/functions.php";
           </md-toolbar>
 	<div flex layout="row">
 	<div layout="column" flex>
-		<md-tabs md-selected="data.selectedIndex">
+		<md-tabs md-swipe-content="true" md-selected="data.selectedIndex">
 		  <md-tab label="Domains"></md-tab>
 		  <md-tab label="Hosting"></md-tab>
 		  <md-tab label="Registrar"></md-tab>
@@ -81,11 +81,15 @@ include "inc/functions.php";
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-animate.min.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular-aria.min.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.1/angular-material.min.js"></script>
-    <script src="scripts/ngclipboard.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ng-csv/0.3.3/ng-csv.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.4/angular-sanitize.min.js"></script>
+    <script type="text/javascript" src="scripts/ngclipboard.min.js"></script>
 		<script type="text/javascript" src="scripts/angular-messages.min.js"></script>
 		<script src="https://code.angularjs.org/1.6.0/angular-resource.min.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-route.min.js"></script>
-		<script type="text/javascript" src="scripts/md-data-table.js"></script>
+    <!-- <script type="text/javascript" src="scripts/fixed-table-header.min.js"></script> -->
+    <script type="text/javascript" src="scripts/md-data-table.js"></script>
+
 		<script type="text/javascript" src="scripts/app.js"></script>
     <script type="text/javascript" src="tabs/domains/domainHelpers.js"></script>
     <script type="text/javascript" src="tabs/domains/domainController.js"></script>

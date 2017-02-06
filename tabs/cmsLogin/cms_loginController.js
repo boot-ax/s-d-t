@@ -1,4 +1,4 @@
-angular.module('SE_App').controller('cms_loginController', ['$mdDialog','$cms_login', '$scope', '$mdEditDialog', '$http','$q','changeCellServices',function ($mdDialog, $cms_login, $scope, $mdEditDialog, $http,$q,changeCellServices) {
+angular.module('SE_App').controller('cms_loginController', ['$mdDialog','$cms_login', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $cms_login, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
   'use strict';
 
   var bookmark;
@@ -8,6 +8,10 @@ angular.module('SE_App').controller('cms_loginController', ['$mdDialog','$cms_lo
 	  	$scope.getDesserts();
 	  }
   });
+
+  $scope.$file = 'cms_login.csv';
+  $scope.$header = ['install_site_url_name','login_url','username','password','recovery_email','cpanel_url','cpanel_username','cpanel_password','domain_ID','install_site_url_ID','domain_name'];
+  $scope.$location = '/service/cms_login';
 
   $scope.selected = [];
 
@@ -53,7 +57,7 @@ angular.module('SE_App').controller('cms_loginController', ['$mdDialog','$cms_lo
       focusOnOpen: false,
       targetEvent: event,
       locals: { cms_login_tables: $scope.selected },
-      templateUrl: 'tabs/cmsLogin/deleteCms_loginDialog.html',
+      templateUrl: 'inc/delete.html',
     }).then($scope.getDesserts);
   };
 
@@ -87,8 +91,8 @@ angular.module('SE_App').controller('cms_loginController', ['$mdDialog','$cms_lo
   });
 
   $scope.changeCellText = changeCellServices.changeCellText;
-
   $scope.changeDropdown = changeCellServices.changeDropdown;
+  $scope.bulkDownload = upDownloadService.bulkDownload;
 
 $scope.getDomainsFunc = function(){
 	$http.get('service/getdomains')

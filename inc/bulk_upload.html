@@ -1,0 +1,28 @@
+<md-dialog-content class="md-dialog-content">
+
+
+
+  <!-- ngIf: item.form.$submitted && item.form.$invalid -->
+
+<form style="" class="ng-invalid ng-invalid-required" name="item.form" ng-submit="ctrl.bulkUpload()">
+
+<h3 class="md-subhead">Bulk Upload Items</h3>
+<div id="dvImportSegments" class="fileupload ">
+<fieldset>
+<legend>Upload your CSV File</legend>
+<input type="file" name="File Upload" id="txtFileUpload" accept=".csv" />
+</fieldset>
+</div>
+<pre><code id="output"></code></pre>
+
+  </form>
+
+
+
+  <div class="md-dialog-actions">
+    <button disabled="disabled" aria-disabled="true" aria-label="Add Item" ng-click="ctrl.addItem()" ng-disabled="item.form.$invalid" class="md-primary md-button md-ink-ripple" type="button"><span>Add Items</span></button>
+    <button aria-label="Cancel" ng-click="ctrl.cancel()" class="md-primary md-button md-ink-ripple" type="button"><span>Cancel</span></button>
+  </div>
+
+  <div tabindex="0" class="md-dialog-focus-trap"></div>
+</md-dialog-content>

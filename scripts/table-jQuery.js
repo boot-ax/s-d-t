@@ -10,7 +10,7 @@ function storeid(){
 	var storeVal = new Array();
 	for(var i = 0; i < idStore.length; i++){
 			var child = document.getElementById(idStore[i]).children;
-			
+
 storeVal.push(child[child.length - 1].innerHTML);
 	}
     return storeVal;
@@ -28,15 +28,14 @@ function storeidUpdate(){
 	var storeVal = new Array();
 	for(var i = 0; i < idStore.length; i++){
 			var child = document.getElementById(idStore[i]).children;
-for(var k = 0; k < child.length; k++){		
+for(var k = 0; k < child.length; k++){
 storeVal.push(child[k].innerHTML);
 	}
 	}
-	
+
 	storeVal.shift();
 	//console.log(storeVal);
     return storeVal;
 }
 
-
-
+//===========================================================

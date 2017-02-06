@@ -1,7 +1,11 @@
-angular.module('SE_App').controller('resource_loginController', ['$mdDialog','$resource_login', '$scope', '$mdEditDialog', '$http','$q','changeCellServices',function ($mdDialog, $resource_login, $scope, $mdEditDialog, $http,$q,changeCellServices) {
+angular.module('SE_App').controller('resource_loginController', ['$mdDialog','$resource_login', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $resource_login, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
   'use strict';
 
   var bookmark;
+
+  $scope.$file = 'resource_login.csv';
+  $scope.$header = ['resource_url_name','name_of_product','username','password','product_description','resource_url_ID','first_name','last_name'];
+  $scope.$location = '/service/resource_login';
 
     $scope.$on('locationUpdate', function (event, data) {
 	  if(data.location == 'resource_login'){
@@ -54,7 +58,7 @@ angular.module('SE_App').controller('resource_loginController', ['$mdDialog','$r
       focusOnOpen: false,
       targetEvent: event,
       locals: { resource_login_tables: $scope.selected },
-      templateUrl: 'tabs/resourceLogin/deleteResource_loginDialog.html',
+      templateUrl: 'inc/delete.html',
     }).then($scope.getDesserts);
   };
 
@@ -90,6 +94,7 @@ angular.module('SE_App').controller('resource_loginController', ['$mdDialog','$r
   $scope.changeCellText = changeCellServices.changeCellText;
 
   $scope.changeDropdown = changeCellServices.changeDropdown;
+    $scope.bulkDownload = upDownloadService.bulkDownload;
 
 
 //Below is changing the selection and Date Pickers

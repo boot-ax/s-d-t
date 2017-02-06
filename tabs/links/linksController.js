@@ -1,7 +1,11 @@
-angular.module('SE_App').controller('linksController', ['$mdDialog','$links', '$scope', '$mdEditDialog', '$http','$q','changeCellServices',function ($mdDialog, $links, $scope, $mdEditDialog, $http,$q,changeCellServices) {
+angular.module('SE_App').controller('linksController', ['$mdDialog','$links', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $links, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
   'use strict';
 
   var bookmark;
+
+  $scope.$file = 'links.csv';
+  $scope.$header = ['source_url','target_url','anchor_text','alt_text','follow_link','date_created','title','comment','link_ID'];
+  $scope.$location = '/service/links';
 
   $scope.selected = [];
 
@@ -54,7 +58,7 @@ angular.module('SE_App').controller('linksController', ['$mdDialog','$links', '$
       focusOnOpen: false,
       targetEvent: event,
       locals: { links_tables: $scope.selected },
-      templateUrl: 'tabs/links/deleteLinksDialog.html',
+      templateUrl: 'inc/delete.html',
     }).then($scope.getDesserts);
   };
 
@@ -92,6 +96,7 @@ angular.module('SE_App').controller('linksController', ['$mdDialog','$links', '$
   $scope.changeDate = changeCellServices.changeDate;
 
   $scope.changeSwitchValue = changeCellServices.changeSwitchValue;
+    $scope.bulkDownload = upDownloadService.bulkDownload;
 
 
   $scope.date_created = function(links_table){

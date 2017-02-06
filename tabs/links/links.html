@@ -5,6 +5,9 @@
     <button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="filter.show = true" aria-label="filter_list">
       <md-icon class="material-icons">search</md-icon>
     </button>
+    <button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="bulkDownload($event,links_tables.data,$file,$header,$location)" aria-label="bulk_download">
+      <i class="material-icons">file_download</i>
+    </button>
     <button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="addItem($event)" aria-label="local_dining">
       <md-icon class="material-icons">add_circle</md-icon>
     </button>
@@ -44,7 +47,9 @@
         <th md-column md-order-by="follow_link"><span>Follow Link</span></th>
         <th md-column md-order-by="date_created"><span>Date Created</span></th>
         <th md-column md-order-by="title"><span>Title</span></th>
-        <th md-column md-order-by="comment"><span>Comment</span></th><h1></h1>
+        <th md-column md-order-by="comment">
+          <md-icon class="ng-isolate-scope material-icons">comments</md-icon>
+          <span>Comment</span></th><h1></h1>
       </tr>
     </thead>
     <tbody md-body>

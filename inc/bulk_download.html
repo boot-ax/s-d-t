@@ -1,0 +1,17 @@
+<md-dialog-content class="md-dialog-content">
+<h3>This will download a CSV file.</h3>
+<h3>Not supported in Safari<h3>
+
+
+  <!-- ngIf: item.form.$submitted && item.form.$invalid -->
+
+
+  <div class="md-dialog-actions" md-progress="promise">
+      <!-- csv-header="['Id', 'Name', 'Status']" -->
+    <button type="button" class="md-primary md-button md-ink-ripple" csv-header="ctrl.$csv_header" ng-csv="ctrl.tableNew()" filename="{{ctrl.$file}}" charset="utf-8">Export Visible</button>
+    <button filename="{{ctrl.$file}}" csv-header="ctrl.$csv_header" ng-csv="ctrl.bulkDownload()" aria-label="Export Data" class="md-primary md-button md-ink-ripple" type="button" charset="utf-8"><span>Export All</span></button>
+    <button aria-label="Cancel" ng-click="ctrl.cancel()" class="md-primary md-button md-ink-ripple" type="button"><span>Cancel</span></button>
+  </div>
+
+  <div tabindex="0" class="md-dialog-focus-trap"></div>
+</md-dialog-content>

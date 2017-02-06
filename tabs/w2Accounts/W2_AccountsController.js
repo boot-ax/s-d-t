@@ -1,7 +1,11 @@
-angular.module('SE_App').controller('W2_accountsController', ['$mdDialog','$W2_accounts', '$scope', '$mdEditDialog', '$http','$q','changeCellServices',function ($mdDialog, $W2_accounts, $scope, $mdEditDialog, $http,$q,changeCellServices) {
+angular.module('SE_App').controller('W2_accountsController', ['$mdDialog','$W2_accounts', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $W2_accounts, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
   'use strict';
 
   var bookmark;
+
+  $scope.$file = 'W2_accounts.csv';
+  $scope.$header = ['login_url_name','login','password','account_url','attached_domain','W2_ID','first_name','last_name'];
+  $scope.$location = '/service/W2_accounts';
 
     $scope.$on('locationUpdate', function (event, data) {
 	  if(data.location == 'W2_accounts'){
@@ -90,6 +94,7 @@ angular.module('SE_App').controller('W2_accountsController', ['$mdDialog','$W2_a
   $scope.changeCellText = changeCellServices.changeCellText;
 
   $scope.changeDropdown = changeCellServices.changeDropdown;
+    $scope.bulkDownload = upDownloadService.bulkDownload;
 
 //Below is changing the selection and Date Pickers
 

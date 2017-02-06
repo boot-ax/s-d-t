@@ -21,13 +21,6 @@ $scope.getPersonsFunc = function(){
 	});
 };
 
-$scope.getChange_logFunc = function(){
-	$http.get('service/getchange_log')
-		.then(function(response){
-	$scope.getChange_log = response.data;
-	});
-};
-
   this.cancel = $mdDialog.cancel;
 
   function success(change_log_table) {
@@ -99,3 +92,34 @@ angular.module('SE_App').controller('deleteChange_logController', ['$authorize',
   };
 
 }]);
+
+// =======================================================
+
+angular.module('SE_App').controller('bulkUploadController', ['$mdDialog', '$change_log', '$scope' , '$http', '$q','$mdToast', function ($mdDialog, $change_log, $scope, $http, $q, $mdToast) {
+  'use strict';
+
+  this.cancel = $mdDialog.cancel;
+
+  function success(change_log_table) {
+    $mdToast.show(
+        $mdToast.simple()
+          .textContent('New Content Added')
+          .hideDelay(3000)
+      );
+    $mdDialog.hide(change_log_table);
+  }
+
+    function fedup(data){
+  	//console.log('FAILED!',data);
+	$mdToast.show(
+      $mdToast.simple()
+        .textContent(data.data)
+        .hideDelay(3000)
+    );
+  }
+
+
+}])
+;
+
+//  =========================================================

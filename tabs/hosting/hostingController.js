@@ -1,7 +1,11 @@
-angular.module('SE_App').controller('hostingController', ['$mdDialog','$hosting', '$scope', '$mdEditDialog', '$http','$q','changeCellServices',function ($mdDialog, $hosting, $scope, $mdEditDialog, $http,$q,changeCellServices) {
+angular.module('SE_App').controller('hostingController', ['$mdDialog','$hosting', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $hosting, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
   'use strict';
 
   var bookmark;
+
+  $scope.$file = 'hosting.csv';
+  $scope.$header = ['hosting_name','login_url','username','password','date_started','expiration_date','creditcard_last_4','setup_domain','hosting_ID'];
+  $scope.$location = '/service/hosting';
 
     $scope.$on('locationUpdate', function (event, data) {
 	  if(data.location == 'hosting'){
@@ -66,7 +70,7 @@ angular.module('SE_App').controller('hostingController', ['$mdDialog','$hosting'
       focusOnOpen: false,
       targetEvent: event,
       locals: { hosting_tables: $scope.selected },
-      templateUrl: 'tabs/hosting/deleteHostingDialog.html',
+      templateUrl: 'inc/delete.html',
     }).then($scope.getDesserts);
   };
 
@@ -106,6 +110,7 @@ angular.module('SE_App').controller('hostingController', ['$mdDialog','$hosting'
   $scope.changeDropdown = changeCellServices.changeDropdown;
 
   $scope.changeSwitchValue = changeCellServices.changeSwitchValue;
+    $scope.bulkDownload = upDownloadService.bulkDownload;
 
 
 //Below is changing the selection and Date Pickers

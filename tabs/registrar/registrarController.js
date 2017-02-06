@@ -1,10 +1,14 @@
 
 
 
-angular.module('SE_App').controller('registrarController', ['$mdDialog','$registrar', '$scope', '$mdEditDialog', '$http','$q','changeCellServices',function ($mdDialog, $registrar, $scope, $mdEditDialog, $http,$q,changeCellServices) {
+angular.module('SE_App').controller('registrarController', ['$mdDialog','$registrar', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $registrar, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
   'use strict';
 
   var bookmark;
+
+  $scope.$file = 'registrar.csv';
+  $scope.$header = ['registrar_name','login_url','login_username','login_password','credit_card_last_4','registrar_ID','first_name','last_name'];
+  $scope.$location = '/service/registrar';
 
   $scope.selected = [];
 
@@ -51,7 +55,7 @@ angular.module('SE_App').controller('registrarController', ['$mdDialog','$regist
       focusOnOpen: false,
       targetEvent: event,
       locals: { registrar_tables: $scope.selected },
-      templateUrl: 'tabs/registrar/deleteRegistrarDialog.html',
+      templateUrl: 'inc/delete.html',
     }).then($scope.getDesserts);
   };
 
@@ -93,6 +97,7 @@ angular.module('SE_App').controller('registrarController', ['$mdDialog','$regist
   $scope.changeCellText = changeCellServices.changeCellText;
 
   $scope.changeDropdown = changeCellServices.changeDropdown;
+    $scope.bulkDownload = upDownloadService.bulkDownload;
 
 //Below is changing the selection and Date Pickers
 

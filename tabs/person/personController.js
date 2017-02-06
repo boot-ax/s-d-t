@@ -1,7 +1,11 @@
-angular.module('SE_App').controller('personController', ['$mdDialog','$person', '$scope', '$mdEditDialog', '$http','$q','changeCellServices',function ($mdDialog, $person, $scope, $mdEditDialog, $http,$q,changeCellServices) {
+angular.module('SE_App').controller('personController', ['$mdDialog','$person', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $person, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
   'use strict';
 
   var bookmark;
+
+  $scope.$file = 'person.csv';
+  $scope.$header = ['first_name','last_name','email','street_address','city','state','phone_number','zip_code','person_ID'];
+  $scope.$location = '/service/person';
 
     $scope.$on('locationUpdate', function (event, data) {
 	  if(data.location == 'person'){
@@ -55,7 +59,7 @@ angular.module('SE_App').controller('personController', ['$mdDialog','$person', 
       focusOnOpen: false,
       targetEvent: event,
       locals: { person_tables: $scope.selected },
-      templateUrl: 'tabs/person/deletePersonDialog.html',
+      templateUrl: 'inc/delete.html',
     }).then($scope.getDesserts);
   };
 
@@ -89,6 +93,7 @@ angular.module('SE_App').controller('personController', ['$mdDialog','$person', 
   });
 
   $scope.changeCellText = changeCellServices.changeCellText;
+    $scope.bulkDownload = upDownloadService.bulkDownload;
 
 
 }]);

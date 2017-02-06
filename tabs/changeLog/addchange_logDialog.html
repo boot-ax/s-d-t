@@ -3,7 +3,7 @@
 
   <form style="" class="ng-invalid ng-invalid-required" name="item.form" ng-submit="ctrl.addItem()">
 
-<h3 class="md-subhead">Link Information</h3>
+<h3 class="md-subhead">Change Log Information</h3>
 
     <div layout="row" class="input-row layout-row">
       <md-input-container class="flex" flex="">
@@ -14,25 +14,38 @@
         </div>
       </md-input-container>
       </div>
-      
-      <div layout="row" class="input-row layout-row">      
-      <md-input-container>
+
+      <div layout="row" class="input-row layout-row">
+        <div layout="column" flex style="font-size:.8em; color:grey">
             <label>Date Entered&#42;</label>
             <md-datepicker ng-init="change_log_table.date_entered = myDate" ng-model="change_log_table.date_entered" name="dateEnteredField" required="true"></md-datepicker>
-          </md-input-container>
+        </div>
+      </div>
 
 
+
+
+<div layout="row" class="input-row layout-row">
           <md-input-container class="flex" flex="">
-        		<md-select required="true" md-on-open="getPersonsFunc()" ng-model="change_log_table.person_ID" placeholder="Person&#42;" class="flex" flex="">
+        		<md-select required="true" md-on-open="getPersonsFunc()" ng-model="change_log_table.person_ID" placeholder="Person&#42;">
           				<md-option ng-value="person.person_ID" ng-repeat="person in getPersons.data">{{person.first_name}}, {{person.last_name}}</md-option>
           		</md-select>
-          
+
     			<button ng-controller="personController" class="md-button md-ink-ripple" type="button" ng-click="addItem($event)">
       				<div class="addButtonInModl">+ person</div>
     			</button>
-      		</md-input-container> 
-            </div>   
-      
+        </md-input-container>
+        </div>
+
+        <div layout="row" class="input-row layout-row">
+          <md-input-container style="margin-top:40px" class="flex" flex="">
+          <label style="margin-bottom:20px">Completed</label>
+            <md-switch aria-label="active switch" ng-init="change_log_table.completed = 'No'" ng-model="change_log_table.completed" ng-true-value="'Yes'" ng-false-value="'No'">
+              {{change_log_table.completed}}
+        </md-switch>
+          </md-input-container>
+        </div>
+
 
   </form>
   <div class="md-dialog-actions">
@@ -42,4 +55,3 @@
 
   <div tabindex="0" class="md-dialog-focus-trap"></div>
 </md-dialog-content>
-

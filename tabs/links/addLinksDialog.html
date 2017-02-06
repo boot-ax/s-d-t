@@ -28,7 +28,7 @@
         <input style="" aria-invalid="true" name="anchor_text" ng-model="links_table.anchor_text">
         <div class="md-errors-spacer"></div>
       </md-input-container>
-      
+
       <md-input-container class="flex" flex="">
         <label>Alt Text</label>
         <input style="" name="alt_text" ng-model="links_table.alt_text">
@@ -42,22 +42,23 @@
     <md-switch aria-label="active switch" ng-init="links_table.follow_link = 'No'" ng-model="links_table.follow_link" ng-true-value="'Yes'" ng-false-value="'No'">
       {{links_table.follow_link}}
 </md-switch>
-  </md-input-container> 
-  
+  </md-input-container>
+
 
 
    <md-input-container class="flex" flex="">
         <label>Title</label>
         <input style="" name="title" ng-model="links_table.title">
         <div class="md-errors-spacer"></div>
-      </md-input-container>   
+      </md-input-container>
         <div layout="row" class="input-row layout-row">
-        
-        <!--Add Date-->      
-      <md-input-container>
+
+        <!--Add Date-->     
+
+          <div layout="column" flex style="font-size:.8em; color:grey">
             <label>Date Created&#42;</label>
             <md-datepicker ng-init="links_table.date_created = myDate" ng-model="links_table.date_created" name="dateCreatedField" required="true"></md-datepicker>
-          </md-input-container>
+          </div>
 </div>
 <div class="md-errors-spacer"></div>
 <div layout="row" class="input-row layout-row">
@@ -75,4 +76,3 @@
 
   <div tabindex="0" class="md-dialog-focus-trap"></div>
 </md-dialog-content>
-

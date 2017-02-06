@@ -5,7 +5,13 @@
     <button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="filter.show = true" aria-label="filter_list">
       <md-icon class="material-icons">search</md-icon>
     </button>
-    <button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="addItem($event)" aria-label="local_dining">
+    <!-- <button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="bulkUpload($event)" aria-label="bulk_upload">
+      <i class="material-icons">file_upload</i>
+    </button> -->
+    <button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="bulkDownload($event,change_log_tables.data,$file,$header,$location)" aria-label="bulk_download">
+      <i class="material-icons">file_download</i>
+    </button>
+    <button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="addItem($event)" aria-label="add_new_item">
       <md-icon class="material-icons">add_circle</md-icon>
     </button>
   </div>
@@ -35,7 +41,8 @@
 <!-- exact table from live demo -->
 <md-table-container>
   <table md-table md-row-select ng-model="selected" md-progress="promise">
-    <thead md-head md-order="query.order" md-on-reorder="getDesserts">
+
+    <thead md-head md-order="query.order" md-on-reorder="getChangeLog">
       <tr md-row>
         <th md-column md-order-by="issue"><span>Issue</span></th>
         <th md-column md-numeric md-order-by="date_entered"><span>Date Entered</span></th>
@@ -80,4 +87,4 @@
   </table>
 </md-table-container>
 
-<md-table-pagination md-limit="query.limit" md-limit-options="[5, 10, 15]" md-page="query.page" md-total="{{change_log_tables.count}}" md-on-paginate="getDesserts" md-page-select></md-table-pagination>
+<md-table-pagination md-limit="query.limit" md-limit-options="[5, 10, 15]" md-page="query.page" md-total="{{change_log_tables.count}}" md-on-paginate="getChangeLog" md-page-select></md-table-pagination>

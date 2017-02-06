@@ -5,6 +5,9 @@
     <button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="filter.show = true" aria-label="filter_list">
       <md-icon class="material-icons">search</md-icon>
     </button>
+    <button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="bulkDownload($event,person_tables.data,$file,$header,$location)" aria-label="bulk_download">
+      <i class="material-icons">file_download</i>
+    </button>
     <button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="addItem($event)" aria-label="local_dining">
       <md-icon class="material-icons">add_circle</md-icon>
     </button>
@@ -63,7 +66,7 @@
         class="md-cell ng-binding md-clickable" tabindex="0">{{person_table.state}}</td>
         <td md-cell="" ng-click="changeCellText($event, person_table, 'phone_number',dbTableInfo.db_table,dbTableInfo.db_ID)" placeholder="{{person_table.phone_number}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{person_table.phone_number}}</td>
-        <td md-cell="" ng-click="changeCellText($event, person_table, 'zip_code',dbTableInfo.db_table,dbTableInfo.db_ID,8)" placeholder="{{person_table.zip_code}} " 
+        <td md-cell="" ng-click="changeCellText($event, person_table, 'zip_code',dbTableInfo.db_table,dbTableInfo.db_ID,8)" placeholder="{{person_table.zip_code}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{person_table.zip_code}}</td>
       </tr>
     </tbody>

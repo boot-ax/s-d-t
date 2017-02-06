@@ -1,7 +1,12 @@
-angular.module('SE_App').controller('change_logController', ['$mdDialog','$change_log', '$scope', '$mdEditDialog', '$http','$q','changeCellServices',function ($mdDialog, $change_log, $scope, $mdEditDialog, $http,$q,changeCellServices) {
+angular.module('SE_App').controller('change_logController', ['$mdDialog','$change_log', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $change_log, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
   'use strict';
 
   var bookmark;
+
+  $scope.$file = 'change_log.csv';
+  $scope.$header = ['issue','date_entered','completed','change_log_ID','person_ID','first_name','last_name'];
+  $scope.$location = '/service/change_log';
+
 
   $scope.selected = [];
 
@@ -14,7 +19,7 @@ angular.module('SE_App').controller('change_logController', ['$mdDialog','$chang
   $scope.query = {
     filter: '',
     limit: '5',
-    order: 'date_entered',
+    order: ['date_entered','completed'],
     page: 1
   };
 
@@ -35,6 +40,17 @@ angular.module('SE_App').controller('change_logController', ['$mdDialog','$chang
     $scope.change_log_tables = change_log_tables;
   }
 
+  $scope.bulkUpload = function (event) {
+    $mdDialog.show({
+      clickOutsideToClose: true,
+      controller: 'bulkUploadController',
+      controllerAs: 'ctrl',
+      focusOnOpen: false,
+      targetEvent: event,
+      templateUrl: 'inc/bulk_upload.html',
+    }).then($scope.getChangeLog);
+  };
+
   $scope.addItem = function (event) {
     $mdDialog.show({
       clickOutsideToClose: true,
@@ -43,7 +59,7 @@ angular.module('SE_App').controller('change_logController', ['$mdDialog','$chang
       focusOnOpen: false,
       targetEvent: event,
       templateUrl: 'tabs/changeLog/addchange_logDialog.html',
-    }).then($scope.getDesserts);
+    }).then($scope.getChangeLog);
   };
 
   $scope.delete = function (event) {
@@ -54,11 +70,11 @@ angular.module('SE_App').controller('change_logController', ['$mdDialog','$chang
       focusOnOpen: false,
       targetEvent: event,
       locals: { change_log_tables: $scope.selected },
-      templateUrl: 'tabs/changeLog/deletechange_logDialog.html',
-    }).then($scope.getDesserts);
+      templateUrl: 'inc/delete.html',
+    }).then($scope.getChangeLog);
   };
 
-  $scope.getDesserts = function () {
+  $scope.getChangeLog = function () {
     $scope.promise = $change_log.change_log_tables.get($scope.query, success).$promise;
   };
 
@@ -84,16 +100,14 @@ angular.module('SE_App').controller('change_logController', ['$mdDialog','$chang
       $scope.query.page = bookmark;
     }
 
-    $scope.getDesserts();
+    $scope.getChangeLog();
   });
 
   $scope.changeCellText = changeCellServices.changeCellText;
-
   $scope.changeDate = changeCellServices.changeDate;
-
   $scope.changeDropdown = changeCellServices.changeDropdown;
-
   $scope.changeSwitchValue = changeCellServices.changeSwitchValue;
+  $scope.bulkDownload = upDownloadService.bulkDownload;
 
 
   $scope.date_entered = function(change_log_table){

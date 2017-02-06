@@ -1,6 +1,6 @@
 //angular.module('se_management', ['ngMaterial', 'md.data.table','ngResource']);
 
-angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute','ngclipboard'])
+angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute','ngclipboard','ngSanitize', 'ngCsv'])
 
   .config(['$compileProvider', '$mdThemingProvider','$mdAriaProvider','$routeProvider','$locationProvider', function ($compileProvider, $mdThemingProvider,$mdAriaProvider,$routeProvider, $locationProvider) {
     'use strict';
@@ -13,7 +13,7 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
 
     $routeProvider
      .when('/domains', {
-       templateUrl: 'tabs/domains/domains.html',
+       templateUrl: '/tabs/domains/domains.html/',
        controller: 'domainController'
      })
      .when('/hosting', {
@@ -55,6 +55,33 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
     // configure html5 to get links working on jsfiddle
     // $locationProvider.html5Mode(true);
   }])
+.service('upDownloadService',function($q,$http,$mdToast,$mdDialog){
+
+  this.bulkDownload = function (event,$current_data,$file_name,$header,$location) {
+    $mdDialog.show({
+      clickOutsideToClose: true,
+      controller: 'bulkDownloadController',
+      controllerAs: 'ctrl',
+      focusOnOpen: false,
+      targetEvent: event,
+      templateUrl: 'inc/bulk_download.html',
+      resolve: {
+           tableData: function () {
+             return $current_data;
+           },
+           file_name: function(){
+             return $file_name;
+           },
+           header: function(){
+             return $header;
+           },
+           location: function(){
+             return $location;
+           }
+         }
+    });
+  };
+})
 
   .service('changeCellServices',function($mdEditDialog,$q,$http,$mdToast){
 
@@ -89,7 +116,7 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
             $obj.value = table[column];
             $obj.identifier = db_ID;
             $obj.id = table[db_ID];
-            $http.post('service/updateItem',$obj).then(function(response){
+            $http.post('/service/updateItem/',$obj).then(function(response){
               success(response);
               deferred.resolve();
             },function(response){
@@ -263,4 +290,54 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
 		}
 
 	});
+}]);
+
+angular.module('SE_App').controller('bulkDownloadController', ['$mdDialog','$scope' , '$http', '$q','$mdToast','tableData','file_name','header','location',function ($mdDialog, $scope, $http, $q, $mdToast,tableData,file_name,header,location) {
+  'use strict';
+
+this.$file = file_name;
+
+this.$csv_header = header;
+
+this.$location = location;
+
+
+this.tableNew = function(){
+    $mdDialog.hide();
+    return tableData;
+  };
+  this.cancel = $mdDialog.cancel;
+
+  this.bulkDownload = function () {
+
+    var failure  = function(data){
+      $mdToast.show(
+          $mdToast.simple()
+            .textContent(data.data)
+            .hideDelay(3000)
+        );
+    };
+
+    var $query = {
+      all: 'true'
+    };
+var deferred = $q.defer();
+$scope.promise = deferred.promise;
+console.log('step one');
+$http({
+  method: 'GET',
+  url: location,
+  params:$query
+}).then(function(response){
+  //success(response);
+  //console.log(response.data.data);
+  deferred.resolve(response.data.data);
+},function(response){
+  failure(response);
+  deferred.reject();
+});
+$mdDialog.hide();
+console.log(deferred.promise);
+return deferred.promise;
+  };
 }]);

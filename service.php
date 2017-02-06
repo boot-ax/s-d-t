@@ -318,6 +318,7 @@ exit();
 	}
 });
 
+
 Flight::route('GET /service/hosting', function(){
 
 
@@ -339,6 +340,11 @@ Flight::route('GET /service/hosting', function(){
 	$order = mysqli_real_escape_string($con, $order);
 	$page = $_GET['page'];
 
+	$all = $_GET['all'];
+	if ($all ==='true'){
+		$limit = '';
+	};
+
 	$start_from = ($page-1) * $limit;
 
 
@@ -352,9 +358,12 @@ Flight::route('GET /service/hosting', function(){
 					OR (`date_started` LIKE '%".$filter."%')
 					OR (`expiration_date` LIKE '%".$filter."%')
 					OR (`creditcard_last_4` LIKE '%".$filter."%')
-					OR (`setup_domain` LIKE '%".$filter."%')
-					ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder."
-					LIMIT ".$start_from.",". $limit."";
+					OR (`setup_domain` LIKE '%".$filter."%')";
+					if($all !=='true'){
+						$sql_query .=
+				"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
+				" LIMIT ".$start_from.",". $limit."";
+					};
 
 
     	$qry_result = mysqli_query($con, $sql_query) or die(mysqli_error($con));
@@ -396,6 +405,11 @@ Flight::route('GET /service/person', function(){
 	$order = mysqli_real_escape_string($con, $order);
 	$page = $_GET['page'];
 
+	$all = $_GET['all'];
+	if ($all ==='true'){
+		$limit = '';
+	};
+
 	$start_from = ($page-1) * $limit;
 
 
@@ -408,9 +422,12 @@ Flight::route('GET /service/person', function(){
 					OR (`city` LIKE '%".$filter."%')
 					OR (`state` LIKE '%".$filter."%')
 					OR (`phone_number` LIKE '%".$filter."%')
-					OR (`zip_code` LIKE '%".$filter."%')
-					ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder."
-					LIMIT ".$start_from.",". $limit."";
+					OR (`zip_code` LIKE '%".$filter."%')";
+					if($all !=='true'){
+						$sql_query .=
+				"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
+				" LIMIT ".$start_from.",". $limit."";
+					};
 
 
    	$qry_result = mysqli_query($con, $sql_query) or die(mysqli_error($con));
@@ -452,6 +469,11 @@ Flight::route('GET /service/links', function(){
 	$order = mysqli_real_escape_string($con, $order);
 	$page = $_GET['page'];
 
+	$all = $_GET['all'];
+	if ($all ==='true'){
+		$limit = '';
+	};
+
 	$start_from = ($page-1) * $limit;
 
 
@@ -464,10 +486,12 @@ Flight::route('GET /service/links', function(){
 					OR (`follow_link` LIKE '%".$filter."%')
 					OR (`date_created` LIKE '%".$filter."%')
 					OR (`title` LIKE '%".$filter."%')
-					OR (`comment` LIKE '%".$filter."%')
-					ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder."
-					LIMIT ".$start_from.",". $limit."";
-
+					OR (`comment` LIKE '%".$filter."%')";
+					if($all !=='true'){
+						$sql_query .=
+				"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
+				" LIMIT ".$start_from.",". $limit."";
+					};
 
   	$qry_result = mysqli_query($con, $sql_query) or die(mysqli_error($con));
 
@@ -489,7 +513,6 @@ Flight::route('GET /service/links', function(){
 
 Flight::route('GET /service/change_log', function(){
 
-
 		if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
 		header('Location: https://dev.webwright.io');
 		exit();
@@ -508,23 +531,27 @@ Flight::route('GET /service/change_log', function(){
 	$order = mysqli_real_escape_string($con, $order);
 	$page = $_GET['page'];
 
-	$start_from = ($page-1) * $limit;
+	$all = $_GET['all'];
+	if ($all ==='true'){
+		$limit = '';
+	};
 
+	$start_from = ($page-1) * $limit;
 
 	$sql_query = "SELECT SQL_CALC_FOUND_ROWS change_log.issue,change_log.date_entered,change_log.completed,change_log.change_log_ID,change_log.person_ID,person.first_name,person.last_name FROM change_log
 
-
 					LEFT JOIN `person` ON change_log.person_ID = person.person_ID
-
 
 					WHERE (`issue` LIKE '%".$filter."%')
 					OR (`date_entered` LIKE '%".$filter."%')
 					OR (`completed` LIKE '%".$filter."%')
 					OR (`first_name` LIKE '%".$filter."%')
-					OR (`last_name` LIKE '%".$filter."%')
-					ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder."
-					LIMIT ".$start_from.",". $limit."";
-
+					OR (`last_name` LIKE '%".$filter."%')";
+					if($all !=='true'){
+						$sql_query .=
+				"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
+				" LIMIT ".$start_from.",". $limit."";
+					};
 
   	$qry_result = mysqli_query($con, $sql_query) or die(mysqli_error($con));
 
@@ -537,15 +564,12 @@ Flight::route('GET /service/change_log', function(){
 		$num_rows = mysqli_fetch_array($qry_result);
 		$newArray = array('page'=>$page,'count'=>$num_rows[0],'data'=>$rows);
 
-
-
 	Flight::json($newArray);
 	//echo (str_replace('\u0000', '', json_encode($newArray)));
 		}
 });
 
 Flight::route('GET /service/registrar', function(){
-
 
 		if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
 		header('Location: https://dev.webwright.io');
@@ -564,6 +588,10 @@ Flight::route('GET /service/registrar', function(){
 	$order = htmlspecialchars($order);
 	$order = mysqli_real_escape_string($con, $order);
 	$page = $_GET['page'];
+	$all = $_GET['all'];
+	if ($all ==='true'){
+		$limit = '';
+	};
 
 	$start_from = ($page-1) * $limit;
 
@@ -579,10 +607,12 @@ Flight::route('GET /service/registrar', function(){
 					OR (`login_password` LIKE '%".$filter."%')
 					OR (`credit_card_last_4` LIKE '%".$filter."%')
 					OR (`first_name` LIKE '%".$filter."%')
-					OR (`last_name` LIKE '%".$filter."%')
-					ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder."
-					LIMIT ".$start_from.",". $limit."";
-
+					OR (`last_name` LIKE '%".$filter."%')";
+					if($all !=='true'){
+						$sql_query .=
+				"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
+				" LIMIT ".$start_from.",". $limit."";
+					};
 
     	$qry_result = mysqli_query($con, $sql_query) or die(mysqli_error($con));
 
@@ -622,6 +652,10 @@ Flight::route('GET /service/resource_login', function(){
 	$order = htmlspecialchars($order);
 	$order = mysqli_real_escape_string($con, $order);
 	$page = $_GET['page'];
+	$all = $_GET['all'];
+	if ($all ==='true'){
+		$limit = '';
+	};
 
 	$start_from = ($page-1) * $limit;
 
@@ -637,9 +671,12 @@ Flight::route('GET /service/resource_login', function(){
 					OR (`password` LIKE '%".$filter."%')
 					OR (`product_description` LIKE '%".$filter."%')
 					OR (`first_name` LIKE '%".$filter."%')
-					OR (`last_name` LIKE '%".$filter."%')
-					ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder."
-					LIMIT ".$start_from.",". $limit."";
+					OR (`last_name` LIKE '%".$filter."%')";
+					if($all !=='true'){
+						$sql_query .=
+				"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
+				" LIMIT ".$start_from.",". $limit."";
+					};
 
 
   	$qry_result = mysqli_query($con, $sql_query) or die(mysqli_error($con));
@@ -680,6 +717,10 @@ Flight::route('GET /service/W2_accounts', function(){
 	$order = htmlspecialchars($order);
 	$order = mysqli_real_escape_string($con, $order);
 	$page = $_GET['page'];
+	$all = $_GET['all'];
+	if ($all ==='true'){
+		$limit = '';
+	};
 
 	$start_from = ($page-1) * $limit;
 
@@ -695,9 +736,12 @@ Flight::route('GET /service/W2_accounts', function(){
 					OR (`password` LIKE '%".$filter."%')
 					OR (`attached_domain` LIKE '%".$filter."%')
 					OR (`first_name` LIKE '%".$filter."%')
-					OR (`last_name` LIKE '%".$filter."%')
-					ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder."
-					LIMIT ".$start_from.",". $limit."";
+					OR (`last_name` LIKE '%".$filter."%')";
+					if($all !=='true'){
+						$sql_query .=
+				"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
+				" LIMIT ".$start_from.",". $limit."";
+					};
 
 
    	$qry_result = mysqli_query($con, $sql_query) or die(mysqli_error($con));
@@ -738,27 +782,34 @@ Flight::route('GET /service/domains', function(){
 	$order = htmlspecialchars($order);
 	$order = mysqli_real_escape_string($con, $order);
 	$page = $_GET['page'];
+	$all = $_GET['all'];
+	if ($all ==='true'){
+		$limit = '';
+	};
 
 	$start_from = ($page-1) * $limit;
 
-	$sql_query = "SELECT SQL_CALC_FOUND_ROWS domains.domain_name,domains.ip_address,domains.nameserver_1,domains.ns1_IP,domains.nameserver_2,domains.ns2_IP,domains.nameserver_3,domains.ns3_IP,domains.date_purchased,domains.expiration_date,domains.registrar_ID,domains.hosting_ID,domains.registrar_301,domains.registrar_301_target,domains.whois_protected,domains.domain_ID,registrar.registrar_name,hosting.hosting_name FROM domains ".
-						"LEFT JOIN `registrar` ON domains.registrar_ID = registrar.registrar_ID ".
-						"LEFT JOIN `hosting` ON domains.hosting_ID = hosting.hosting_ID ".
-						"WHERE (`domain_name` LIKE '%".$filter."%') ".
-						"OR (`ip_address` LIKE '%".$filter."%') ".
-						"OR (`nameserver_1` LIKE '%".$filter."%') ".
-						"OR (`ns1_IP` LIKE '%".$filter."%') ".
-						"OR (`nameserver_2` LIKE '%".$filter."%') ".
-						"OR (`ns2_IP` LIKE '%".$filter."%') ".
-						"OR (`nameserver_3` LIKE '%".$filter."%') ".
-						"OR (`ns3_IP` LIKE '%".$filter."%') ".
-						"OR (`registrar_name` LIKE '%".$filter."%') ".
-						"OR (`hosting_name` LIKE '%".$filter."%') ".
-						"OR (`registrar_301` LIKE '%".$filter."%') ".
-						"OR (`registrar_301_target` LIKE '%".$filter."%') ".
-						"OR (`whois_protected` LIKE '%".$filter."%') ".
-						"ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder." ".
-						"LIMIT ".$start_from.",".$limit;
+	$sql_query = "SELECT SQL_CALC_FOUND_ROWS domains.domain_name,domains.ip_address,domains.nameserver_1,domains.ns1_IP,domains.nameserver_2,domains.ns2_IP,domains.nameserver_3,domains.ns3_IP,domains.date_purchased,domains.expiration_date,domains.registrar_ID,domains.hosting_ID,domains.registrar_301,domains.registrar_301_target,domains.whois_protected,domains.domain_ID,registrar.registrar_name,hosting.hosting_name FROM domains
+						LEFT JOIN `registrar` ON domains.registrar_ID = registrar.registrar_ID
+						LEFT JOIN `hosting` ON domains.hosting_ID = hosting.hosting_ID
+						WHERE (`domain_name` LIKE '%".$filter."%')
+						OR (`ip_address` LIKE '%".$filter."%')
+						OR (`nameserver_1` LIKE '%".$filter."%')
+						OR (`ns1_IP` LIKE '%".$filter."%')
+						OR (`nameserver_2` LIKE '%".$filter."%')
+						OR (`ns2_IP` LIKE '%".$filter."%')
+						OR (`nameserver_3` LIKE '%".$filter."%')
+						OR (`ns3_IP` LIKE '%".$filter."%')
+						OR (`registrar_name` LIKE '%".$filter."%')
+						OR (`hosting_name` LIKE '%".$filter."%')
+						OR (`registrar_301` LIKE '%".$filter."%')
+						OR (`registrar_301_target` LIKE '%".$filter."%')
+						OR (`whois_protected` LIKE '%".$filter."%')";
+						if($all !=='true'){
+							$sql_query .=
+					"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
+					" LIMIT ".$start_from.",". $limit."";
+						};
 
    	$qry_result = mysqli_query($con, $sql_query) or die(mysqli_error($con));
 
@@ -798,6 +849,10 @@ Flight::route('GET /service/cms_login', function(){
 	$order = htmlspecialchars($order);
 	$order = mysqli_real_escape_string($con, $order);
 	$page = $_GET['page'];
+	$all = $_GET['all'];
+	if ($all ==='true'){
+		$limit = '';
+	};
 
 	$start_from = ($page-1) * $limit;
 
@@ -814,9 +869,12 @@ Flight::route('GET /service/cms_login', function(){
 					OR (`cpanel_url` LIKE '%".$filter."%')
 					OR (`cpanel_username` LIKE '%".$filter."%')
 					OR (`cpanel_password` LIKE '%".$filter."%')
-					OR (`domain_name` LIKE '%".$filter."%')
-					ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder."
-					LIMIT ".$start_from.",". $limit."";
+					OR (`domain_name` LIKE '%".$filter."%')";
+					if($all !=='true'){
+						$sql_query .=
+				"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
+				" LIMIT ".$start_from.",". $limit."";
+					};
 
 
   	$qry_result = mysqli_query($con, $sql_query) or die(mysqli_error($con));
@@ -829,8 +887,6 @@ Flight::route('GET /service/cms_login', function(){
 		$qry_result = mysqli_query($con, "SELECT FOUND_ROWS()");
 		$num_rows = mysqli_fetch_array($qry_result);
 		$newArray = array('page'=>$page,'count'=>$num_rows[0],'data'=>$rows);
-
-
 
 	Flight::json($newArray);
 	//echo (str_replace('\u0000', '', json_encode($newArray)));
