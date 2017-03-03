@@ -20,7 +20,7 @@ angular.module('SE_App').controller('registrarController', ['$mdDialog','$regist
 
   $scope.query = {
     filter: '',
-    limit: '5',
+    limit: '15',
     order: 'registrar_name',
     page: 1
   };

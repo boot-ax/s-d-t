@@ -9,7 +9,7 @@
 
 angular.module('md.table.templates', ['md-table-pagination.html', 'md-table-progress.html', 'arrow-up.svg', 'navigate-before.svg', 'navigate-first.svg', 'navigate-last.svg', 'navigate-next.svg']);
 
-angular.module('md-table-pagination.html', []).run(['$templateCache', function($templateCache) {
+angular.module('md-table-pagination.html', []).run(['$templateCache', function($templateCache,user) {
   $templateCache.put('md-table-pagination.html',
     '<div class="page-select" ng-if="$pagination.showPageSelect()">\n' +
     '  <div class="label">{{$pagination.label.page}}</div>\n' +

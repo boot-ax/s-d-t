@@ -25,9 +25,9 @@ function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q,changeCe
 
   $scope.query = {
     filter: '',
-    limit: '5',
+    limit: '15',
     order: 'domain_name',
-    page: 1
+    page: 1,
   };
 
   $scope.dbTableInfo = {

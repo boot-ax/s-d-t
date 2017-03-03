@@ -24,7 +24,7 @@ angular.module('SE_App').controller('resource_loginController', ['$mdDialog','$r
 
   $scope.query = {
     filter: '',
-    limit: '5',
+    limit: '15',
     order: 'resource_url_name',
     page: 1
   };

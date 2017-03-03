@@ -111,3 +111,11 @@ md-dialog[add-item-dialog] > md-dialog-content > form > .input-row {
 md-dialog[add-item-dialog] > md-dialog-content > form > .input-row > md-input-container {
   min-width: 120px;
 }
+
+
+
+.menudemoMenuWidth .md-menu-demo {
+  padding: 24px; }
+
+.menudemoMenuWidth .menu-demo-container {
+  min-height: 200px; }

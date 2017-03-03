@@ -24,7 +24,7 @@ angular.module('SE_App').controller('hostingController', ['$mdDialog','$hosting'
 
   $scope.query = {
     filter: '',
-    limit: '5',
+    limit: '15',
     order: 'hosting_name',
     page: 1
   };

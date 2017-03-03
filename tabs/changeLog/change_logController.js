@@ -18,7 +18,7 @@ angular.module('SE_App').controller('change_logController', ['$mdDialog','$chang
 
   $scope.query = {
     filter: '',
-    limit: '5',
+    limit: '15',
     order: ['date_entered','completed'],
     page: 1
   };

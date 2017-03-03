@@ -24,7 +24,7 @@ angular.module('SE_App').controller('personController', ['$mdDialog','$person', 
 
   $scope.query = {
     filter: '',
-    limit: '5',
+    limit: '15',
     order: 'last_name',
     page: 1
   };

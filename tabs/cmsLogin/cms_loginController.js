@@ -23,7 +23,7 @@ angular.module('SE_App').controller('cms_loginController', ['$mdDialog','$cms_lo
 
   $scope.query = {
     filter: '',
-    limit: '5',
+    limit: '15',
     order: 'install_site_url_name',
     page: 1
   };

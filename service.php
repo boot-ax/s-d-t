@@ -1,16 +1,68 @@
 <?php
 
+
 require 'vendor/autoload.php';
 
 //date_default_timezone_set('UTC');
 
+$jwt_key = "joelikeshisinflatableball";
+
+Flight::before('start', function(&$params, &$output){
+    global $jwt_key;
+
+    $request = Flight::request();
+    if($request->url != '/service/auth/login'){
+      $jwt = substr($_SERVER['HTTP_AUTHORIZATION'],7);
+      try{
+				$validator = new \Gamegos\JWT\Validator();
+				$token = $validator->validate($jwt, $jwt_key);
+
+        $request->data->user = json_decode($token->getClaims()['sub']);
+				//Used to check the token information being injected into the request object of Flight PHP
+				// var_dump($request->data->user);
+				// die();
+      }catch(Exception $e){
+        Flight::halt(401,"User not authorized");
+      }
+    }
+});
+
+Flight::route('POST /service/auth/login', function(){
+	global $jwt_key;
+	$entityBody = Flight::request()->getBody();
+	include "inc/connection.php";
+
+	$entityBody = str_replace('\\u0000', '', $entityBody);
+	$entityBody2 = json_decode($entityBody,true);
+	// build query...
+
+    $sql  = "SELECT user_id, user_email FROM registration
+		WHERE (`user_email` = '".$entityBody2['email']."')
+		AND (`user_password` = md5('".$entityBody2['password']."'));";
+
+		$qry_result = mysqli_query($con, $sql) or die(mysqli_error($con));
+
+		if(mysqli_num_rows($qry_result)>0){
+			$user = mysqli_fetch_assoc($qry_result);
+
+	$alg = "HS256";
+
+	$token = new \Gamegos\JWT\Token();
+	$token->setClaim('sub', json_encode($user));
+	$token->setClaim('exp', time()+60*60*24*7);
+
+	$encoder = new \Gamegos\JWT\Encoder();
+	$encoder->encode($token, $jwt_key, $alg);
+
+	Flight::json(array('token'=>$token->getJWT()));
+} else {
+	FLight::halt(401,$entityBody2['email'] . " or password is incorrect");
+}
+
+});
+
 
 Flight::route('POST /service/cms_login', function(){
-
-	if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-exit();
-	} else {
 
 	$entityBody = Flight::request()->getBody();
 
@@ -39,15 +91,11 @@ exit();
    Flight::halt(500,mysqli_error($con));
    //die(mysqli_error($con));
   }
-	}
+
 });
 
 Flight::route('POST /service/domains', function(){
 
-	if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-exit();
-	} else {
 
 	$entityBody = Flight::request()->getBody();
 
@@ -73,15 +121,74 @@ exit();
 	  Flight::halt(500,mysqli_error($con));
 	  //die(mysqli_error($con));
   }
-	}
+
+});
+
+
+Flight::route('POST /service/url_data', function(){
+
+
+	$entityBody = Flight::request()->getBody();
+
+
+
+	include "inc/connection.php";
+
+	$entityBody = str_replace('\\u0000', '', $entityBody);
+	$entityBody2 = json_decode($entityBody,true);
+
+	// build query...
+   $sql  = "INSERT INTO url_data";
+   // implode keys of $array...
+   $sql .= " (`".implode("`, `", array_keys($entityBody2['url_data_table']))."`)";
+   // implode values of $array...
+	 $sql .= " VALUES (\"".implode("\", \"", $entityBody2['url_data_table'])."\");";
+
+
+ // execute query...
+  $qry_result = mysqli_query($con, $sql);
+  if($qry_result){
+	  Flight::halt(200,"Resource login Added.");
+  }else{
+	  Flight::halt(500,mysqli_error($con));
+	  //die(mysqli_error($con));
+  }
+
+});
+
+Flight::route('POST /service/software_keys', function(){
+
+
+	$entityBody = Flight::request()->getBody();
+
+
+
+	include "inc/connection.php";
+
+	$entityBody = str_replace('\\u0000', '', $entityBody);
+	$entityBody2 = json_decode($entityBody,true);
+
+	// build query...
+   $sql  = "INSERT INTO software_keys";
+   // implode keys of $array...
+   $sql .= " (`".implode("`, `", array_keys($entityBody2['software_keys_table']))."`)";
+   // implode values of $array...
+	 $sql .= " VALUES (\"".implode("\", \"", $entityBody2['software_keys_table'])."\");";
+
+
+ // execute query...
+  $qry_result = mysqli_query($con, $sql);
+  if($qry_result){
+	  Flight::halt(200,"Resource login Added.");
+  }else{
+	  Flight::halt(500,mysqli_error($con));
+	  //die(mysqli_error($con));
+  }
+
 });
 
 Flight::route('POST /service/resource_login', function(){
 
-	if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-exit();
-	} else {
 
 	$entityBody = Flight::request()->getBody();
 
@@ -108,15 +215,11 @@ exit();
 	  Flight::halt(500,mysqli_error($con));
 	  //die(mysqli_error($con));
   }
-	}
+
 });
 
 Flight::route('POST /service/W2_accounts', function(){
 
-	if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-exit();
-	} else {
 
 	$entityBody = Flight::request()->getBody();
 
@@ -144,15 +247,12 @@ exit();
 	  Flight::halt(500,mysqli_error($con));
 	  //die(mysqli_error($con));
   }
-	}
+
 });
 
 Flight::route('POST /service/hosting', function(){
 
-	if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-exit();
-	} else {
+
 
 	$entityBody = Flight::request()->getBody();
 
@@ -180,15 +280,12 @@ exit();
 	  Flight::halt(500,mysqli_error($con));
 	  //die(mysqli_error($con));
   }
-	}
+
 });
 
 Flight::route('POST /service/person', function(){
 
-	if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-exit();
-	} else {
+
 
 	$entityBody = Flight::request()->getBody();
 	include "inc/connection.php";
@@ -213,15 +310,11 @@ exit();
 	  Flight::halt(500,mysqli_error($con));
 	  //die(mysqli_error($con));
   }
-	}
+
 });
 
 Flight::route('POST /service/links', function(){
 
-	if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-exit();
-	} else {
 
 	$entityBody = Flight::request()->getBody();
 	include "inc/connection.php";
@@ -246,15 +339,12 @@ exit();
 	  Flight::halt(500,mysqli_error($con));
 	  //die(mysqli_error($con));
   }
-	}
+
 });
 
 Flight::route('POST /service/change_log', function(){
 
-	if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-exit();
-	} else {
+
 
 	$entityBody = Flight::request()->getBody();
 	include "inc/connection.php";
@@ -279,15 +369,11 @@ exit();
 	  Flight::halt(500,mysqli_error($con));
 	  //die(mysqli_error($con));
   }
-	}
+
 });
 
 Flight::route('POST /service/registrar', function(){
 
-	if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-exit();
-	} else {
 
 	$entityBody = Flight::request()->getBody();
 
@@ -315,17 +401,12 @@ exit();
 	  Flight::halt(500,mysqli_error($con));
 	  //die(mysqli_error($con));
   }
-	}
+
 });
 
 
 Flight::route('GET /service/hosting', function(){
 
-
-		if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-		exit();
-		} else {
 	include "inc/connection.php";
 	$limit = $_GET['limit'];
 	$filter = $_GET['filter'];
@@ -373,24 +454,21 @@ Flight::route('GET /service/hosting', function(){
     			$rows[] = $r;
 				}
 
+
 		$qry_result = mysqli_query($con, "SELECT FOUND_ROWS()");
 		$num_rows = mysqli_fetch_array($qry_result);
 		$newArray = array('page'=>$page,'count'=>$num_rows[0],'data'=>$rows);
 
 
-
 	Flight::json($newArray);
 	//echo (str_replace('\u0000', '', json_encode($newArray)));
-		}
+
 });
 
 Flight::route('GET /service/person', function(){
 
 
-		if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-		exit();
-		} else {
+
 	include "inc/connection.php";
 	$limit = $_GET['limit'];
 	$filter = $_GET['filter'];
@@ -445,16 +523,13 @@ Flight::route('GET /service/person', function(){
 
 	Flight::json($newArray);
 	//echo (str_replace('\u0000', '', json_encode($newArray)));
-		}
+
 });
 
 Flight::route('GET /service/links', function(){
 
 
-		if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-		exit();
-		} else {
+
 	include "inc/connection.php";
 	$limit = $_GET['limit'];
 	$filter = $_GET['filter'];
@@ -508,15 +583,11 @@ Flight::route('GET /service/links', function(){
 
 	Flight::json($newArray);
 	//echo (str_replace('\u0000', '', json_encode($newArray)));
-		}
+
 });
 
 Flight::route('GET /service/change_log', function(){
 
-		if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-		exit();
-		} else {
 	include "inc/connection.php";
 	$limit = $_GET['limit'];
 	$filter = $_GET['filter'];
@@ -566,15 +637,12 @@ Flight::route('GET /service/change_log', function(){
 
 	Flight::json($newArray);
 	//echo (str_replace('\u0000', '', json_encode($newArray)));
-		}
+
 });
 
 Flight::route('GET /service/registrar', function(){
 
-		if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-		exit();
-		} else {
+
 	include "inc/connection.php";
 	$limit = $_GET['limit'];
 	$filter = $_GET['filter'];
@@ -629,16 +697,15 @@ Flight::route('GET /service/registrar', function(){
 
 	Flight::json($newArray);
 	//echo (str_replace('\u0000', '', json_encode($newArray)));
-		}
+
 });
 
-Flight::route('GET /service/resource_login', function(){
 
 
-		if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-		exit();
-		} else {
+Flight::route('GET /service/url_data', function(){
+
+
+
 	include "inc/connection.php";
 	$limit = $_GET['limit'];
 	$filter = $_GET['filter'];
@@ -659,20 +726,30 @@ Flight::route('GET /service/resource_login', function(){
 
 	$start_from = ($page-1) * $limit;
 
+	$sql_query1 = "SELECT ose_metrics_ID FROM ose_metrics WHERE id = LAST_INSERT_ID()";
 
-	$sql_query = "SELECT SQL_CALC_FOUND_ROWS resource_login.resource_url_name,resource_login.name_of_product,resource_login.username,resource_login.password,resource_login.product_description,resource_login.resource_url_ID,person.first_name,person.last_name FROM resource_login
+
+	$sql_query ="SELECT SQL_CALC_FOUND_ROWS u.*,ose1.domain_authority,ose1.page_authority,ose1.ose_num_links,ose1.ose_status_code,ose1.ose_external_equity,maj1.trust_flow,maj1.citation_flow,maj1.majestic_num_links
+
+FROM url_data u
+LEFT JOIN `ose_metrics` ose1 ON u.ose_metrics_ID = ose1.ose_metrics_ID
+LEFT JOIN `majestic_metrics` maj1 ON u.majestic_metrics_ID = maj1.majestic_metrics_ID
 
 
-					LEFT JOIN `person` ON resource_login.person_ID = person.person_ID
+ 					WHERE (`url_name` LIKE '%".$filter."%')
+					OR (`crawl_frequency` LIKE '%".$filter."%')
+					OR (`domain_authority` LIKE '%".$filter."%')
+					OR (`page_authority` LIKE '%".$filter."%')
+					OR (`trust_flow` LIKE '%".$filter."%')
+					OR (`citation_flow` LIKE '%".$filter."%')
 
-					WHERE (`resource_url_name` LIKE '%".$filter."%')
-					OR (`name_of_product` LIKE '%".$filter."%')
-					OR (`username` LIKE '%".$filter."%')
-					OR (`password` LIKE '%".$filter."%')
-					OR (`product_description` LIKE '%".$filter."%')
-					OR (`first_name` LIKE '%".$filter."%')
-					OR (`last_name` LIKE '%".$filter."%')";
-					if($all !=='true'){
+					OR (`ose_num_links` LIKE '%".$filter."%')
+					OR (`majestic_num_links` LIKE '%".$filter."%')";
+
+
+
+
+if($all !=='true'){
 						$sql_query .=
 				"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
 				" LIMIT ".$start_from.",". $limit."";
@@ -694,16 +771,126 @@ Flight::route('GET /service/resource_login', function(){
 
 	Flight::json($newArray);
 	//echo (str_replace('\u0000', '', json_encode($newArray)));
-		}
+
 });
+
+
+
+Flight::route('GET /service/resource_login', function(){
+
+	include "inc/connection.php";
+	$limit = $_GET['limit'];
+	$filter = $_GET['filter'];
+	$filter = htmlspecialchars($filter);
+	$filter = mysqli_real_escape_string($con, $filter);
+	$order = $_GET['order'];
+	$orderOrder = "";
+	if (strpos($order, '-') !== false) {
+    $orderOrder = "DESC";
+		} else {$orderOrder = "ASC";}
+	$order = htmlspecialchars($order);
+	$order = mysqli_real_escape_string($con, $order);
+	$page = $_GET['page'];
+	$all = $_GET['all'];
+	if ($all ==='true'){
+		$limit = '';
+	};
+
+	$start_from = ($page-1) * $limit;
+
+	$sql_query = "SELECT SQL_CALC_FOUND_ROWS resource_login.resource_url_name,resource_login.name_of_product,resource_login.username,resource_login.password,resource_login.product_description,resource_login.resource_url_ID,person.first_name,person.last_name FROM resource_login
+
+					LEFT JOIN `person` ON resource_login.person_ID = person.person_ID
+
+					WHERE (`resource_url_name` LIKE '%".$filter."%')
+					OR (`name_of_product` LIKE '%".$filter."%')
+					OR (`username` LIKE '%".$filter."%')
+					OR (`password` LIKE '%".$filter."%')
+					OR (`product_description` LIKE '%".$filter."%')
+					OR (`first_name` LIKE '%".$filter."%')
+					OR (`last_name` LIKE '%".$filter."%')";
+					if($all !=='true'){
+						$sql_query .=
+				"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
+				" LIMIT ".$start_from.",". $limit."";
+					};
+
+  	$qry_result = mysqli_query($con, $sql_query) or die(mysqli_error($con));
+
+	$rows = array();
+			while($r = mysqli_fetch_assoc($qry_result)) {
+    			$rows[] = $r;
+				}
+
+		$qry_result = mysqli_query($con, "SELECT FOUND_ROWS()");
+		$num_rows = mysqli_fetch_array($qry_result);
+		$newArray = array('page'=>$page,'count'=>$num_rows[0],'data'=>$rows);
+
+	Flight::json($newArray);
+
+});
+
+
+Flight::route('GET /service/software_keys', function(){
+
+	include "inc/connection.php";
+	$limit = $_GET['limit'];
+	$filter = $_GET['filter'];
+	$filter = htmlspecialchars($filter);
+	$filter = mysqli_real_escape_string($con, $filter);
+	$order = $_GET['order'];
+	$orderOrder = "";
+	if (strpos($order, '-') !== false) {
+    $orderOrder = "DESC";
+		} else {$orderOrder = "ASC";}
+	$order = htmlspecialchars($order);
+	$order = mysqli_real_escape_string($con, $order);
+	$page = $_GET['page'];
+	$all = $_GET['all'];
+	if ($all ==='true'){
+		$limit = '';
+	};
+
+	$start_from = ($page-1) * $limit;
+
+	$sql_query = "SELECT SQL_CALC_FOUND_ROWS software_keys.software_name,software_keys.license_key,software_keys.serial_number,software_keys.comments,software_keys.software_keys_ID,person.first_name,person.last_name FROM software_keys
+
+					LEFT JOIN `person` ON software_keys.person_ID = person.person_ID
+
+					WHERE (`software_name` LIKE '%".$filter."%')
+					OR (`license_key` LIKE '%".$filter."%')
+					OR (`serial_number` LIKE '%".$filter."%')
+					OR (`software_keys_ID` LIKE '%".$filter."%')
+					OR (`first_name` LIKE '%".$filter."%')
+          OR (`comments` LIKE '%".$filter."%')
+					OR (`last_name` LIKE '%".$filter."%')";
+					if($all !=='true'){
+						$sql_query .=
+				"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
+				" LIMIT ".$start_from.",". $limit."";
+					};
+
+var_dump($sql_query);
+
+  	$qry_result = mysqli_query($con, $sql_query) or die(mysqli_error($con));
+
+	$rows = array();
+			while($r = mysqli_fetch_assoc($qry_result)) {
+    			$rows[] = $r;
+				}
+
+		$qry_result = mysqli_query($con, "SELECT FOUND_ROWS()");
+		$num_rows = mysqli_fetch_array($qry_result);
+		$newArray = array('page'=>$page,'count'=>$num_rows[0],'data'=>$rows);
+
+	Flight::json($newArray);
+
+});
+
+
 
 Flight::route('GET /service/W2_accounts', function(){
 
-
-		if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-		exit();
-		} else {
 	include "inc/connection.php";
 	$limit = $_GET['limit'];
 	$filter = $_GET['filter'];
@@ -759,16 +946,15 @@ Flight::route('GET /service/W2_accounts', function(){
 
 	Flight::json($newArray);
 	//echo (str_replace('\u0000', '', json_encode($newArray)));
-		}
+
 });
 
 Flight::route('GET /service/domains', function(){
 
+	// $data = Flight::request()->data;
+	// var_dump(Flight::request()->data->user->user_id);
+	// die();
 
-		if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-		exit();
-		} else {
 	include "inc/connection.php";
 	$limit = $_GET['limit'];
 	$filter = $_GET['filter'];
@@ -826,16 +1012,13 @@ Flight::route('GET /service/domains', function(){
 
 	Flight::json($newArray);
 	// echo (str_replace('\u0000', '', json_encode($newArray)));
-		}
+
 });
 
 Flight::route('GET /service/cms_login', function(){
 
 
-		if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-		exit();
-		} else {
+
 	include "inc/connection.php";
 	$limit = $_GET['limit'];
 	$filter = $_GET['filter'];
@@ -890,84 +1073,92 @@ Flight::route('GET /service/cms_login', function(){
 
 	Flight::json($newArray);
 	//echo (str_replace('\u0000', '', json_encode($newArray)));
-		}
+
 });
 
 Flight::route('DELETE /service/domains', function(){
-	if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-exit();
-		} else {
+
 	include "inc/connection.php";
 	$id = Flight::request()->query->id;
 	$sql_query2 = "DELETE FROM domains WHERE domain_ID = " . $id;
 	$qry_result2 = mysqli_query($con, $sql_query2) or die(mysqli_error($con));
 
 	//Flight::json($newArray2);
-		}
+
 });
 
+
+Flight::route('DELETE /service/url_data', function(){
+
+	include "inc/connection.php";
+	$id = Flight::request()->query->id;
+	$sql_query2 = "DELETE FROM url_data WHERE url_hash = '" . $id . "'";
+	$qry_result2 = mysqli_query($con, $sql_query2) or die(mysqli_error($con));
+
+	//Flight::json($newArray2);
+
+});
+
+
+
 Flight::route('DELETE /service/resource_login', function(){
-	if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-exit();
-		} else {
+
 	include "inc/connection.php";
 	$id = Flight::request()->query->id;
 	$sql_query2 = "DELETE FROM resource_login WHERE resource_url_ID = " . $id;
 	$qry_result2 = mysqli_query($con, $sql_query2) or die(mysqli_error($con));
 
 	//Flight::json($newArray2);
-		}
+
 });
 
+Flight::route('DELETE /service/software_keys', function(){
+
+	include "inc/connection.php";
+	$id = Flight::request()->query->id;
+	$sql_query2 = "DELETE FROM software_keys WHERE software_keys_ID = " . $id;
+	$qry_result2 = mysqli_query($con, $sql_query2) or die(mysqli_error($con));
+
+	//Flight::json($newArray2);
+
+});
+
+
 Flight::route('DELETE /service/W2_accounts', function(){
-	if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-exit();
-		} else {
+
 	include "inc/connection.php";
 	$id = Flight::request()->query->id;
 	$sql_query2 = "DELETE FROM W2_accounts WHERE W2_ID = " . $id;
 	$qry_result2 = mysqli_query($con, $sql_query2) or die(mysqli_error($con));
 
 	//Flight::json($newArray2);
-		}
+
 });
 
 Flight::route('DELETE /service/person', function(){
-	if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-exit();
-		} else {
+
 	include "inc/connection.php";
 	$id = Flight::request()->query->id;
 	$sql_query2 = "DELETE FROM person WHERE person_ID = " . $id;
 	$qry_result2 = mysqli_query($con, $sql_query2) or die(mysqli_error($con));
 
 	//Flight::json($newArray2);
-		}
+
 });
 
 Flight::route('DELETE /service/registrar', function(){
-	if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-exit();
-		} else {
+
 	include "inc/connection.php";
 	$id = Flight::request()->query->id;
 	$sql_query2 = "DELETE FROM registrar WHERE registrar_ID = " . $id;
 	$qry_result2 = mysqli_query($con, $sql_query2) or die(mysqli_error($con));
 
 	//Flight::json($newArray2);
-		}
+
 });
 
 Flight::route('DELETE /service/hosting', function(){
-	if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-exit();
-		} else {
+
 	include "inc/connection.php";
 	$id = Flight::request()->query->id;
 	var_dump($id);
@@ -975,28 +1166,22 @@ exit();
 	$qry_result2 = mysqli_query($con, $sql_query2) or die(mysqli_error($con));
 
 	//Flight::json($newArray2);
-		}
+
 });
 
 Flight::route('DELETE /service/cms_login', function(){
-	if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-exit();
-		} else {
+
 	include "inc/connection.php";
 	$id = Flight::request()->query->id;
 	$sql_query2 = "DELETE FROM cms_login WHERE install_site_url_ID = " . $id;
 	$qry_result2 = mysqli_query($con, $sql_query2) or die(mysqli_error($con));
 
 	//Flight::json($newArray2);
-		}
+
 });
 
 Flight::route('DELETE /service/links', function(){
-	if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-exit();
-		} else {
+
 	include "inc/connection.php";
 	$id = Flight::request()->query->id;
 	var_dump($id);
@@ -1004,14 +1189,11 @@ exit();
 	$qry_result2 = mysqli_query($con, $sql_query2) or die(mysqli_error($con));
 
 	//Flight::json($newArray2);
-		}
+
 });
 
 Flight::route('DELETE /service/change_log', function(){
-	if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-exit();
-		} else {
+
 	include "inc/connection.php";
 	$id = Flight::request()->query->id;
 	var_dump($id);
@@ -1019,16 +1201,13 @@ exit();
 	$qry_result2 = mysqli_query($con, $sql_query2) or die(mysqli_error($con));
 
 	//Flight::json($newArray2);
-		}
+
 });
 
 
 Flight::route('/service/gethosts', function(){
 
-	if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-exit();
-		} else {
+
 	include "inc/connection.php";
 
 	$sql_query2 = "SELECT hosting_name,hosting_ID FROM hosting;";
@@ -1043,14 +1222,11 @@ exit();
 
 
 	Flight::json($newArray2);
-		}
+
 });
 
 Flight::route('/service/getregistrars', function(){
-	if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-exit();
-		} else {
+
 	include "inc/connection.php";
 
 	$sql_query2 = "SELECT registrar_name,registrar_ID FROM registrar;";
@@ -1065,14 +1241,11 @@ exit();
 
 
 	Flight::json($newArray2);
-		}
+
 });
 
 Flight::route('/service/getdomains', function(){
-	if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-exit();
-		} else {
+
 	include "inc/connection.php";
 
 	$sql_query2 = "SELECT domain_name,domain_ID FROM domains;";
@@ -1087,14 +1260,11 @@ exit();
 
 
 	Flight::json($newArray2);
-		}
+
 });
 
 Flight::route('/service/updateItem', function(){
-	if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-		exit();
-		} else {
+
 	include "inc/connection.php";
 	$entityBody = Flight::request()->getBody();
 
@@ -1116,22 +1286,15 @@ Flight::route('/service/updateItem', function(){
 	  Flight::halt(500,mysqli_error($con));
 	  //die(mysqli_error($con));
   }
-	}
+
 });
 
 Flight::route('/service/9736644323hc4e34', function(){
-	if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-exit();
-		} else {
-		}
+
 });
 
 Flight::route('/service/getpersons', function(){
-	if($id = Flight::request()->cookies->duSWnS1sW !== 'duSWnS1sW'){
-		header('Location: https://dev.webwright.io');
-exit();
-		} else {
+
 	include "inc/connection.php";
 
 	$sql_query2 = "SELECT first_name,last_name,person_ID FROM person;";
@@ -1146,7 +1309,7 @@ exit();
 
 
 	Flight::json($newArray2);
-		}
+
 });
 
 

@@ -24,7 +24,7 @@ angular.module('SE_App').controller('W2_accountsController', ['$mdDialog','$W2_a
 
   $scope.query = {
     filter: '',
-    limit: '5',
+    limit: '15',
     order: 'login_url_name',
     page: 1
   };

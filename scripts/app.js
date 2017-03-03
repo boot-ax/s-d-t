@@ -1,60 +1,141 @@
-//angular.module('se_management', ['ngMaterial', 'md.data.table','ngResource']);
-
-angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute','ngclipboard','ngSanitize', 'ngCsv'])
-
-  .config(['$compileProvider', '$mdThemingProvider','$mdAriaProvider','$routeProvider','$locationProvider', function ($compileProvider, $mdThemingProvider,$mdAriaProvider,$routeProvider, $locationProvider) {
+angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute','ngclipboard','ngSanitize', 'ngCsv','satellizer','ui.router','angular-loading-bar'])
+  .config(['$compileProvider', '$mdThemingProvider','$mdAriaProvider','$stateProvider', '$locationProvider','$urlRouterProvider','$authProvider','cfpLoadingBarProvider', function ($compileProvider, $mdThemingProvider,$mdAriaProvider, $stateProvider, $locationProvider,$urlRouterProvider,$authProvider,cfpLoadingBarProvider) {
     'use strict';
+    // cfpLoadingBarProvider.parentSelector = '#loading-bar-container';
+    // cfpLoadingBarProvider.spinnerTemplate = '<div><span class="fa fa-spinner">Custom Loading Message...</div>';
+
     $mdAriaProvider.disableWarnings();
     $compileProvider.debugInfoEnabled(false);
-
     $mdThemingProvider.theme('default')
       .primaryPalette('blue')
       .accentPalette('pink');
 
-    $routeProvider
-     .when('/domains', {
-       templateUrl: '/tabs/domains/domains.html/',
-       controller: 'domainController'
+    $stateProvider
+    .state('home', {
+      abstract: true,
+      templateUrl: 'partials/home.html',
+      controller: 'BaseController',
+      resolve: {
+        loginRequired: loginRequired
+      }
+    })
+     .state('home.domains', {
+       url:'/domains',
+       templateUrl: 'tabs/domains/domains.html',
+       controller: 'domainController',
+       resolve: {
+         loginRequired: loginRequired
+       }
      })
-     .when('/hosting', {
+     .state('home.hosting', {
+        url: '/hosting',
         templateUrl: 'tabs/hosting/hosting.html',
-        controller: 'hostingController'
+        controller: 'hostingController',
+        resolve: {
+          loginRequired: loginRequired
+        }
       })
-      .when('/registrar', {
+      .state('home.registrar', {
+        url:'/registrar',
         templateUrl: 'tabs/registrar/registrar.html',
-        controller: 'registrarController'
+        controller: 'registrarController',
+        resolve: {
+          loginRequired: loginRequired
+        }
        })
-       .when('/w2-accounts', {
+       .state('home.web2', {
+         url:'/web2.0',
          templateUrl: 'tabs/w2Accounts/W2_Accounts.html',
-         controller: 'W2_accountsController'
+         controller: 'W2_accountsController',
+         resolve: {
+           loginRequired: loginRequired
+         }
         })
-        .when('/people', {
+        .state('home.people', {
+          url: '/people',
           templateUrl: 'tabs/person/person.html',
-          controller: 'personController'
+          controller: 'personController',
+          resolve: {
+            loginRequired: loginRequired
+          }
          })
-         .when('/cms-login', {
+         .state('home.cms-login', {
+           url: '/cms-login',
            templateUrl: 'tabs/cmsLogin/cms_login.html',
-           controller: 'cms_loginController'
+           controller: 'cms_loginController',
+           resolve: {
+             loginRequired: loginRequired
+           }
           })
-          .when('/resources', {
+          .state('home.resources', {
+            url: '/resources',
             templateUrl: 'tabs/resourceLogin/resource_login.html',
-            controller: 'resource_loginController'
+            controller: 'resource_loginController',
+            resolve: {
+              loginRequired: loginRequired
+            }
            })
-           .when('/links', {
+           .state('home.links', {
+             url: '/links',
              templateUrl: 'tabs/links/links.html',
-             controller: 'linksController'
+             controller: 'linksController',
+             resolve: {
+               loginRequired: loginRequired
+             }
             })
-			.when('/change-log', {
+            .state('home.url-data', {
+              url: '/url-data',
+                   templateUrl: 'tabs/urlData/url_data.php',
+                   controller: 'url_dataController',
+                   resolve: {
+                     loginRequired: loginRequired
+                   }
+                  })
+			.state('home.change-log', {
+        url: '/change-log',
              templateUrl: 'tabs/changeLog/change_log.html',
-             controller: 'change_logController'
+             controller: 'change_logController',
+             resolve: {
+               loginRequired: loginRequired
+             }
             })
-     .otherwise({
-        redirectTo: '/domains'
+            .state('home.software-keys', {
+              url: '/software-keys',
+                   templateUrl: 'tabs/softwareKeys/software_keys.html',
+                   controller: 'software_keysController',
+                   resolve: {
+                     loginRequired: loginRequired
+                   }
+                  })
+      .state('login', {
+        url: '/login',
+        templateUrl: 'partials/login.html',
+        controller: 'loginController'
+      })
+      .state('signup', {
+        url: '/signup',
+        templateUrl: 'partials/signup.html',
+        controller: 'signupController'
       });
 
+      $authProvider.loginUrl = '/service/auth/login';
+
+      $urlRouterProvider.otherwise('/domains');
+
+      function loginRequired($q, $location, $auth){
+        var defer = $q.defer();
+        if($auth.isAuthenticated()){
+          defer.resolve();
+        }else{
+          $location.path('/login');
+        }
+        return defer.promise;
+      }
+
     // configure html5 to get links working on jsfiddle
-    // $locationProvider.html5Mode(true);
+    $locationProvider.html5Mode(true);
   }])
+
 .service('upDownloadService',function($q,$http,$mdToast,$mdDialog){
 
   this.bulkDownload = function (event,$current_data,$file_name,$header,$location) {
@@ -253,8 +334,15 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
 ;
 
 
- angular.module('SE_App').controller('BaseController', ['$scope','$rootScope','$location', '$timeout', '$mdSidenav', function($scope,$rootScope,$location, $timeout, $mdSidenav){
+ angular.module('SE_App').controller('BaseController', ['$scope','$rootScope','$location', '$timeout', '$mdSidenav','$auth','$location', function($scope,$rootScope,$location, $timeout, $mdSidenav,$auth,$location){
 
+   $scope.payload = JSON.parse($auth.getPayload().sub);
+
+$scope.logout = function(){
+
+  $auth.logout();
+  $location.path('/login');
+}
 
 	$scope.toggleLeft = buildToggler('left');
     $scope.toggleRight = buildToggler('right');
@@ -265,31 +353,37 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
       }
     }
 
+    $scope.tabClicked = function(){
+      // console.log('Change paths');
+      if($scope.data.selectedIndex == 0){
+  			$location.path('domains');
+  		}else if($scope.data.selectedIndex == 1){
+  			$location.path('/hosting');
+  		}else if($scope.data.selectedIndex == 2){
+  			$location.path('/registrar');
+  		}else if($scope.data.selectedIndex == 3){
+  			$location.path('/web2.0');
+  		}else if($scope.data.selectedIndex == 4){
+  			$location.path('/people');
+  		}else if($scope.data.selectedIndex == 5){
+  			$location.path('/cms-login');
+  		}else if($scope.data.selectedIndex == 6){
+  			$location.path('/resources');
+  		}else if($scope.data.selectedIndex == 7){
+  			$location.path('/links');
+      }else if($scope.data.selectedIndex == 8){
+        $location.path('/software-keys');
+      }else if($scope.data.selectedIndex == 9){
+    			$location.path('url-data');
+  		}else if($scope.data.selectedIndex == 10){
+  			$location.path('/change-log');
+  		}
+    }
+
 	$scope.data = {
       selectedIndex: 0,
     };
-	$scope.$watch('data.selectedIndex', function(){
-		if($scope.data.selectedIndex == 0){
-			$location.path('/domains');
-		}else if($scope.data.selectedIndex == 1){
-			$location.path('/hosting');
-		}else if($scope.data.selectedIndex == 2){
-			$location.path('/registrar');
-		}else if($scope.data.selectedIndex == 3){
-			$location.path('/w2-accounts');
-		}else if($scope.data.selectedIndex == 4){
-			$location.path('/people');
-		}else if($scope.data.selectedIndex == 5){
-			$location.path('/cms-login');
-		}else if($scope.data.selectedIndex == 6){
-			$location.path('/resources');
-		}else if($scope.data.selectedIndex == 7){
-			$location.path('/links');
-		}else if($scope.data.selectedIndex == 8){
-			$location.path('/change-log');
-		}
 
-	});
 }]);
 
 angular.module('SE_App').controller('bulkDownloadController', ['$mdDialog','$scope' , '$http', '$q','$mdToast','tableData','file_name','header','location',function ($mdDialog, $scope, $http, $q, $mdToast,tableData,file_name,header,location) {

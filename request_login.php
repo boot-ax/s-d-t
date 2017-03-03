@@ -1,6 +1,6 @@
 <?php
 class request_login{
-	
+
 	function load($opts){
 		//parse $opts
 		if(!array_key_exists('id_entry',$opts) ||!array_key_exists('usr_pwd',$opts))return 'error format of opts!';
@@ -10,7 +10,7 @@ class request_login{
 		$usr_pwd=$opts['usr_pwd'];
 		$duration=array_key_exists('duration',$opts)?$opts['duration']:72;
 		$background_img=array_key_exists('background_img',$opts)?$opts['background_img']:NULL;
-		
+
 		//check post
 		if (isset($_POST["usr"])) {
 			$allow_entry=false;
@@ -19,22 +19,24 @@ class request_login{
 			foreach ($usr_pwd as $usr=>$pwd) {
 				if ($name == $usr && $passwd == $pwd) {
 					$allow_entry=true;
+					$_SESSION['user'] = $usr;
 				}
 			}
 			if($allow_entry){
 				setcookie($id_entry,$id_entry, time() + 3600 * $duration);
 				echo 'Approved';
+
 				}else{
 				echo (empty($passwd)) ? "Please input password" : "Wrong name or password!";
 			}
 			sleep(.5);
 			exit;
 		}
-		
+
 		//normal entry
 		if (!isset($_COOKIE[$id_entry])) {
-		?> 
-<head> 
+		?>
+<head>
 	<meta name="robots" content="noindex">
 	<link rel="icon" type="image/png" href="icon.png">
 	<title><?php echo $title; ?></title>
@@ -42,11 +44,11 @@ class request_login{
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.2.1/material.min.css" />
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.2.1/material.min.js"></script>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-    <script src="javascript/dialog-polyfill.js"></script>
-  <link rel="stylesheet" type="text/css" href="css/dialog-polyfill.css" />
+
+  
 	<style>
 		.mdl-layout{
-		background: url(<?php echo "$background_img"; ?>) no-repeat center center fixed; 
+		background: url(<?php echo "$background_img"; ?>) no-repeat center center fixed;
 		-webkit-background-size: cover;
 		-moz-background-size: cover;
 		-o-background-size: cover;
@@ -119,6 +121,6 @@ class request_login{
 		    exit;
 		    }
 	    }
-			
-    }			
+
+    }
 ?>

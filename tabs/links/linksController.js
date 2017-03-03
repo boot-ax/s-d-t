@@ -17,7 +17,7 @@ angular.module('SE_App').controller('linksController', ['$mdDialog','$links', '$
 
   $scope.query = {
     filter: '',
-    limit: '5',
+    limit: '15',
     order: 'source_url',
     page: 1
   };

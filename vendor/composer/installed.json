@@ -20,7 +20,7 @@
         "require-dev": {
             "phpunit/phpunit": "~4.6"
         },
-        "time": "2016-10-25 19:27:20",
+        "time": "2016-10-25T19:27:20+00:00",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -43,5 +43,108 @@
         ],
         "description": "Flight is a fast, simple, extensible framework for PHP. Flight enables you to quickly and easily build RESTful web applications.",
         "homepage": "http://flightphp.com"
+    },
+    {
+        "name": "gamegos/jws",
+        "version": "1.0.1",
+        "version_normalized": "1.0.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/Gamegos/php-jws.git",
+            "reference": "a94218e43f45d4e818eecaaa4063ff436b4a5ee0"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/Gamegos/php-jws/zipball/a94218e43f45d4e818eecaaa4063ff436b4a5ee0",
+            "reference": "a94218e43f45d4e818eecaaa4063ff436b4a5ee0",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.4"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "4.1.*"
+        },
+        "time": "2015-04-09T08:33:49+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Gamegos\\JWS\\": [
+                    "src",
+                    "tests"
+                ]
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Mustafa Altun",
+                "email": "gmail@mustafaaltun.com"
+            }
+        ],
+        "description": "Json Web Signature (JWS) PHP implementation",
+        "keywords": [
+            "JSON Web Signature",
+            "JSON Web Token",
+            "JWS",
+            "digital signature",
+            "jwa",
+            "jwt"
+        ]
+    },
+    {
+        "name": "gamegos/jwt",
+        "version": "0.1.1",
+        "version_normalized": "0.1.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/Gamegos/php-jwt.git",
+            "reference": "70bbb5e0d8349c740c9e9fbc0d576cbe77fec9e3"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/Gamegos/php-jwt/zipball/70bbb5e0d8349c740c9e9fbc0d576cbe77fec9e3",
+            "reference": "70bbb5e0d8349c740c9e9fbc0d576cbe77fec9e3",
+            "shasum": ""
+        },
+        "require": {
+            "gamegos/jws": "~1.0",
+            "php": ">=5.4"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "4.1.*"
+        },
+        "time": "2015-04-09T09:39:08+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Gamegos\\JWT\\": [
+                    "src",
+                    "tests"
+                ]
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Mustafa Altun",
+                "email": "gmail@mustafaaltun.com"
+            }
+        ],
+        "description": "Json Web Token (JWT) PHP implementation",
+        "keywords": [
+            "JSON Web Token",
+            "JWS",
+            "json token",
+            "jwt"
+        ]
     }
 ]

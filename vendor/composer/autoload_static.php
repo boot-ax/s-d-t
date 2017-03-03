@@ -11,9 +11,32 @@ class ComposerStaticInite2173f46ac6cd7f7432bb30c478fe4dd
         '5b7d984aab5ae919d3362ad9588977eb' => __DIR__ . '/..' . '/mikecao/flight/flight/Flight.php',
     );
 
+    public static $prefixLengthsPsr4 = array (
+        'G' => 
+        array (
+            'Gamegos\\JWT\\' => 12,
+            'Gamegos\\JWS\\' => 12,
+        ),
+    );
+
+    public static $prefixDirsPsr4 = array (
+        'Gamegos\\JWT\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/gamegos/jwt/src',
+            1 => __DIR__ . '/..' . '/gamegos/jwt/tests',
+        ),
+        'Gamegos\\JWS\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/gamegos/jws/src',
+            1 => __DIR__ . '/..' . '/gamegos/jws/tests',
+        ),
+    );
+
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
+            $loader->prefixLengthsPsr4 = ComposerStaticInite2173f46ac6cd7f7432bb30c478fe4dd::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInite2173f46ac6cd7f7432bb30c478fe4dd::$prefixDirsPsr4;
 
         }, null, ClassLoader::class);
     }
