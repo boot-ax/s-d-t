@@ -1,0 +1,22 @@
+{
+  "name": "public",
+  "homepage": "https://github.com/boot-ax/seo-data-tracking",
+  "authors": [
+    "Joe Kolnik <jkolnik@mac.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "satellizer": "^0.15.5",
+    "angular-ui-router": "ui-router#^0.4.2"
+  }
+}

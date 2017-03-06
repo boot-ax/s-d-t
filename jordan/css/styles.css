@@ -1,0 +1,52 @@
+.data-card {
+width:100%;
+}
+
+.scroll {
+overflow: scroll;
+}
+
+.mdl-card__supporting-text{
+overflow: scroll;
+}
+
+.mdl-icon-toggle__label material-icons {
+	align:left;
+}
+
+label { float:right;}
+
+.inputdemoBasicUsage .md-datepicker-button {
+  width: 20px;
+}
+/*.inputdemoBasicUsage .md-datepicker-input-container {
+  margin-left: 2px;
+}
+.md-datepicker-input-container {
+  display: block;
+}*/
+.md-datepicker-input[placeholder] {
+  color:red;
+}
+.padding-top-0 {
+  padding-top: 0px;
+}
+.padding-bottom-0 {
+  padding-bottom: 0px;
+}
+
+.addButtonInModl{
+	color:blue;
+	text-transform: lowercase;}
+
+	.md-content .copy-button{
+		font-size: 1em;
+		margin-top: 8px;
+		color:#4286f4;
+		-webkit-transition: font-size 0.3s; /* For Safari 3.1 to 6.0 */
+    transition: font-size 0.3s;
+	}
+
+	.md-content .copy-button:hover{
+		font-size:1.5em;
+		text-shadow: .3px .3px grey;}

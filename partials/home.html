@@ -1,0 +1,49 @@
+<md-toolbar class="md-hue-2">
+  <div class="md-toolbar-tools">
+    <md-button aria-label="Settings" ng-click="toggleLeft()">
+      <md-icon>menu</md-icon>
+    </md-button>
+
+    <h2 flex md-truncate>Zipps Management</h2>
+
+    <div flex></div>
+    {{payload.user_email}}
+    <md-button class="md-icon-button" aria-label="More" ng-click="logout()">
+      <md-icon>more_vert</md-icon>
+    </md-button>
+  </div>
+</md-toolbar>
+
+
+<div flex layout="row">
+<div layout="column" flex>
+  <md-tabs md-swipe-content="true" md-selected="data.selectedIndex">
+    <md-tab md-on-select="tabClicked()" label="Domains"></md-tab>
+    <md-tab md-on-select="tabClicked()" label="Hosting"></md-tab>
+    <md-tab md-on-select="tabClicked()" label="Registrar"></md-tab>
+    <md-tab md-on-select="tabClicked()" label="Web 2.0"></md-tab>
+    <md-tab md-on-select="tabClicked()" label="People"></md-tab>
+    <md-tab md-on-select="tabClicked()" label="CMS Login"></md-tab>
+    <md-tab md-on-select="tabClicked()" label="Resource Login"></md-tab>
+    <md-tab md-on-select="tabClicked()" label="Links"></md-tab>
+    <md-tab md-on-select="tabClicked()" label="Software Keys"></md-tab>
+    <md-tab md-on-select="tabClicked()" label="URL Data"></md-tab>
+    <md-tab md-on-select="tabClicked()" label="Change Log"></md-tab>
+  </md-tabs>
+
+
+  <md-sidenav class="md-sidenav-left" md-component-id="left" md-whiteframe="4">
+    <md-toolbar class="md-hue-2">
+      <h1 class="md-toolbar-tools">Choose Wisely</h1>
+    </md-toolbar>
+    <md-content layout-margin>
+      <p class="md-accent">
+        <a href="/jordan.php">Jordan's Method</a>
+      </p>
+    </md-content>
+  </md-sidenav>
+  <md-card>
+    <md-card-content ui-view />
+  </md-card>
+</div>
+</div>

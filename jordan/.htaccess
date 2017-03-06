@@ -1,0 +1,4 @@
+AuthType Basic
+AuthName "Tasty"
+AuthUserFile /srv/users/zipps/apps/webwright-io-zipps-dev-silo/public/jordan/.htpasswd
+Require valid-user

@@ -1,0 +1,12 @@
+RewriteEngine On
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/service/
+#RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -f [OR]
+#RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} -d
+#RewriteRule ^ - [L]
+RewriteRule ^(.*)$ /index.php [QSA,L]
+
+RewriteRule ^service/(.*)$ /service.php [QSA,L]
+#RewriteRule \bservice\b service.php [QSA,L]

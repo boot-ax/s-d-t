@@ -1,0 +1,68 @@
+<md-dialog-content id="dialog_software_keys" class="md-dialog-content">
+
+
+
+  <!-- ngIf: item.form.$submitted && item.form.$invalid -->
+
+  <form style="" class="ng-invalid ng-invalid-required" name="item.form" ng-submit="ctrl.addItem()">
+
+<h3 class="md-subhead">Software Keys</h3>
+
+    <div layout="row" class="input-row layout-row">
+      <md-input-container class="flex" flex="">
+        <label>Software Name&#42;</label>
+        <input style="" ng-trim="false" name="software_name" ng-model="software_keys_table.software_name" required="true">
+        <div class="md-errors-spacer">
+          <div class="md-char-counter"></div>
+        </div>
+      </md-input-container>
+    </div>
+
+
+    <div layout="row" class="input-row layout-row">
+      <md-input-container class="flex" flex="">
+        <label>License Key&#42;</label>
+        <input style="" aria-invalid="true" name="license_key" ng-model="software_keys_table.license_key" required="true">
+        <div class="md-errors-spacer"></div>
+      </md-input-container>
+
+            <md-input-container class="flex" flex="">
+        <label>Serial Number</label>
+        <input style="" aria-invalid="true" name="serial_number" ng-model="software_keys_table.serial_number" required="">
+        <div class="md-errors-spacer"></div>
+      </md-input-container>
+      </div>
+
+    <h3 class="md-subhead">Other Information</h3>
+
+
+
+
+<md-input-container class="flex" flex="">
+        <md-select md-on-open="getPersonsFunc()" ng-model="software_keys_table.person_ID" placeholder="Person" class="flex" flex="">
+          <md-option ng-value="person.person_ID" ng-repeat="person in getPersons.data">{{person.first_name}}, {{person.last_name}}</md-option>
+          </md-select>
+
+    <button ng-controller="personController" class="md-button md-ink-ripple" type="button" ng-click="addItem($event)">
+      <div class="addButtonInModl">+ person</div>
+    </button>
+      </md-input-container>
+<div class="md-errors-spacer"></div>
+      <md-input-container class="flex" flex="">
+        <label>Coments</label>
+        <!-- <input style="" name="comments" ng-model="software_keys_table.comments"> -->
+        <textarea style="" name="comments" ng-model="software_keys_table.comments"></textarea>
+        <div class="md-errors-spacer"></div>
+      </md-input-container>
+
+  </form>
+
+
+
+  <div class="md-dialog-actions">
+    <button disabled="disabled" aria-disabled="true" aria-label="Add Item" ng-click="ctrl.addItem()" ng-disabled="item.form.$invalid" class="md-primary md-button md-ink-ripple" type="button"><span>Add Item</span></button>
+    <button aria-label="Cancel" ng-click="ctrl.cancel()" class="md-primary md-button md-ink-ripple" type="button"><span>Cancel</span></button>
+  </div>
+
+  <div tabindex="0" class="md-dialog-focus-trap"></div>
+</md-dialog-content>

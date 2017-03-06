@@ -1,0 +1,43 @@
+<md-dialog-content id="dialog_registrar" class="md-dialog-content">
+
+
+
+  <!-- ngIf: item.form.$submitted && item.form.$invalid -->
+
+  <form style="" class="ng-invalid ng-invalid-required" name="item.form" ng-submit="ctrl.addItem()">
+
+<h3 class="md-subhead">URL Information</h3>
+
+    <div layout="row" class="input-row layout-row">
+      <md-input-container class="flex" flex="">
+        <label>URL Name&#42;</label>
+        <input style="" ng-trim="false" name="url_name" ng-model="url_data_table.url_name" required="true">
+        <div class="md-errors-spacer">
+          <div class="md-char-counter"></div>
+        </div>
+      </md-input-container>
+<div class="md-errors-spacer"></div>
+</div>
+
+
+<md-input-container class="flex" flex="">
+        <md-select ng-model="url_data_table.crawl_frequency" placeholder="Crawl Frequency&#42;" class="flex" flex="" required="true">
+
+          <md-option value="Daily">Daily</md-option>
+          <md-option value="Weekly">Weekly</md-option>
+          <md-option value="Monthly">Monthly</md-option>
+          <md-option value="Quartly">Quartly</md-option>
+          </md-select>
+
+
+  </form>
+
+
+
+  <div class="md-dialog-actions">
+    <button disabled="disabled" aria-disabled="true" aria-label="Add Item" ng-click="ctrl.addItem()" ng-disabled="item.form.$invalid" class="md-primary md-button md-ink-ripple" type="button"><span>Add Item</span></button>
+    <button aria-label="Cancel" ng-click="ctrl.cancel()" class="md-primary md-button md-ink-ripple" type="button"><span>Cancel</span></button>
+  </div>
+
+  <div tabindex="0" class="md-dialog-focus-trap"></div>
+</md-dialog-content>
