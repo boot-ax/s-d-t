@@ -164,7 +164,7 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
   };
 })
 
-  .service('changeCellServices',function($mdEditDialog,$q,$http,$mdToast){
+  .service('changeCellServices',function($mdEditDialog,$q,$http,$mdToast,$mdDialog){
 
     this.changeCellText = function (event, table, column,db_table,db_ID,$length) {
         event.stopPropagation();
@@ -261,30 +261,32 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
         };
 
 
-        this.changeDropdown = function(column, value, table,db_table,db_ID){
-          var success  = function(data){
-            $mdToast.show(
-                $mdToast.simple()
-                  .textContent(data.data)
-                  .hideDelay(3000)
-              );
-          };
+this.changeDropdown = function(column, value, table,db_table,db_ID){
 
-          var failure  = function(data){
-            $mdToast.show(
-                $mdToast.simple()
-                  .textContent(data.data)
-                  .hideDelay(3000)
-              );
-          };
+              var $obj = {};
+              $obj.table = db_table;
+              $obj.column = column;
+              $obj.value = table[value];
+              $obj.identifier = db_ID;
+              $obj.id = table[db_ID];
 
-        var deferred = $q.defer();
-        var $obj = {};
-        $obj.table = db_table;
-            $obj.column = column;
-            $obj.value = table[value];
-            $obj.identifier = db_ID;
-            $obj.id = table[db_ID];
+              var success  = function(data){
+                  $mdToast.show(
+                      $mdToast.simple()
+                        .textContent(data.data)
+                        .hideDelay(3000)
+                    );
+                };
+
+                var failure  = function(data){
+                  $mdToast.show(
+                      $mdToast.simple()
+                        .textContent(data.data)
+                        .hideDelay(3000)
+                    );
+                };
+
+              var deferred = $q.defer();
 
             $http.post('service/updateItem',$obj).then(function(response){
               success(response);
@@ -330,18 +332,24 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
                });
                return deferred.promise;
              };
-  })
-;
+  });
 
 
  angular.module('SE_App').controller('BaseController', ['$scope','$rootScope','$location', '$timeout', '$mdSidenav','$auth','$location', function($scope,$rootScope,$location, $timeout, $mdSidenav,$auth,$location){
 
    $scope.payload = JSON.parse($auth.getPayload().sub);
 
+
+
+
 $scope.logout = function(){
 
   $auth.logout();
   $location.path('/login');
+}
+
+$scope.userSettings = function(){
+
 }
 
 	$scope.toggleLeft = buildToggler('left');
@@ -356,7 +364,7 @@ $scope.logout = function(){
     $scope.tabClicked = function(){
       // console.log('Change paths');
       if($scope.data.selectedIndex == 0){
-  			$location.path('domains');
+  			$location.path('/domains');
   		}else if($scope.data.selectedIndex == 1){
   			$location.path('/hosting');
   		}else if($scope.data.selectedIndex == 2){
@@ -374,11 +382,11 @@ $scope.logout = function(){
       }else if($scope.data.selectedIndex == 8){
         $location.path('/software-keys');
       }else if($scope.data.selectedIndex == 9){
-    			$location.path('url-data');
+    			$location.path('/url-data');
   		}else if($scope.data.selectedIndex == 10){
   			$location.path('/change-log');
   		}
-    }
+    };
 
 	$scope.data = {
       selectedIndex: 0,

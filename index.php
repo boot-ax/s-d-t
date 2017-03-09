@@ -45,7 +45,6 @@
             <script type="text/javascript" src="bower_components/satellizer/dist/satellizer.js"></script>
             <script type="text/javascript" src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
             <script type="text/javascript" src="bower_components/angular-loading-bar/build/loading-bar.js"></script>
-
             <script type="text/javascript" src="scripts/md-data-table.js"></script>
 
         		<script type="text/javascript" src="scripts/app.js"></script>

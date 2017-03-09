@@ -1,20 +1,30 @@
-<div flex layout="row" layout-align="center center">
-	<md-card class="md-padding" flex="50" flex-xs="75" ng-show="busy" layout-align="center center">
+
+<div layout="row" layout-align="center center">
+	<md-card layout="column" ng-show="busy" layout-align="center center">
 		<md-progress-circular md-mode="indeterminate"></md-progress-circular>
 	</md-card>
 
-	<md-card class="md-padding" flex-xs="75" flex="50" ng-hide="busy">
+	<md-card ng-hide="busy" layout="column" layout-align="center center">
 		<md-input-container>
-			<md-icon>email</md-icon>
-			<input ng-model="user.email" type="email" placeholder="Email" ng-required="true" autocomplete="off">
+			<div layout="colum">
+			<md-icon flex="20">email</md-icon>
+			<label style="margin-left:30%">Email</label>
+			<input flex="70" ng-model="user.email" type="email" ng-required="true" autocomplete="off">
+		</div>
 		</md-input-container>
+
 		<md-input-container>
-			<md-icon>lock</md-icon>
-			<input ng-model="user.password" type="password" placeholder="Password" ng-required="true" ng-keydown="$event.which === 13 && login(user)" autocomplete="off">
+			<div layout="row">
+			<md-icon flex="20">lock</md-icon>
+			<label style="margin-left:30%">Password</label>
+			<input flex="70" ng-model="user.password" type="password" ng-required="true" ng-keydown="$event.which === 13 && login(user)" autocomplete="off">
+		</div>
 		</md-input-container>
 		<section layout="row" layout-align="center center">
 			<md-button class="md-raised md-primary" ng-click="login(user)">Login</md-button>
 		</section>
 	</md-card>
 </div>
-<p style="text-align: center;"><a href="#/reset-password">Forgot your password?</a></p>
+
+
+<p style="text-align: center;"><a href="/reset-password">Forgot your password?</a></p>

@@ -4,14 +4,50 @@
       <md-icon>menu</md-icon>
     </md-button>
 
-    <h2 flex md-truncate>Zipps Management</h2>
+    <h2 flex md-truncate>Zipps</h2>
 
-    <div flex></div>
+
+
+<div flex style="padding-right:20px"></div>
+{{payload.user_email}}
+    <div class="md-menu-demo" ng-cloak>
+      <div>
+        <md-menu>
+          <md-button class="md-icon-button" aria-label="More" ng-click="$mdOpenMenu()">
+            <md-icon>more_vert</md-icon>
+          </md-button>
+          <md-menu-content width="4">
+            <md-menu-item>
+              <md-button ng-click="userSettings()">
+                <i class="material-icons">settings</i>
+                User Settings
+              </md-button>
+            </md-menu-item>
+            <md-menu-divider></md-menu-divider>
+            <md-menu-item>
+              <md-button ng-click="logout()">
+                <i class="material-icons">&#xE8AC;</i>
+                Logout
+              </md-button>
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
+      </div>
+    </div>
+  </div>
+
+    <!-- <div flex></div>
     {{payload.user_email}}
     <md-button class="md-icon-button" aria-label="More" ng-click="logout()">
       <md-icon>more_vert</md-icon>
     </md-button>
-  </div>
+  </div> -->
+
+
+
+
+
+
 </md-toolbar>
 
 

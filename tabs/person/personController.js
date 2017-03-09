@@ -1,10 +1,11 @@
-angular.module('SE_App').controller('personController', ['$mdDialog','$person', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $person, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
+angular.module('SE_App').controller('personController', ['$mdDialog','$person', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService','$mdToast',function ($mdDialog, $person, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService,$mdToast) {
   'use strict';
 
   var bookmark;
 
   $scope.$file = 'person.csv';
-  $scope.$header = ['first_name','last_name','email','street_address','city','state','phone_number','zip_code','person_ID'];
+  $scope.$header = ['user_name','user_email','user_address','user_phone','user_type','user_ID'];
+
   $scope.$location = '/service/person';
 
     $scope.$on('locationUpdate', function (event, data) {
@@ -12,7 +13,6 @@ angular.module('SE_App').controller('personController', ['$mdDialog','$person', 
 	  	$scope.getDesserts();
 	  }
   });
-
 
   $scope.selected = [];
 
@@ -25,13 +25,13 @@ angular.module('SE_App').controller('personController', ['$mdDialog','$person', 
   $scope.query = {
     filter: '',
     limit: '15',
-    order: 'last_name',
+    order: 'user_name',
     page: 1
   };
 
   $scope.dbTableInfo = {
-    db_table:'person',
-    db_ID:'person_ID',
+    db_table:'registration',
+    db_ID:'user_ID',
     //table:hosting_table,
   };
 
@@ -63,6 +63,19 @@ angular.module('SE_App').controller('personController', ['$mdDialog','$person', 
     }).then($scope.getDesserts);
   };
 
+  $scope.addPwrd = function (event,column, value, table,db_table,db_ID) {
+    $mdDialog.show({
+      clickOutsideToClose: true,
+      controller: 'getPwrdController',
+      controllerAs: 'ctrl',
+      skipHide: true,
+      focusOnOpen: false,
+      targetEvent: event,
+      templateUrl: '/partials/pwrd.html',
+    })
+    .then($scope.changeDropdown(event,column, value, table,db_table,db_ID));
+  };
+
   $scope.getDesserts = function () {
     $scope.promise = $person.person_tables.get($scope.query, success).$promise;
   };
@@ -92,8 +105,57 @@ angular.module('SE_App').controller('personController', ['$mdDialog','$person', 
     $scope.getDesserts();
   });
 
+
+
+$scope.changeDropdown = function(event,column, value, table,db_ID){
+                var $obj = {};
+                $obj.table = 'registration';
+                $obj.column = column;
+                $obj.value = table[value];
+                $obj.identifier = db_ID;
+                $obj.id = table[db_ID];
+
+                var success  = function(data){
+                    $mdToast.show(
+                        $mdToast.simple()
+                          .textContent(data.data)
+                          .hideDelay(3000)
+                      );
+                  };
+
+                  var failure  = function(data){
+                    $mdToast.show(
+                        $mdToast.simple()
+                          .textContent(data.data)
+                          .hideDelay(3000)
+                      );
+                  };
+
+                var deferred = $q.defer();
+
+              $http.post('service/updateItem',$obj).then(function(response){
+                success(response);
+                deferred.resolve();
+              },function(response){
+                failure(response);
+                deferred.reject();
+              });
+              return deferred.promise;
+              };
+
+
+
+
+
+
   $scope.changeCellText = changeCellServices.changeCellText;
     $scope.bulkDownload = upDownloadService.bulkDownload;
 
+    $scope.getUserType = function(){
+    	$http.get('service/getusertype')
+    		.then(function(response){
+    	$scope.getUserT = response.data;
+    });
+    };
 
 }]);

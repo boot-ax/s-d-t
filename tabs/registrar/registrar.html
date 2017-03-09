@@ -44,7 +44,7 @@
         <th md-column md-numeric md-order-by="login_url"><span>Login URL</span></th>
         <th md-column md-numeric md-order-by="login_username"><span>Username</span></th>
         <th md-column md-numeric md-order-by="login_password"><span>Password</span></th>
-        <th md-column md-numeric md-order-by="last_name"><span>Person</span></th>
+        <th md-column md-numeric md-order-by="user_name"><span>Owner</span></th>
         <th md-column md-numeric md-order-by="credit_card_last_4"><span>Credit Card Last Four</span></th>
       </tr>
     </thead>
@@ -59,10 +59,10 @@
         <td md-cell="" ng-click="changeCellText($event, registrar_table, 'login_password',dbTableInfo.db_table,dbTableInfo.db_ID,382)" placeholder="{{registrar_table.login_password}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{registrar_table.login_password}}</td>
         <td md-cell>
-  			<md-select md-on-open="getPersonsFunc()" ng-change="changeDropdown('person_ID','person_ID',registrar_table,dbTableInfo.db_table,dbTableInfo.db_ID)"
-            ng-model="registrar_table.person_ID" placeholder="{{registrar_table.first_name}}, {{registrar_table.last_name}}">
-    			<md-option ng-value="registrar.person_ID"
-                ng-repeat="registrar in getPersons.data">{{registrar.first_name}}, {{registrar.last_name}}</md-option>
+  			<md-select md-on-open="getOwnersFunc()" ng-change="changeDropdown('user_ID','user_ID',registrar_table,dbTableInfo.db_table,dbTableInfo.db_ID)"
+            ng-model="registrar_table.user_ID" placeholder="{{registrar_table.user_name}}</br>{{registrar_table.user_email}}">
+    			<md-option ng-value="registrar.user_ID"
+                ng-repeat="registrar in getOwners.data">{{registrar.user_name}}</br>{{registrar.user_email}}</md-option>
   			</md-select>
 
 		</td>

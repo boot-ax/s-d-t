@@ -58,7 +58,7 @@ angular.module('SE_App').controller('deletePersonController', ['$authorize', 'pe
   this.cancel = $mdDialog.cancel;
 
   function deleteDessert(person_table, index) {
-    var deferred = $person.person_tables.remove({id: person_table.person_ID});
+    var deferred = $person.person_tables.remove({id: person_table.user_ID});
 
     deferred.$promise.then(function () {
       person_tables.splice(index, 1);
@@ -82,5 +82,54 @@ angular.module('SE_App').controller('deletePersonController', ['$authorize', 'pe
   this.authorizeUser = function () {
     $authorize.get({secret: $scope.authorize.secret}, success, error);
   };
+
+}]);
+
+// =======================================================
+
+angular.module('SE_App').controller('getPwrdController', ['$mdDialog', '$person', '$scope','changeCellServices', function ($mdDialog, $person, $scope,changeCellServices) {
+  'use strict';
+
+  this.cancel = $mdDialog.cancel;
+// console.log($person.person_table.get({pwrd: person_table.user_type}));
+  // this.submitPwrd = function () {
+  //   $authorize.get({pwrd: $scope.authorize.secret}, success, error);
+  // };
+
+
+  this.submitPwrd = function () {
+    $scope.pwrd.form.$setSubmitted();
+    console.log({pwrd: $scope.pwrd.user_password});
+    $mdDialog.hide();
+    return {pwrd: $scope.pwrd.user_password};
+
+    // $person.person_tables.user_password = $scope.pwrd.form.user_password;
+  };
+
+  // function deleteDessert(person_table, index) {
+  //   var deferred = $person.person_tables.remove({id: person_table.user_ID});
+  //
+  //   deferred.$promise.then(function () {
+  //     person_tables.splice(index, 1);
+  //   });
+  //
+  //   return deferred.$promise;
+  // }
+  //
+  // function onComplete() {
+  //   $mdDialog.hide();
+  // }
+  //
+  // function error() {
+  //   $scope.error = 'Invalid secret.';
+  // }
+  //
+  // function success() {
+  //   $q.all(person_tables.forEach(deleteDessert)).then(onComplete);
+  // }
+  //
+  // this.authorizeUser = function () {
+  //   $authorize.get({secret: $scope.authorize.secret}, success, error);
+  // };
 
 }]);

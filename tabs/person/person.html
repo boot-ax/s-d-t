@@ -1,6 +1,6 @@
 <md-toolbar class="md-table-toolbar md-default" ng-hide="selected.length || filter.show" aria-hidden="false">
   <div class="md-toolbar-tools">
-    <h2 class="md-title">People</h2>
+    <h2 class="md-title">Users</h2>
     <div flex="" class="flex"></div>
     <button class="md-icon-button md-button md-ink-ripple" type="button" ng-click="filter.show = true" aria-label="filter_list">
       <md-icon class="material-icons">search</md-icon>
@@ -40,34 +40,32 @@
   <table md-table md-row-select ng-model="selected" md-progress="promise">
     <thead md-head md-order="query.order" md-on-reorder="getDesserts">
       <tr md-row>
-        <th md-column md-order-by="first_name"><span>First Name</span></th>
-        <th md-column md-order-by="last_name"><span>Last Name</span></th>
-        <th md-column md-order-by="email"><span>Email</span></th>
-        <th md-column md-order-by="street_address"><span>Street Address</span></th>
-        <th md-column md-order-by="city"><span>City</span></th>
-        <th md-column md-order-by="state"><span>State</span></th>
-        <th md-column md-order-by="phone_number"><span>Phone Number</span></th>
-        <th md-column md-numeric md-order-by="zip_code"><span>Zip Code</span></th>
+        <th md-column md-order-by="user_name"><span>User Name</span></th>
+        <th md-column md-order-by="user_email"><span>Email</span></th>
+        <th md-column md-order-by="user_address"><span>Address</span></th>
+        <th md-column md-order-by="user_phone"><span>Phone Number</span></th>
+        <th md-column md-order-by="user_type"><span>User Type</span></th>
       </tr>
     </thead>
     <tbody md-body>
       <tr md-row md-select="person_table" md-select-id="name" ng-repeat="person_table in person_tables.data">
-        <td md-cell="" ng-click="changeCellText($event, person_table, 'first_name',dbTableInfo.db_table,dbTableInfo.db_ID,382)" placeholder="{{person_table.first_name}} "
-        aria-label="person_table.first_name" class="md-cell ng-binding md-clickable" tabindex="0">{{person_table.first_name}}</td>
-        <td md-cell="" ng-click="changeCellText($event, person_table, 'last_name',dbTableInfo.db_table,dbTableInfo.db_ID,382)" placeholder="{{person_table.last_name}} "
-        class="md-cell ng-binding md-clickable" tabindex="0">{{person_table.last_name}}</td>
-        <td md-cell="" ng-click="changeCellText($event, person_table, 'email',dbTableInfo.db_table,dbTableInfo.db_ID,382)" placeholder="{{person_table.email}} "
-        class="md-cell ng-binding md-clickable" tabindex="0">{{person_table.email}}</td>
-        <td md-cell="" ng-click="changeCellText($event, person_table, 'street_address',dbTableInfo.db_table,dbTableInfo.db_ID,382)" placeholder="{{person_table.street_address}} "
-        class="md-cell ng-binding md-clickable" tabindex="0">{{person_table.street_address}}</td>
-        <td md-cell="" ng-click="changeCellText($event, person_table, 'city',dbTableInfo.db_table,dbTableInfo.db_ID,382)" placeholder="{{person_table.city}} "
-        class="md-cell ng-binding md-clickable" tabindex="0">{{person_table.city}}</td>
-        <td md-cell="" ng-click="changeCellText($event, person_table, 'state',dbTableInfo.db_table,dbTableInfo.db_ID,382)" placeholder="{{person_table.state}} "
-        class="md-cell ng-binding md-clickable" tabindex="0">{{person_table.state}}</td>
-        <td md-cell="" ng-click="changeCellText($event, person_table, 'phone_number',dbTableInfo.db_table,dbTableInfo.db_ID)" placeholder="{{person_table.phone_number}} "
-        class="md-cell ng-binding md-clickable" tabindex="0">{{person_table.phone_number}}</td>
-        <td md-cell="" ng-click="changeCellText($event, person_table, 'zip_code',dbTableInfo.db_table,dbTableInfo.db_ID,8)" placeholder="{{person_table.zip_code}} "
-        class="md-cell ng-binding md-clickable" tabindex="0">{{person_table.zip_code}}</td>
+        <td md-cell="" ng-click="changeCellText($event, person_table, 'user_name',dbTableInfo.db_table,dbTableInfo.db_ID,382)" placeholder="{{person_table.user_name}} "
+        aria-label="person_table.user_name" class="md-cell ng-binding md-clickable" tabindex="0">{{person_table.user_name}}</td>
+        <td md-cell="" ng-click="changeCellText($event, person_table, 'user_email',dbTableInfo.db_table,dbTableInfo.db_ID,382)" placeholder="{{person_table.user_email}} "
+        class="md-cell ng-binding md-clickable" tabindex="0">{{person_table.user_email}}</td>
+        <td md-cell="" ng-click="changeCellText($event, person_table, 'user_address',dbTableInfo.db_table,dbTableInfo.db_ID,382)" placeholder="{{person_table.user_address}} "
+        class="md-cell ng-binding md-clickable" tabindex="0">{{person_table.user_address}}</td>
+        <td md-cell="" ng-click="changeCellText($event, person_table, 'user_phone',dbTableInfo.db_table,dbTableInfo.db_ID,382)" placeholder="{{person_table.user_phone}} "
+        class="md-cell ng-binding md-clickable" tabindex="0">{{person_table.user_phone}}</td>
+        <!-- <td md-cell="" ng-click="changeCellText($event, person_table, 'user_type',dbTableInfo.db_table,dbTableInfo.db_ID,382)" placeholder="{{person_table.user_type}} "
+        class="md-cell ng-binding md-clickable" tabindex="0">{{person_table.user_type}}</td> -->
+        <td md-cell>
+  			<md-select md-on-open="getUserType()" ng-change="addPwrd('user_type','user_type',person_table,dbTableInfo.db_table,dbTableInfo.db_ID)"
+            ng-model="person_table.user_type" placeholder="{{person_table.user_type}}">
+    			<md-option ng-value="userType.user_type"
+                ng-repeat="userType in getUserT.data">{{userType.user_type}}</md-option>
+  			</md-select>
+      </td>
       </tr>
     </tbody>
   </table>

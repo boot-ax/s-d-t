@@ -4,7 +4,7 @@ require '../vendor/autoload.php';
 
 //date_default_timezone_set('UTC');
 
-$jwt_key = "joelikeshisinflatableball";
+$jwt_key = "joelikeshisinflatablebal$22";
 
 Flight::before('start', function(&$params, &$output){
     global $jwt_key;
@@ -37,7 +37,8 @@ Flight::route('POST /auth/login', function(){
 
     $sql  = "SELECT user_id, user_email FROM registration
 		WHERE (`user_email` = '".$entityBody2['email']."')
-		AND (`user_password` = md5('".$entityBody2['password']."'));";
+		AND (`user_password` = md5('".$entityBody2['password']."'))
+    AND (`user_type` != 'no_access');";
 
 		$qry_result = mysqli_query($con, $sql) or die(mysqli_error($con));
 
@@ -55,7 +56,7 @@ Flight::route('POST /auth/login', function(){
 
 	Flight::json(array('token'=>$token->getJWT()));
 } else {
-	FLight::halt(401,$entityBody2['email'] . " or password is incorrect");
+	FLight::halt(401,"Email or password is incorrect.");
 }
 
 });
@@ -291,23 +292,26 @@ Flight::route('POST /person', function(){
 
 	$entityBody = str_replace('\\u0000', '', $entityBody);
 	$entityBody2 = json_decode($entityBody,true);
+  $entityBody2['person_table']['user_password'] = md5($entityBody2['person_table']['user_password']);
 
 
-	// build query...
-   $sql  = "INSERT INTO person";
-   // implode keys of $array...
+
+var_dump($entityBody2);
+
+   $sql  = "INSERT INTO registration";
+
    $sql .= " (`".implode("`, `", array_keys($entityBody2['person_table']))."`)";
-   // implode values of $array...
+
 	 $sql .= " VALUES (\"".implode("\", \"", $entityBody2['person_table'])."\");";
 
 
-  // execute query...
+
   $qry_result = mysqli_query($con, $sql);
   if($qry_result){
 	  Flight::halt(200,"Person Added.");
   }else{
 	  Flight::halt(500,mysqli_error($con));
-	  //die(mysqli_error($con));
+
   }
 
 });
@@ -490,16 +494,13 @@ Flight::route('GET /person', function(){
 	$start_from = ($page-1) * $limit;
 
 
-	$sql_query = "SELECT SQL_CALC_FOUND_ROWS first_name,last_name,email,street_address,city,state,phone_number,zip_code,person_ID FROM person
+	$sql_query = "SELECT SQL_CALC_FOUND_ROWS user_name,user_email,user_address,user_phone,user_type,user_ID FROM registration
 
-					WHERE (`first_name` LIKE '%".$filter."%')
-					OR (`last_name` LIKE '%".$filter."%')
-					OR (`email` LIKE '%".$filter."%')
-					OR (`street_address` LIKE '%".$filter."%')
-					OR (`city` LIKE '%".$filter."%')
-					OR (`state` LIKE '%".$filter."%')
-					OR (`phone_number` LIKE '%".$filter."%')
-					OR (`zip_code` LIKE '%".$filter."%')";
+					WHERE (`user_name` LIKE '%".$filter."%')
+					OR (`user_email` LIKE '%".$filter."%')
+					OR (`user_address` LIKE '%".$filter."%')
+					OR (`user_phone` LIKE '%".$filter."%')
+					OR (`user_type` LIKE '%".$filter."%')";
 					if($all !=='true'){
 						$sql_query .=
 				"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
@@ -663,18 +664,18 @@ Flight::route('GET /registrar', function(){
 	$start_from = ($page-1) * $limit;
 
 
-	$sql_query = "SELECT SQL_CALC_FOUND_ROWS registrar.registrar_name,registrar.login_url,registrar.login_username,registrar.login_password,registrar.credit_card_last_4,registrar.registrar_ID,person.first_name,person.last_name FROM registrar
+	$sql_query = "SELECT SQL_CALC_FOUND_ROWS registrar.registrar_name,registrar.login_url,registrar.login_username,registrar.login_password,registrar.credit_card_last_4,registrar.registrar_ID,registration.user_name,registration.user_email FROM registrar
 
 
-					LEFT JOIN `person` ON registrar.person_ID = person.person_ID
+					LEFT JOIN `registration` ON registrar.user_ID = registration.user_ID
 
 					WHERE (`registrar_name` LIKE '%".$filter."%')
 					OR (`login_url` LIKE '%".$filter."%')
 					OR (`login_username` LIKE '%".$filter."%')
 					OR (`login_password` LIKE '%".$filter."%')
 					OR (`credit_card_last_4` LIKE '%".$filter."%')
-					OR (`first_name` LIKE '%".$filter."%')
-					OR (`last_name` LIKE '%".$filter."%')";
+					OR (`user_name` LIKE '%".$filter."%')
+					OR (`user_email` LIKE '%".$filter."%')";
 					if($all !=='true'){
 						$sql_query .=
 				"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
@@ -909,18 +910,18 @@ Flight::route('GET /W2_accounts', function(){
 	$start_from = ($page-1) * $limit;
 
 
-	$sql_query = "SELECT SQL_CALC_FOUND_ROWS W2_accounts.login_url_name,W2_accounts.login,W2_accounts.password,W2_accounts.account_url,W2_accounts.attached_domain,W2_accounts.W2_ID,person.first_name,person.last_name FROM W2_accounts
+	$sql_query = "SELECT SQL_CALC_FOUND_ROWS W2_accounts.login_url_name,W2_accounts.login,W2_accounts.password,W2_accounts.account_url,W2_accounts.attached_domain,W2_accounts.W2_ID,registration.user_name,registration.user_email FROM W2_accounts
 
 
-					LEFT JOIN `person` ON W2_accounts.person_ID = person.person_ID
+					LEFT JOIN `registration` ON W2_accounts.user_ID = registration.user_ID
 
 					WHERE (`login_url_name` LIKE '%".$filter."%')
 					OR (`login` LIKE '%".$filter."%')
 					OR (`account_url` LIKE '%".$filter."%')
 					OR (`password` LIKE '%".$filter."%')
 					OR (`attached_domain` LIKE '%".$filter."%')
-					OR (`first_name` LIKE '%".$filter."%')
-					OR (`last_name` LIKE '%".$filter."%')";
+					OR (`user_name` LIKE '%".$filter."%')
+					OR (`user_email` LIKE '%".$filter."%')";
 					if($all !=='true'){
 						$sql_query .=
 				"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
@@ -1136,7 +1137,8 @@ Flight::route('DELETE /person', function(){
 
 	include "../inc/connection.php";
 	$id = Flight::request()->query->id;
-	$sql_query2 = "DELETE FROM person WHERE person_ID = " . $id;
+	$sql_query2 = "DELETE FROM registration WHERE user_ID = " . $id;
+  echo $sql_query2;
 	$qry_result2 = mysqli_query($con, $sql_query2) or die(mysqli_error($con));
 
 	//Flight::json($newArray2);
@@ -1222,6 +1224,28 @@ Flight::route('/gethosts', function(){
 
 });
 
+
+
+Flight::route('/getusertype', function(){
+
+
+	include "../inc/connection.php";
+
+	$sql_query2 = "SELECT DISTINCT user_type FROM registration;";
+
+   	$qry_result2 = mysqli_query($con, $sql_query2) or die(mysqli_error($con));
+	$rows2 = array();
+			while($r2 = mysqli_fetch_assoc($qry_result2)) {
+    			$rows2[] = $r2;
+				}
+		$num_rows2 = mysqli_num_rows($qry_result2);
+		$newArray2 = array('data'=>$rows2);
+
+
+	Flight::json($newArray2);
+
+});
+
 Flight::route('/getregistrars', function(){
 
 	include "../inc/connection.php";
@@ -1268,20 +1292,22 @@ Flight::route('/updateItem', function(){
 	$entityBody = str_replace('\\u0000', '', $entityBody);
 	$entityBody2 = json_decode($entityBody,true);
 
-
-
-	// build query...
+  if($entityBody2['column'] = 'user_type'){
+  var_dump($entityBody2);
+    if($entityBody2['user_type'] != 'no_access'){
+      $sql  = "UPDATE " . $entityBody2['table'] . " SET " . $entityBody2['column'] . "=\"" . $entityBody2['value'] . "\",user_password=\"".md5($entityBody2['pwrd'])."\"";
+      $sql .= " WHERE " . $entityBody2['identifier']. "=" . $entityBody2['id'];
+    }
+  } else {
    $sql  = "UPDATE " . $entityBody2['table'] . " SET " . $entityBody2['column'] . "=\"" . $entityBody2['value'] . "\"";
-  //$sql  = "UPDATE " . $entityBody2['table'] . " SET " . $entityBody2['column'] . "='" . mysqli_real_escape_string($con,$entityBody2['value']) . "'";
    $sql .= " WHERE " . $entityBody2['identifier']. "=" . $entityBody2['id'];
+};
 
- // execute query...
   $qry_result = mysqli_query($con, $sql);
   if($qry_result){
 	  Flight::halt(200,$entityBody2['column'] . ": Updated");
   }else{
 	  Flight::halt(500,mysqli_error($con));
-	  //die(mysqli_error($con));
   }
 
 });
@@ -1290,11 +1316,11 @@ Flight::route('/9736644323hc4e34', function(){
 
 });
 
-Flight::route('/getpersons', function(){
+Flight::route('/getowners', function(){
 
 	include "../inc/connection.php";
 
-	$sql_query2 = "SELECT first_name,last_name,person_ID FROM person;";
+	$sql_query2 = "SELECT user_name,user_email,user_ID FROM registration;";
 
    	$qry_result2 = mysqli_query($con, $sql_query2) or die(mysqli_error($con));
 	$rows2 = array();

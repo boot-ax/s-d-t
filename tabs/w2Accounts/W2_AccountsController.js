@@ -4,7 +4,7 @@ angular.module('SE_App').controller('W2_accountsController', ['$mdDialog','$W2_a
   var bookmark;
 
   $scope.$file = 'W2_accounts.csv';
-  $scope.$header = ['login_url_name','login','password','account_url','attached_domain','W2_ID','first_name','last_name'];
+  $scope.$header = ['login_url_name','login','password','account_url','attached_domain','W2_ID','user_name','user_email'];
   $scope.$location = '/service/W2_accounts';
 
     $scope.$on('locationUpdate', function (event, data) {
@@ -98,10 +98,10 @@ angular.module('SE_App').controller('W2_accountsController', ['$mdDialog','$W2_a
 
 //Below is changing the selection and Date Pickers
 
-$scope.getPersonsFunc = function(){
-	$http.get('service/getpersons')
+$scope.getOwnersFunc = function(){
+	$http.get('service/getowners')
 		.then(function(response){
-	$scope.getPersons = response.data;
+	$scope.getOwners = response.data;
 	});
 };
 

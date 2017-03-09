@@ -44,7 +44,7 @@
         <th md-column md-numeric md-order-by="login"><span>Login</span></th>
         <th md-column md-numeric md-order-by="password"><span>Password</span></th>
         <th md-column md-numeric md-order-by="account_url"><span>Account URL</span></th>
-        <th md-column md-numeric md-order-by="person"><span>Person</span></th>
+        <th md-column md-numeric md-order-by="user_name"><span>Owner</span></th>
         <th md-column md-numeric md-order-by="attached_domain"><span>Attached Domain</span></th>
       </tr>
     </thead>
@@ -59,11 +59,11 @@
         <td md-cell="" ng-click="changeCellText($event, W2_accounts_table, 'account_url',dbTableInfo.db_table,dbTableInfo.db_ID)" placeholder="{{W2_accounts_table.account_url}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{W2_accounts_table.account_url}}</td>
         <td md-cell>
-  			<md-select md-on-open="getPersonsFunc()" ng-change="changeDropdown('person_ID','person_ID',W2_accounts_table,dbTableInfo.db_table,dbTableInfo.db_ID)"
-            ng-model="W2_accounts_table.person_ID" placeholder="{{W2_accounts_table.first_name}}, {{W2_accounts_table.last_name}}">
-    			<md-option ng-value="registrar.person_ID"
-                ng-repeat="registrar in getPersons.data">{{registrar.first_name}}, {{registrar.last_name}}</md-option>
-  			</md-select>
+          <md-select md-on-open="getOwnersFunc()" ng-change="changeDropdown('user_ID','user_ID',W2_accounts_table,dbTableInfo.db_table,dbTableInfo.db_ID)"
+              ng-model="W2_accounts_table.user_ID" placeholder="{{W2_accounts_table.user_name}}</br>{{W2_accounts_table.user_email}}">
+            <md-option ng-value="registrar.user_ID"
+                  ng-repeat="variable in getOwners.data">{{variable.user_name}}</br>{{variable.user_email}}</md-option>
+          </md-select>
 
 		</td>
         <td md-cell="" ng-click="changeCellText($event, W2_accounts_table, 'attached_domain',dbTableInfo.db_table,dbTableInfo.db_ID,253)" placeholder="{{W2_accounts_table.attached_domain}} "

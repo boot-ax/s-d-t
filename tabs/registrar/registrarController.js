@@ -7,7 +7,7 @@ angular.module('SE_App').controller('registrarController', ['$mdDialog','$regist
   var bookmark;
 
   $scope.$file = 'registrar.csv';
-  $scope.$header = ['registrar_name','login_url','login_username','login_password','credit_card_last_4','registrar_ID','first_name','last_name'];
+  $scope.$header = ['registrar_name','login_url','login_username','login_password','credit_card_last_4','registrar_ID','user_name','user_email'];
   $scope.$location = '/service/registrar';
 
   $scope.selected = [];
@@ -101,10 +101,10 @@ angular.module('SE_App').controller('registrarController', ['$mdDialog','$regist
 
 //Below is changing the selection and Date Pickers
 
-$scope.getPersonsFunc = function(){
-	$http.get('service/getpersons')
+$scope.getOwnersFunc = function(){
+	$http.get('service/getowners')
 		.then(function(response){
-	$scope.getPersons = response.data;
+	$scope.getOwners = response.data;
 	});
 };
 

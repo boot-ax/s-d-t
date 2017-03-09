@@ -1,4 +1,4 @@
-<md-dialog-content id="dialog_registrar" class="md-dialog-content">
+<md-dialog-content id="dialog_registrar" class="md-dialog-content" layout-padding>
 
 
 
@@ -6,70 +6,66 @@
 
   <form style="" class="ng-invalid ng-invalid-required" name="item.form" ng-submit="ctrl.addItem()">
 
-<h3 class="md-subhead">Person Information</h3>
+<h3 class="md-subhead">User Information</h3>
 
     <div layout="row" class="input-row layout-row">
-      <md-input-container class="flex" flex="">
-        <label>First Name&#42;</label>
-        <input style="" ng-trim="false" name="first_name" ng-model="person_table.first_name" required="true">
+      <md-input-container class="flex=70" flex="">
+        <label>Full Name&#42;</label>
+        <input style="" ng-trim="false" name="user_name" ng-model="person_table.user_name" required="true">
         <div class="md-errors-spacer">
           <div class="md-char-counter"></div>
         </div>
       </md-input-container>
+</div>
+<div layout="column">
 
-      <md-input-container class="flex" flex="">
-        <label>Last Name&#42;</label>
-        <input style="" aria-invalid="true" name="last_name" ng-model="person_table.last_name" required="true">
-        <div class="md-errors-spacer"></div>
-      </md-input-container>
+        <label>User Access</label>
+          <md-switch layout-align="start" ng-click="access = !access" aria-label="active switch" ng-init="person_table.user_access = 'no'" ng-model="person_table.user_access" ng-true-value="'yes'" ng-false-value="'no'">
+            {{person_table.user_access}}
+      </md-switch>
+
+
+<md-input-container ng-show="access" class="flex" flex="">
+      <md-select
+          ng-model="person_table.user_type" placeholder="User Type&#42;" ng-required="access">
+        <md-option ng-value="userType"
+              ng-repeat="userType in ['admin','user1','user2']">{{userType}}</md-option>
+      </md-select>
+</md-input-container>
     </div>
 
 
     <div layout="row" class="input-row layout-row">
+
+      <md-input-container ng-show="access" class="flex" flex="">
+        <label>Password&#42;</label>
+        <input style="" aria-invalid="true" name="user_password" ng-model="person_table.user_password" ng-required="access">
+        <div class="md-errors-spacer"></div>
+      </md-input-container>
+    </div>
+
+    <div layout="row" class="input-row layout-row">
+
       <md-input-container class="flex" flex="">
         <label>Email&#42;</label>
-        <input style="" aria-invalid="true" name="email" ng-model="person_table.email" required="true">
+        <input type="email" aria-invalid="true" name="user_email" ng-model="person_table.user_email" required="true">
+        <div class="md-errors-spacer"></div>
+      </md-input-container>
+    </div>
+<div layout="row" class="input-row layout-row">
+      <md-input-container class="flex" flex="">
+        <label>Address</label>
+        <input style="" aria-invalid="true" name="user_address" ng-model="person_table.user_address">
         <div class="md-errors-spacer"></div>
       </md-input-container>
       </div>
       <div layout="row" class="input-row layout-row">
             <md-input-container class="flex" flex="">
-        <label>Street Address</label>
-        <input style="" aria-invalid="true" name="street_address" ng-model="person_table.street_address">
+        <label>Phone Number</label>
+        <input style="" aria-invalid="true" name="user_phone" ng-model="person_table.user_phone">
         <div class="md-errors-spacer"></div>
       </md-input-container>
       </div>
-
-
-    <div layout="row" class="input-row layout-row">
-
-<md-input-container class="flex" flex="">
-        <label>City</label>
-        <input style="" name="city" ng-model="person_table.city">
-        <div class="md-errors-spacer"></div>
-      </md-input-container>
-
-      <md-input-container class="flex" flex="">
-        <label>State</label>
-        <input style="" name="state" ng-model="person_table.state">
-        <div class="md-errors-spacer"></div>
-      </md-input-container>
-    </div>
-    
-        <div layout="row" class="input-row layout-row">
-
-<md-input-container class="flex" flex="">
-        <label>Phone Number</label>
-        <input style="" name="phone_number" ng-model="person_table.phone_number">
-        <div class="md-errors-spacer"></div>
-      </md-input-container>
-
-      <md-input-container class="flex" flex="">
-        <label>Zip Code</label>
-        <input style="" name="zip_code" ng-model="person_table.zip_code">
-        <div class="md-errors-spacer"></div>
-      </md-input-container>
-    </div>
   </form>
 
 
@@ -81,4 +77,3 @@
 
   <div tabindex="0" class="md-dialog-focus-trap"></div>
 </md-dialog-content>
-
