@@ -1,0 +1,20 @@
+<md-dialog-content class="md-dialog-content">
+<div layout="column" layout-align="center center">
+   <h2 ng-hide="isHidden == 'no_access';" class="md-title">Enter New Password For</h2>
+   <h2 ng-show="isHidden == 'no_access';" class="md-title">Confirm Set No Access For</h2>
+      <h4>{{$email}}</h4>
+<div>
+   <!-- ngIf: error -->
+   <div><form class="ng-pristine ng-valid" name="pwrd.form" ng-submit="ctrl.submitPwrd()">
+     <md-input-container class="layout-row" layout="row">
+       <!-- <label>Secret</label> -->
+       <input ng-hide="isHidden == 'no_access';" name="pwrd" ng-model="pwrd.user_password" type="password">
+     <div class="md-errors-spacer"></div></md-input-container>
+   </form>
+ </div>
+ </md-dialog-content>
+ <div class="md-dialog-actions">
+   <button aria-label="Submit" ng-click="ctrl.submitPwrd()" class="md-primary md-button md-ink-ripple" type="button"><span>Submit</span></button>
+   <button aria-label="Close" ng-click="ctrl.cancel()" class="md-primary md-button md-ink-ripple" type="button"><span>Cancel</span></button>
+ </div>
+<div tabindex="0" class="md-dialog-focus-trap"></div>

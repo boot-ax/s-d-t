@@ -44,7 +44,7 @@
         <th md-column md-numeric md-order-by="name_of_product"><span>Name of Product</span></th>
         <th md-column md-numeric md-order-by="username"><span>Username</span></th>
         <th md-column md-numeric md-order-by="password"><span>Password</span></th>
-        <th md-column md-numeric md-order-by="last_name"><span>Person</span></th>
+        <th md-column md-numeric md-order-by="user_name"><span>Owner</span></th>
         <th md-column md-order-by="product_description">
           <md-icon class="ng-isolate-scope material-icons">comments</md-icon>
           <span>Product Description</span></th>
@@ -61,12 +61,11 @@
         <td md-cell="" ng-click="changeCellText($event, resource_login_table, 'password',dbTableInfo.db_table,dbTableInfo.db_ID,382)" placeholder="{{resource_login_table.password}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{resource_login_table.password}}</td>
         <td md-cell>
-  			<md-select md-on-open="getPersonsFunc()" ng-change="changeDropdown('person_ID','person_ID',resource_login_table,dbTableInfo.db_table,dbTableInfo.db_ID)"
-            ng-model="resource_login_table.person_ID" placeholder="{{resource_login_table.first_name}}, {{resource_login_table.last_name}}">
-    			<md-option ng-value="registrar.person_ID"
-                ng-repeat="registrar in getPersons.data">{{registrar.first_name}}, {{registrar.last_name}}</md-option>
-  			</md-select>
-
+          <md-select md-on-open="getOwnersFunc()" ng-change="changeDropdown('user_ID','user_ID',resource_login_table,dbTableInfo.db_table,dbTableInfo.db_ID)"
+              ng-model="resource_login_table.user_ID" placeholder="{{$firstSpan}}{{resource_login_table.user_name}}</span></br>{{$secondSpan}}{{resource_login_table.user_email}}</span>">
+            <md-option ng-value="variable.user_ID"
+                  ng-repeat="variable in getOwners.data"><span class="firstSpan">{{variable.user_name}}</span></br><span class="secondSpan">{{variable.user_email}}</span></md-option>
+          </md-select>
 		</td>
         <td md-cell="" ng-click="changeCellText($event, resource_login_table, 'product_description',dbTableInfo.db_table,dbTableInfo.db_ID)" placeholder="{{resource_login_table.product_description}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{resource_login_table.product_description}}</td>

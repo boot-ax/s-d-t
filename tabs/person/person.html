@@ -60,10 +60,10 @@
         <!-- <td md-cell="" ng-click="changeCellText($event, person_table, 'user_type',dbTableInfo.db_table,dbTableInfo.db_ID,382)" placeholder="{{person_table.user_type}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{person_table.user_type}}</td> -->
         <td md-cell>
-  			<md-select md-on-open="getUserType()" ng-change="addPwrd('user_type','user_type',person_table,dbTableInfo.db_table,dbTableInfo.db_ID)"
+  			<md-select ng-change="addPwrd($event,person_table,'user_type','user_type',dbTableInfo.db_table,dbTableInfo.db_ID,person_table.user_email)"
             ng-model="person_table.user_type" placeholder="{{person_table.user_type}}">
-    			<md-option ng-value="userType.user_type"
-                ng-repeat="userType in getUserT.data">{{userType.user_type}}</md-option>
+    			<md-option ng-value="userType"
+                ng-repeat="userType in ['admin','no_access','user1','user2','user3']">{{userType}}</md-option>
   			</md-select>
       </td>
       </tr>

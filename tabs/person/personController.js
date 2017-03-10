@@ -63,7 +63,14 @@ angular.module('SE_App').controller('personController', ['$mdDialog','$person', 
     }).then($scope.getDesserts);
   };
 
-  $scope.addPwrd = function (event,column, value, table,db_table,db_ID) {
+  $scope.addPwrd = function (event,$table,column,$value,db_table,db_ID,$email) {
+    var $obj = {};
+    $obj.email = $email;
+    $obj.table = db_table;
+    $obj.column = column;
+    $obj.value = $table[$value];
+    $obj.identifier = db_ID;
+    $obj.id = $table[db_ID];
     $mdDialog.show({
       clickOutsideToClose: true,
       controller: 'getPwrdController',
@@ -72,8 +79,13 @@ angular.module('SE_App').controller('personController', ['$mdDialog','$person', 
       focusOnOpen: false,
       targetEvent: event,
       templateUrl: '/partials/pwrd.html',
-    })
-    .then($scope.changeDropdown(event,column, value, table,db_table,db_ID));
+      resolve:{
+        $object: function(){
+          return $obj;
+        }
+      }
+    }).then($scope.getDesserts)
+    ;
   };
 
   $scope.getDesserts = function () {
@@ -104,48 +116,6 @@ angular.module('SE_App').controller('personController', ['$mdDialog','$person', 
 
     $scope.getDesserts();
   });
-
-
-
-$scope.changeDropdown = function(event,column, value, table,db_ID){
-                var $obj = {};
-                $obj.table = 'registration';
-                $obj.column = column;
-                $obj.value = table[value];
-                $obj.identifier = db_ID;
-                $obj.id = table[db_ID];
-
-                var success  = function(data){
-                    $mdToast.show(
-                        $mdToast.simple()
-                          .textContent(data.data)
-                          .hideDelay(3000)
-                      );
-                  };
-
-                  var failure  = function(data){
-                    $mdToast.show(
-                        $mdToast.simple()
-                          .textContent(data.data)
-                          .hideDelay(3000)
-                      );
-                  };
-
-                var deferred = $q.defer();
-
-              $http.post('service/updateItem',$obj).then(function(response){
-                success(response);
-                deferred.resolve();
-              },function(response){
-                failure(response);
-                deferred.reject();
-              });
-              return deferred.promise;
-              };
-
-
-
-
 
 
   $scope.changeCellText = changeCellServices.changeCellText;

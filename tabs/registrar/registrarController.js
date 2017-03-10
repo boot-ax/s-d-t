@@ -5,7 +5,8 @@ angular.module('SE_App').controller('registrarController', ['$mdDialog','$regist
   'use strict';
 
   var bookmark;
-
+  $scope.$firstSpan = '<span class="firstSpan">';
+  $scope.$secondSpan = '<span class="secondSpan">';
   $scope.$file = 'registrar.csv';
   $scope.$header = ['registrar_name','login_url','login_username','login_password','credit_card_last_4','registrar_ID','user_name','user_email'];
   $scope.$location = '/service/registrar';

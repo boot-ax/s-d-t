@@ -31,7 +31,7 @@
         <input style="" aria-invalid="true" name="username" ng-model="resource_login_table.username" required="true">
         <div class="md-errors-spacer"></div>
       </md-input-container>
-      
+
             <md-input-container class="flex" flex="">
         <label>Password&#42;</label>
         <input style="" aria-invalid="true" name="password" ng-model="resource_login_table.password" required="true">
@@ -42,15 +42,14 @@
     <h3 class="md-subhead">Other Information</h3>
 
 
- 
+
 
 <md-input-container class="flex" flex="">
-        <md-select md-on-open="getPersonsFunc()" ng-model="resource_login_table.person_ID" placeholder="Person" class="flex" flex="">
-          <md-option ng-value="person.person_ID" ng-repeat="person in getPersons.data">{{person.first_name}}, {{person.last_name}}</md-option>
+        <md-select md-on-open="getOwnersFunc()" ng-model="resource_login_table.user_ID" placeholder="Owner" class="flex" flex="">
+          <md-option ng-value="variable.user_ID" ng-repeat="variable in getOwners.data"><span style="font-size:.8em">{{variable.user_name}}</span></br><span style="color:#2196F3">{{variable.user_email}}</span></md-option>
           </md-select>
-          
     <button ng-controller="personController" class="md-button md-ink-ripple" type="button" ng-click="addItem($event)">
-      <div class="addButtonInModl">+ person</div>
+      <div class="addButtonInModl">+ Owner</div>
     </button>
       </md-input-container>
 <div class="md-errors-spacer"></div>
@@ -59,7 +58,7 @@
         <input style="" name="product_description" ng-model="resource_login_table.product_description">
         <div class="md-errors-spacer"></div>
       </md-input-container>
-    
+
   </form>
 
 
@@ -71,4 +70,3 @@
 
   <div tabindex="0" class="md-dialog-focus-trap"></div>
 </md-dialog-content>
-

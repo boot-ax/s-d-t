@@ -47,7 +47,7 @@
         <th md-column md-order-by="issue"><span>Issue</span></th>
         <th md-column md-numeric md-order-by="date_entered"><span>Date Entered</span></th>
         <th md-column md-numeric md-order-by="completed"><span>Completed</span></th>
-        <th md-column md-numeric md-order-by="last_name"><span>Person</span></th>
+        <th md-column md-numeric md-order-by="user_name"><span>Owner</span></th>
       </tr>
     </thead>
     <tbody md-body>
@@ -75,11 +75,11 @@
 
 
         <td md-cell>
-  			<md-select md-on-open="getPersonsFunc()" ng-change="changeDropdown('person_ID','person_ID',change_log_table,dbTableInfo.db_table,dbTableInfo.db_ID)"
-            ng-model="change_log_table.person_ID" placeholder="{{change_log_table.first_name}}, {{change_log_table.last_name}}">
-    			<md-option ng-value="change_log_table.person_ID"
-                ng-repeat="change_log_table in getPersons.data">{{change_log_table.first_name}}, {{change_log_table.last_name}}</md-option>
-  			</md-select>
+        <md-select md-on-open="getOwnersFunc()" ng-change="changeDropdown('user_ID','user_ID',W2_accounts_table,dbTableInfo.db_table,dbTableInfo.db_ID)"
+            ng-model="change_log_table.user_ID" placeholder="{{$firstSpan}}{{change_log_table.user_name}}</span></br>{{$secondSpan}}{{change_log_table.user_email}}</span>">
+          <md-option ng-value="variable.user_ID"
+                ng-repeat="variable in getOwners.data"><span class="firstSpan">{{variable.user_name}}</span></br><span class="secondSpan">{{variable.user_email}}</span></md-option>
+        </md-select>
 
 		</td>
       </tr>

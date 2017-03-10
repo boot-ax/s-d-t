@@ -13,10 +13,10 @@ angular.module('SE_App').controller('addW2_AccountsController', ['$mdDialog', '$
 
 $scope.myDate = new Date();
 
-$scope.getPersonsFunc = function(){
-	$http.get('service/getpersons')
+$scope.getOwnersFunc = function(){
+	$http.get('service/getowners')
 		.then(function(response){
-	$scope.getPersons = response.data;
+	$scope.getOwners = response.data;
 	});
 };
 

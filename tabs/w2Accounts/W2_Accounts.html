@@ -60,9 +60,9 @@
         class="md-cell ng-binding md-clickable" tabindex="0">{{W2_accounts_table.account_url}}</td>
         <td md-cell>
           <md-select md-on-open="getOwnersFunc()" ng-change="changeDropdown('user_ID','user_ID',W2_accounts_table,dbTableInfo.db_table,dbTableInfo.db_ID)"
-              ng-model="W2_accounts_table.user_ID" placeholder="{{W2_accounts_table.user_name}}</br>{{W2_accounts_table.user_email}}">
-            <md-option ng-value="registrar.user_ID"
-                  ng-repeat="variable in getOwners.data">{{variable.user_name}}</br>{{variable.user_email}}</md-option>
+              ng-model="W2_accounts_table.user_ID" placeholder="{{$firstSpan}}{{W2_accounts_table.user_name}}</span></br>{{$secondSpan}}{{W2_accounts_table.user_email}}</span>">
+            <md-option ng-value="variable.user_ID"
+                  ng-repeat="variable in getOwners.data"><span class="firstSpan">{{variable.user_name}}</span></br><span class="secondSpan">{{variable.user_email}}</span></md-option>
           </md-select>
 
 		</td>

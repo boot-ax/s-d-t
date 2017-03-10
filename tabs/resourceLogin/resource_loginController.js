@@ -2,9 +2,10 @@ angular.module('SE_App').controller('resource_loginController', ['$mdDialog','$r
   'use strict';
 
   var bookmark;
-
+  $scope.$firstSpan = '<span class="firstSpan">';
+  $scope.$secondSpan = '<span class="secondSpan">';
   $scope.$file = 'resource_login.csv';
-  $scope.$header = ['resource_url_name','name_of_product','username','password','product_description','resource_url_ID','first_name','last_name'];
+  $scope.$header = ['resource_url_name','name_of_product','username','password','product_description','resource_url_ID','user_name','user_email'];
   $scope.$location = '/service/resource_login';
 
     $scope.$on('locationUpdate', function (event, data) {
@@ -100,10 +101,10 @@ angular.module('SE_App').controller('resource_loginController', ['$mdDialog','$r
 //Below is changing the selection and Date Pickers
 
 
-$scope.getPersonsFunc = function(){
-	$http.get('service/getpersons')
+$scope.getOwnersFunc = function(){
+	$http.get('service/getowners')
 		.then(function(response){
-	$scope.getPersons = response.data;
+	$scope.getOwners = response.data;
 	});
 };
 

@@ -43,7 +43,7 @@
         <th md-column md-order-by="software_name"><span>Software Name</span></th>
         <th md-column md-numeric md-order-by="license_key"><span>License Key</span></th>
         <th md-column md-numeric md-order-by="serial_number"><span>Serial Number</span></th>
-        <th md-column md-numeric md-order-by="last_name"><span>Person</span></th>
+        <th md-column md-numeric md-order-by="user_name"><span>Owner</span></th>
         <th md-column md-order-by="comments">
           <md-icon class="ng-isolate-scope material-icons">comments</md-icon>
           <span>Comments</span></th>
@@ -58,11 +58,11 @@
         <td md-cell="" ng-click="changeCellText($event, software_keys_table, 'serial_number',dbTableInfo.db_table,dbTableInfo.db_ID,255)" placeholder="{{software_keys_table.serial_number}} "
         class="md-cell ng-binding md-clickable" tabindex="0">{{software_keys_table.serial_number}}</td>
         <td md-cell>
-  			<md-select md-on-open="getPersonsFunc()" ng-change="changeDropdown('person_ID','person_ID',software_keys_table,dbTableInfo.db_table,dbTableInfo.db_ID)"
-            ng-model="software_keys_table.person_ID" placeholder="{{software_keys_table.first_name}}, {{software_keys_table.last_name}}">
-    			<md-option ng-value="registrar.person_ID"
-                ng-repeat="registrar in getPersons.data">{{registrar.first_name}}, {{registrar.last_name}}</md-option>
-  			</md-select>
+        <md-select md-on-open="getOwnersFunc()" ng-change="changeDropdown('user_ID','user_ID',software_keys_table,dbTableInfo.db_table,dbTableInfo.db_ID)"
+            ng-model="software_keys_table.user_ID" placeholder="{{$firstSpan}}{{software_keys_table.user_name}}</span></br>{{$secondSpan}}{{software_keys_table.user_email}}</span>">
+          <md-option ng-value="variable.user_ID"
+                ng-repeat="variable in getOwners.data"><span class="firstSpan">{{variable.user_name}}</span></br><span class="secondSpan">{{variable.user_email}}</span></md-option>
+        </md-select>
 
 		</td>
         <td md-cell="" ng-click="changeCellText($event, software_keys_table, 'comments',dbTableInfo.db_table,dbTableInfo.db_ID)" placeholder="{{software_keys_table.comments}} "

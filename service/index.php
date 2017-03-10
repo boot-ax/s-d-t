@@ -609,15 +609,15 @@ Flight::route('GET /change_log', function(){
 
 	$start_from = ($page-1) * $limit;
 
-	$sql_query = "SELECT SQL_CALC_FOUND_ROWS change_log.issue,change_log.date_entered,change_log.completed,change_log.change_log_ID,change_log.person_ID,person.first_name,person.last_name FROM change_log
+	$sql_query = "SELECT SQL_CALC_FOUND_ROWS change_log.issue,change_log.date_entered,change_log.completed,change_log.change_log_ID,change_log.user_ID,registration.user_name,registration.user_email FROM change_log
 
-					LEFT JOIN `person` ON change_log.person_ID = person.person_ID
+					LEFT JOIN `registration` ON change_log.user_ID = registration.user_ID
 
 					WHERE (`issue` LIKE '%".$filter."%')
 					OR (`date_entered` LIKE '%".$filter."%')
 					OR (`completed` LIKE '%".$filter."%')
-					OR (`first_name` LIKE '%".$filter."%')
-					OR (`last_name` LIKE '%".$filter."%')";
+					OR (`user_name` LIKE '%".$filter."%')
+					OR (`user_email` LIKE '%".$filter."%')";
 					if($all !=='true'){
 						$sql_query .=
 				"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
@@ -798,17 +798,17 @@ Flight::route('GET /resource_login', function(){
 
 	$start_from = ($page-1) * $limit;
 
-	$sql_query = "SELECT SQL_CALC_FOUND_ROWS resource_login.resource_url_name,resource_login.name_of_product,resource_login.username,resource_login.password,resource_login.product_description,resource_login.resource_url_ID,person.first_name,person.last_name FROM resource_login
+	$sql_query = "SELECT SQL_CALC_FOUND_ROWS resource_login.resource_url_name,resource_login.name_of_product,resource_login.username,resource_login.password,resource_login.product_description,resource_login.resource_url_ID,registration.user_name,registration.user_email FROM resource_login
 
-					LEFT JOIN `person` ON resource_login.person_ID = person.person_ID
+					LEFT JOIN `registration` ON resource_login.user_ID = registration.user_ID
 
 					WHERE (`resource_url_name` LIKE '%".$filter."%')
 					OR (`name_of_product` LIKE '%".$filter."%')
 					OR (`username` LIKE '%".$filter."%')
 					OR (`password` LIKE '%".$filter."%')
 					OR (`product_description` LIKE '%".$filter."%')
-					OR (`first_name` LIKE '%".$filter."%')
-					OR (`last_name` LIKE '%".$filter."%')";
+					OR (`user_name` LIKE '%".$filter."%')
+					OR (`user_email` LIKE '%".$filter."%')";
 					if($all !=='true'){
 						$sql_query .=
 				"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
@@ -853,17 +853,17 @@ Flight::route('GET /software_keys', function(){
 
 	$start_from = ($page-1) * $limit;
 
-  $sql_query = "SELECT SQL_CALC_FOUND_ROWS software_keys.software_name,software_keys.license_key,software_keys.serial_number,software_keys.comments,software_keys.software_keys_ID,person.first_name,person.last_name FROM software_keys
+  $sql_query = "SELECT SQL_CALC_FOUND_ROWS software_keys.software_name,software_keys.license_key,software_keys.serial_number,software_keys.comments,software_keys.software_keys_ID,registration.user_name,registration.user_email FROM software_keys
 
-					LEFT JOIN `person` ON software_keys.person_ID = person.person_ID
+					LEFT JOIN `registration` ON software_keys.user_ID = registration.user_ID
 
 					WHERE (`software_name` LIKE '%".$filter."%')
 					OR (`license_key` LIKE '%".$filter."%')
 					OR (`serial_number` LIKE '%".$filter."%')
 					OR (`software_keys_ID` LIKE '%".$filter."%')
-					OR (`first_name` LIKE '%".$filter."%')
+					OR (`user_name` LIKE '%".$filter."%')
           OR (`comments` LIKE '%".$filter."%')
-					OR (`last_name` LIKE '%".$filter."%')";
+					OR (`user_email` LIKE '%".$filter."%')";
 					if($all !=='true'){
 						$sql_query .=
 				"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
@@ -1226,25 +1226,25 @@ Flight::route('/gethosts', function(){
 
 
 
-Flight::route('/getusertype', function(){
-
-
-	include "../inc/connection.php";
-
-	$sql_query2 = "SELECT DISTINCT user_type FROM registration;";
-
-   	$qry_result2 = mysqli_query($con, $sql_query2) or die(mysqli_error($con));
-	$rows2 = array();
-			while($r2 = mysqli_fetch_assoc($qry_result2)) {
-    			$rows2[] = $r2;
-				}
-		$num_rows2 = mysqli_num_rows($qry_result2);
-		$newArray2 = array('data'=>$rows2);
-
-
-	Flight::json($newArray2);
-
-});
+// Flight::route('/getusertype', function(){
+//
+//
+// 	include "../inc/connection.php";
+//
+// 	$sql_query2 = "SELECT DISTINCT user_type FROM registration;";
+//
+//    	$qry_result2 = mysqli_query($con, $sql_query2) or die(mysqli_error($con));
+// 	$rows2 = array();
+// 			while($r2 = mysqli_fetch_assoc($qry_result2)) {
+//     			$rows2[] = $r2;
+// 				}
+// 		$num_rows2 = mysqli_num_rows($qry_result2);
+// 		$newArray2 = array('data'=>$rows2);
+//
+//
+// 	Flight::json($newArray2);
+//
+// });
 
 Flight::route('/getregistrars', function(){
 
@@ -1292,16 +1292,16 @@ Flight::route('/updateItem', function(){
 	$entityBody = str_replace('\\u0000', '', $entityBody);
 	$entityBody2 = json_decode($entityBody,true);
 
-  if($entityBody2['column'] = 'user_type'){
-  var_dump($entityBody2);
-    if($entityBody2['user_type'] != 'no_access'){
-      $sql  = "UPDATE " . $entityBody2['table'] . " SET " . $entityBody2['column'] . "=\"" . $entityBody2['value'] . "\",user_password=\"".md5($entityBody2['pwrd'])."\"";
-      $sql .= " WHERE " . $entityBody2['identifier']. "=" . $entityBody2['id'];
-    }
-  } else {
+  // if($entityBody2['column'] = 'user_type'){
+  // var_dump($entityBody2);
+  //   if($entityBody2['user_type'] != 'no_access'){
+  //     $sql  = "UPDATE " . $entityBody2['table'] . " SET " . $entityBody2['column'] . "=\"" . $entityBody2['value'] . "\",user_password=\"".md5($entityBody2['pwrd'])."\"";
+  //     $sql .= " WHERE " . $entityBody2['identifier']. "=" . $entityBody2['id'];
+  //   }
+  // } else {
    $sql  = "UPDATE " . $entityBody2['table'] . " SET " . $entityBody2['column'] . "=\"" . $entityBody2['value'] . "\"";
    $sql .= " WHERE " . $entityBody2['identifier']. "=" . $entityBody2['id'];
-};
+// };
 
   $qry_result = mysqli_query($con, $sql);
   if($qry_result){

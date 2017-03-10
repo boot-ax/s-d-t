@@ -60,7 +60,7 @@
         class="md-cell ng-binding md-clickable" tabindex="0">{{registrar_table.login_password}}</td>
         <td md-cell>
   			<md-select md-on-open="getOwnersFunc()" ng-change="changeDropdown('user_ID','user_ID',registrar_table,dbTableInfo.db_table,dbTableInfo.db_ID)"
-            ng-model="registrar_table.user_ID" placeholder="{{registrar_table.user_name}}</br>{{registrar_table.user_email}}">
+            ng-model="registrar_table.user_ID" placeholder="{{$firstSpan}}{{registrar_table.user_name}}</span></br>{{$secondSpan}}{{registrar_table.user_email}}</span>">
     			<md-option ng-value="registrar.user_ID"
                 ng-repeat="registrar in getOwners.data">{{registrar.user_name}}</br>{{registrar.user_email}}</md-option>
   			</md-select>

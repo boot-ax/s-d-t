@@ -14,10 +14,10 @@ angular.module('SE_App').controller('addChange_logController', ['$mdDialog', '$c
 
 $scope.myDate = new Date();
 
-$scope.getPersonsFunc = function(){
-	$http.get('service/getpersons')
+$scope.getOwnersFunc = function(){
+	$http.get('service/getowners')
 		.then(function(response){
-	$scope.getPersons = response.data;
+	$scope.getOwners = response.data;
 	});
 };
 

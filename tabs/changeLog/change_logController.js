@@ -2,7 +2,8 @@ angular.module('SE_App').controller('change_logController', ['$mdDialog','$chang
   'use strict';
 
   var bookmark;
-
+  $scope.$firstSpan = '<span class="firstSpan">';
+  $scope.$secondSpan = '<span class="secondSpan">';
   $scope.$file = 'change_log.csv';
   $scope.$header = ['issue','date_entered','completed','change_log_ID','person_ID','first_name','last_name'];
   $scope.$location = '/service/change_log';
@@ -117,11 +118,11 @@ angular.module('SE_App').controller('change_logController', ['$mdDialog','$chang
   };
 
 
-$scope.getPersonsFunc = function(){
-	$http.get('service/getpersons')
-		.then(function(response){
-	$scope.getPersons = response.data;
-	});
-};
+  $scope.getOwnersFunc = function(){
+  	$http.get('service/getowners')
+  		.then(function(response){
+  	$scope.getOwners = response.data;
+  	});
+  };
 
 }]);

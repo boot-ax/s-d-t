@@ -2,7 +2,8 @@ angular.module('SE_App').controller('software_keysController', ['$mdDialog','$so
   'use strict';
 
   var bookmark;
-
+  $scope.$firstSpan = '<span class="firstSpan">';
+  $scope.$secondSpan = '<span class="secondSpan">';
   $scope.$file = 'software_keys.csv';
   $scope.$header = ['software_name','license_key','serial_number','comments','software_keys_ID','first_name','last_name'];
   $scope.$location = '/service/software_keys';
@@ -100,10 +101,10 @@ angular.module('SE_App').controller('software_keysController', ['$mdDialog','$so
 //Below is changing the selection and Date Pickers
 
 
-$scope.getPersonsFunc = function(){
-	$http.get('service/getpersons')
+$scope.getOwnersFunc = function(){
+	$http.get('service/getowners')
 		.then(function(response){
-	$scope.getPersons = response.data;
+	$scope.getOwners = response.data;
 	});
 };
 

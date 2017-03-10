@@ -87,49 +87,53 @@ angular.module('SE_App').controller('deletePersonController', ['$authorize', 'pe
 
 // =======================================================
 
-angular.module('SE_App').controller('getPwrdController', ['$mdDialog', '$person', '$scope','changeCellServices', function ($mdDialog, $person, $scope,changeCellServices) {
+angular.module('SE_App').controller('getPwrdController', ['$mdDialog', '$person', '$scope','changeCellServices','$object','$http','$q','$mdToast', function ($mdDialog, $person, $scope,changeCellServices,$object,$http,$q,$mdToast) {
   'use strict';
+$scope.$email = $object.email;
+console.log($object.value);
 
-  this.cancel = $mdDialog.cancel;
-// console.log($person.person_table.get({pwrd: person_table.user_type}));
-  // this.submitPwrd = function () {
-  //   $authorize.get({pwrd: $scope.authorize.secret}, success, error);
-  // };
+this.cancel = function (){
+  $mdDialog.hide();
+}
 
+$scope.isHidden = $object.value;
 
   this.submitPwrd = function () {
     $scope.pwrd.form.$setSubmitted();
-    console.log({pwrd: $scope.pwrd.user_password});
-    $mdDialog.hide();
-    return {pwrd: $scope.pwrd.user_password};
+    $object.pwrd = $scope.pwrd.user_password;
 
-    // $person.person_tables.user_password = $scope.pwrd.form.user_password;
+    changeDropdown();
+
   };
 
-  // function deleteDessert(person_table, index) {
-  //   var deferred = $person.person_tables.remove({id: person_table.user_ID});
-  //
-  //   deferred.$promise.then(function () {
-  //     person_tables.splice(index, 1);
-  //   });
-  //
-  //   return deferred.$promise;
-  // }
-  //
-  // function onComplete() {
-  //   $mdDialog.hide();
-  // }
-  //
-  // function error() {
-  //   $scope.error = 'Invalid secret.';
-  // }
-  //
-  // function success() {
-  //   $q.all(person_tables.forEach(deleteDessert)).then(onComplete);
-  // }
-  //
-  // this.authorizeUser = function () {
-  //   $authorize.get({secret: $scope.authorize.secret}, success, error);
-  // };
+  function changeDropdown(){
+                  var success  = function(data){
+                      $mdToast.show(
+                          $mdToast.simple()
+                            .textContent(data.data)
+                            .hideDelay(3000)
+                        );
+                        $mdDialog.hide();
+                    };
+
+                    var failure  = function(data){
+                      $mdToast.show(
+                          $mdToast.simple()
+                            .textContent(data.data)
+                            .hideDelay(3000)
+                        );
+                    };
+
+                  var deferred = $q.defer();
+
+                $http.post('service/updateItem',$object).then(function(response){
+                  success(response);
+                  deferred.resolve();
+                },function(response){
+                  failure(response);
+                  deferred.reject();
+                });
+                return deferred.promise;
+                };
 
 }]);

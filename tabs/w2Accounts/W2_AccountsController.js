@@ -2,7 +2,8 @@ angular.module('SE_App').controller('W2_accountsController', ['$mdDialog','$W2_a
   'use strict';
 
   var bookmark;
-
+  $scope.$firstSpan = '<span class="firstSpan">';
+  $scope.$secondSpan = '<span class="secondSpan">';
   $scope.$file = 'W2_accounts.csv';
   $scope.$header = ['login_url_name','login','password','account_url','attached_domain','W2_ID','user_name','user_email'];
   $scope.$location = '/service/W2_accounts';

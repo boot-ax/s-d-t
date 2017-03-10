@@ -39,12 +39,11 @@
 
 
 <md-input-container class="flex" flex="">
-        <md-select md-on-open="getPersonsFunc()" ng-model="software_keys_table.person_ID" placeholder="Person" class="flex" flex="">
-          <md-option ng-value="person.person_ID" ng-repeat="person in getPersons.data">{{person.first_name}}, {{person.last_name}}</md-option>
+        <md-select md-on-open="getOwnersFunc()" ng-model="software_keys_table.user_ID" placeholder="Owner" class="flex" flex="">
+          <md-option ng-value="variable.user_ID" ng-repeat="variable in getOwners.data"><span class="firstSpan">{{variable.user_name}}</span></br><span class="secondSpan">{{variable.user_email}}</span></md-option>
           </md-select>
-
     <button ng-controller="personController" class="md-button md-ink-ripple" type="button" ng-click="addItem($event)">
-      <div class="addButtonInModl">+ person</div>
+      <div class="addButtonInModl">+ owner</div>
     </button>
       </md-input-container>
 <div class="md-errors-spacer"></div>

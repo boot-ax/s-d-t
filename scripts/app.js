@@ -166,7 +166,7 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
 
   .service('changeCellServices',function($mdEditDialog,$q,$http,$mdToast,$mdDialog){
 
-    this.changeCellText = function (event, table, column,db_table,db_ID,$length) {
+    this.changeCellText = function (event, $table, $column,db_table,db_ID,$length) {
         event.stopPropagation();
 
         var success  = function(data){
@@ -187,16 +187,16 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
 
         var promise = $mdEditDialog.large({
 
-          modelValue: table[column],
+          modelValue: $table[$column],
           save: function (input) {
             var deferred = $q.defer();
-            table[column] = input.$modelValue;
+            $table[$column] = input.$modelValue;
             var $obj = {};
             $obj.table = db_table;
-            $obj.column = column;
-            $obj.value = table[column];
+            $obj.column = $column;
+            $obj.value = $table[$column];
             $obj.identifier = db_ID;
-            $obj.id = table[db_ID];
+            $obj.id = $table[db_ID];
             $http.post('/service/updateItem/',$obj).then(function(response){
               success(response);
               deferred.resolve();
@@ -223,7 +223,7 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
       };
 
 
-      this.changeDate = function(column, table,db_table,db_ID){
+      this.changeDate = function($column, $table,db_table,db_ID){
         var success  = function(data){
           $mdToast.show(
               $mdToast.simple()
@@ -243,13 +243,13 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
           var deferred = $q.defer();
           var $obj = {};
           $obj.table = db_table;
-          $obj.column = column;
-          $obj.value = table[column];
-          $obj.value = table[column].getFullYear()+"-"+
-          ("0"+(table[column].getMonth()+1)).slice(-2)+"-"+
-          ("0"+table[column].getDate()).slice(-2);
+          $obj.column = $column;
+          $obj.value = $table[$column];
+          $obj.value = $table[$column].getFullYear()+"-"+
+          ("0"+($table[$column].getMonth()+1)).slice(-2)+"-"+
+          ("0"+$table[$column].getDate()).slice(-2);
           $obj.identifier = db_ID;
-          $obj.id = table[db_ID];
+          $obj.id = $table[db_ID];
           $http.post('service/updateItem',$obj).then(function(response){
             success(response);
             deferred.resolve();
@@ -261,14 +261,14 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
         };
 
 
-this.changeDropdown = function(column, value, table,db_table,db_ID){
+this.changeDropdown = function($column, $value, $table,db_table,db_ID){
 
               var $obj = {};
               $obj.table = db_table;
-              $obj.column = column;
-              $obj.value = table[value];
+              $obj.column = $column;
+              $obj.value = $table[$value];
               $obj.identifier = db_ID;
-              $obj.id = table[db_ID];
+              $obj.id = $table[db_ID];
 
               var success  = function(data){
                   $mdToast.show(
@@ -299,7 +299,7 @@ this.changeDropdown = function(column, value, table,db_table,db_ID){
 
             };
 
-            this.changeSwitchValue = function(column, table,db_table,db_ID){
+            this.changeSwitchValue = function($column, $table,db_table,db_ID){
               var success  = function(data){
                 $mdToast.show(
                     $mdToast.simple()
@@ -319,10 +319,10 @@ this.changeDropdown = function(column, value, table,db_table,db_ID){
                var deferred = $q.defer();
                var $obj = {};
                $obj.table = db_table;
-               $obj.column = column;
-               $obj.value = table[column];
+               $obj.column = $column;
+               $obj.value = $table[$column];
                $obj.identifier = db_ID;
-               $obj.id = table[db_ID];
+               $obj.id = $table[db_ID];
                $http.post('service/updateItem',$obj).then(function(response){
                  success(response);
                  deferred.resolve();
