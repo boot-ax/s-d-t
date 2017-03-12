@@ -1,8 +1,8 @@
-angular.module('SE_App').controller('hostingController', ['$mdDialog','$hosting', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $hosting, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
+angular.module('SE_App').controller('hostingController', ['$mdDialog','$hosting', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService','$auth',function ($mdDialog, $hosting, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService,$auth) {
   'use strict';
 
   var bookmark;
-
+var payload = JSON.parse($auth.getPayload().sub);
   $scope.$file = 'hosting.csv';
   $scope.$header = ['hosting_name','login_url','username','password','date_started','expiration_date','creditcard_last_4','setup_domain','hosting_ID'];
   $scope.$location = '/service/hosting';
@@ -26,7 +26,10 @@ angular.module('SE_App').controller('hostingController', ['$mdDialog','$hosting'
     filter: '',
     limit: '15',
     order: 'hosting_name',
-    page: 1
+    page: 1,
+    name: payload.user_name,
+    email: payload.user_email,
+    security:payload.user_security
   };
 
   $scope.dbTableInfo = {

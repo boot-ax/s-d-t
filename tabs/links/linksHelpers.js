@@ -8,10 +8,10 @@ angular.module('SE_App').factory('$links', ['$resource', function ($resource) {
 
 //===========================================================
 
-angular.module('SE_App').controller('addLinksController', ['$mdDialog', '$links', '$scope' , '$http', '$q','$mdToast', function ($mdDialog, $links, $scope, $http, $q, $mdToast) {
+angular.module('SE_App').controller('addLinksController', ['$mdDialog', '$links', '$scope' , '$http', '$q','$mdToast', '$auth',function ($mdDialog, $links, $scope, $http, $q, $mdToast,$auth) {
   'use strict';
 
-
+  var payload = JSON.parse($auth.getPayload().sub);
 $scope.myDate = new Date();
 
 $scope.getLinksFunc = function(){
@@ -43,6 +43,8 @@ $scope.getLinksFunc = function(){
 
 
   this.addItem = function () {
+    $scope.links_table.user_email =  payload.user_email;
+    $scope.links_table.user_security = payload.user_security;
     $scope.item.form.$setSubmitted();
 
     var data = angular.copy($scope.links_table);

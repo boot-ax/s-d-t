@@ -8,9 +8,9 @@ angular.module('SE_App').factory('$domains', ['$resource', function ($resource) 
 
 //===========================================================
 
-angular.module('SE_App').controller('addDomainController', ['$mdDialog', '$domains', '$scope' , '$http', '$q','$mdToast', function ($mdDialog, $domains, $scope, $http, $q,$mdToast) {
+angular.module('SE_App').controller('addDomainController', ['$mdDialog', '$domains', '$scope' , '$http', '$q','$mdToast', '$auth',function ($mdDialog, $domains, $scope, $http, $q,$mdToast,$auth) {
   'use strict';
-
+  var payload = JSON.parse($auth.getPayload().sub);
 $scope.myDate = new Date();
 
 $scope.getHostsFunc = function(){
@@ -49,6 +49,8 @@ $scope.getRegistrarsFunc = function(){
   }
 
   this.addItem = function () {
+    $scope.domains_table.user_email =  payload.user_email;
+    $scope.domains_table.user_security = payload.user_security;
     $scope.item.form.$setSubmitted();
 
     var data = angular.copy($scope.domains_table);

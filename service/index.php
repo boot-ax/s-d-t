@@ -1,5 +1,5 @@
 <?php
-
+include '../inc/functions2.php';
 require '../vendor/autoload.php';
 
 //date_default_timezone_set('UTC');
@@ -35,7 +35,7 @@ Flight::route('POST /auth/login', function(){
 	$entityBody2 = json_decode($entityBody,true);
 	// build query...
 
-    $sql  = "SELECT user_id, user_email FROM registration
+    $sql  = "SELECT user_name, user_email,user_security FROM registration
 		WHERE (`user_email` = '".$entityBody2['email']."')
 		AND (`user_password` = md5('".$entityBody2['password']."'))
     AND (`user_type` != 'no_access');";
@@ -72,24 +72,40 @@ Flight::route('POST /cms_login', function(){
 
 	$entityBody = str_replace('\\u0000', '', $entityBody);
 	$entityBody2 = json_decode($entityBody,true);
+  $email = $entityBody2["cms_login_table"]["user_email"];
+  $security = $entityBody2["cms_login_table"]["user_security"];
+  $sql_security = "SELECT account.account_ID FROM registration
+  LEFT JOIN `account` ON registration.account_ID = account.account_ID
+  where user_security = '" .$security. "'
+  AND user_email = '" .$email. "';";
 
+  $qry_result_security = mysqli_query($con, $sql_security) or die(mysqli_error($con));
+  $rows1 = array();
+  while($r = mysqli_fetch_assoc($qry_result_security)) {
+    $rows1[] = $r;
+  }
+
+  $account = $rows1[0]['account_ID'];
+
+  $entityBody2['cms_login_table']['account_ID'] = $account;
+  unset($entityBody2["cms_login_table"]["user_email"]);
+  unset($entityBody2["cms_login_table"]["user_security"]);
 
  // build query...
    $sql  = "INSERT INTO cms_login";
    // implode keys of $array...
    $sql .= " (`".implode("`, `", array_keys($entityBody2['cms_login_table']))."`)";
    // implode values of $array...
-	 $sql .= " VALUES (\"".implode("\", \"", $entityBody2['cms_login_table'])."\");";
+  $sql .= " VALUES (\"".implode("\", \"", $entityBody2['cms_login_table'])."\");";
 
  //execute query...
-
   $qry_result = mysqli_query($con, $sql);
 
   if($qry_result){
    Flight::halt(200,"CMS Info Added.");
   }else{
    Flight::halt(500,mysqli_error($con));
-   //die(mysqli_error($con));
+   die(mysqli_error($con));
   }
 
 });
@@ -105,6 +121,25 @@ Flight::route('POST /domains', function(){
 
 	$entityBody = str_replace('\\u0000', '', $entityBody);
 	$entityBody2 = json_decode($entityBody,true);
+
+    $email = $entityBody2["domains_table"]["user_email"];
+    $security = $entityBody2["domains_table"]["user_security"];
+    $sql_security = "SELECT account.account_ID FROM registration
+    LEFT JOIN `account` ON registration.account_ID = account.account_ID
+    where user_security = '" .$security. "'
+    AND user_email = '" .$email. "';";
+
+    $qry_result_security = mysqli_query($con, $sql_security) or die(mysqli_error($con));
+    $rows1 = array();
+    while($r = mysqli_fetch_assoc($qry_result_security)) {
+      $rows1[] = $r;
+    }
+
+    $account = $rows1[0]['account_ID'];
+
+    $entityBody2['domains_table']['account_ID'] = $account;
+    unset($entityBody2["domains_table"]["user_email"]);
+    unset($entityBody2["domains_table"]["user_security"]);
 
 	// build query...
    $sql  = "INSERT INTO domains";
@@ -168,6 +203,25 @@ Flight::route('POST /software_keys', function(){
 	$entityBody = str_replace('\\u0000', '', $entityBody);
 	$entityBody2 = json_decode($entityBody,true);
 
+  $email = $entityBody2["software_keys_table"]["user_email"];
+  $security = $entityBody2["software_keys_table"]["user_security"];
+  $sql_security = "SELECT account.account_ID FROM registration
+  LEFT JOIN `account` ON registration.account_ID = account.account_ID
+  where user_security = '" .$security. "'
+  AND user_email = '" .$email. "';";
+
+  $qry_result_security = mysqli_query($con, $sql_security) or die(mysqli_error($con));
+  $rows1 = array();
+  while($r = mysqli_fetch_assoc($qry_result_security)) {
+    $rows1[] = $r;
+  }
+
+  $account = $rows1[0]['account_ID'];
+
+  $entityBody2['software_keys_table']['account_ID'] = $account;
+  unset($entityBody2["software_keys_table"]["user_email"]);
+  unset($entityBody2["software_keys_table"]["user_security"]);
+
 	// build query...
    $sql  = "INSERT INTO software_keys";
    // implode keys of $array...
@@ -191,13 +245,29 @@ Flight::route('POST /resource_login', function(){
 
 
 	$entityBody = Flight::request()->getBody();
-
-
-
 	include "../inc/connection.php";
 
 	$entityBody = str_replace('\\u0000', '', $entityBody);
 	$entityBody2 = json_decode($entityBody,true);
+
+  $email = $entityBody2["resource_login_table"]["user_email"];
+  $security = $entityBody2["resource_login_table"]["user_security"];
+  $sql_security = "SELECT account.account_ID FROM registration
+  LEFT JOIN `account` ON registration.account_ID = account.account_ID
+  where user_security = '" .$security. "'
+  AND user_email = '" .$email. "';";
+
+  $qry_result_security = mysqli_query($con, $sql_security) or die(mysqli_error($con));
+  $rows1 = array();
+  while($r = mysqli_fetch_assoc($qry_result_security)) {
+    $rows1[] = $r;
+  }
+
+  $account = $rows1[0]['account_ID'];
+
+  $entityBody2['resource_login_table']['account_ID'] = $account;
+  unset($entityBody2["resource_login_table"]["user_email"]);
+  unset($entityBody2["resource_login_table"]["user_security"]);
 
 	// build query...
    $sql  = "INSERT INTO resource_login";
@@ -230,6 +300,24 @@ Flight::route('POST /W2_accounts', function(){
 	$entityBody = str_replace('\\u0000', '', $entityBody);
 	$entityBody2 = json_decode($entityBody,true);
 
+  $email = $entityBody2["W2_accounts_table"]["user_email"];
+  $security = $entityBody2["W2_accounts_table"]["user_security"];
+  $sql_security = "SELECT account.account_ID FROM registration
+  LEFT JOIN `account` ON registration.account_ID = account.account_ID
+  where user_security = '" .$security. "'
+  AND user_email = '" .$email. "';";
+
+  $qry_result_security = mysqli_query($con, $sql_security) or die(mysqli_error($con));
+  $rows1 = array();
+  while($r = mysqli_fetch_assoc($qry_result_security)) {
+    $rows1[] = $r;
+  }
+
+  $account = $rows1[0]['account_ID'];
+
+  $entityBody2['W2_accounts_table']['account_ID'] = $account;
+  unset($entityBody2["W2_accounts_table"]["user_email"]);
+  unset($entityBody2["W2_accounts_table"]["user_security"]);
 
 	// build query...
    $sql  = "INSERT INTO W2_accounts";
@@ -263,6 +351,25 @@ Flight::route('POST /hosting', function(){
 	$entityBody = str_replace('\\u0000', '', $entityBody);
 	$entityBody2 = json_decode($entityBody,true);
 
+  $email = $entityBody2["hosting_table"]["user_email"];
+  $security = $entityBody2["hosting_table"]["user_security"];
+  $sql_security = "SELECT account.account_ID FROM registration
+  LEFT JOIN `account` ON registration.account_ID = account.account_ID
+  where user_security = '" .$security. "'
+  AND user_email = '" .$email. "';";
+
+  $qry_result_security = mysqli_query($con, $sql_security) or die(mysqli_error($con));
+  $rows1 = array();
+  while($r = mysqli_fetch_assoc($qry_result_security)) {
+    $rows1[] = $r;
+  }
+
+  $account = $rows1[0]['account_ID'];
+
+  $entityBody2['hosting_table']['account_ID'] = $account;
+  unset($entityBody2["hosting_table"]["user_email"]);
+  unset($entityBody2["hosting_table"]["user_security"]);
+
 
 	// build query...
    $sql  = "INSERT INTO hosting";
@@ -285,8 +392,6 @@ Flight::route('POST /hosting', function(){
 
 Flight::route('POST /person', function(){
 
-
-
 	$entityBody = Flight::request()->getBody();
 	include "../inc/connection.php";
 
@@ -294,17 +399,30 @@ Flight::route('POST /person', function(){
 	$entityBody2 = json_decode($entityBody,true);
   $entityBody2['person_table']['user_password'] = md5($entityBody2['person_table']['user_password']);
 
+  $email = $entityBody2["person_table"]["user_email"];
+  $security = $entityBody2["person_table"]["user_security"];
+  $sql_security = "SELECT account.account_ID FROM registration
+  LEFT JOIN `account` ON registration.account_ID = account.account_ID
+  where user_security = '" .$security. "'
+  AND user_email = '" .$email. "';";
+
+  $qry_result_security = mysqli_query($con, $sql_security) or die(mysqli_error($con));
+  $rows1 = array();
+  while($r = mysqli_fetch_assoc($qry_result_security)) {
+    $rows1[] = $r;
+  }
+
+  $account = $rows1[0]['account_ID'];
 
 
-var_dump($entityBody2);
+  $entityBody2['person_table']['account_ID'] = $account;
+  $entityBody2['person_table']['user_security'] = randomPassword();
+  $entityBody2['person_table']['user_email'] = $entityBody2['person_table']['user_email2'];
+  unset($entityBody2["person_table"]["user_email2"]);
 
    $sql  = "INSERT INTO registration";
-
    $sql .= " (`".implode("`, `", array_keys($entityBody2['person_table']))."`)";
-
 	 $sql .= " VALUES (\"".implode("\", \"", $entityBody2['person_table'])."\");";
-
-
 
   $qry_result = mysqli_query($con, $sql);
   if($qry_result){
@@ -326,6 +444,24 @@ Flight::route('POST /links', function(){
 	var_dump($entityBody);
 	$entityBody2 = json_decode($entityBody,true);
 
+  $email = $entityBody2["links_table"]["user_email"];
+  $security = $entityBody2["links_table"]["user_security"];
+  $sql_security = "SELECT account.account_ID FROM registration
+  LEFT JOIN `account` ON registration.account_ID = account.account_ID
+  where user_security = '" .$security. "'
+  AND user_email = '" .$email. "';";
+
+  $qry_result_security = mysqli_query($con, $sql_security) or die(mysqli_error($con));
+  $rows1 = array();
+  while($r = mysqli_fetch_assoc($qry_result_security)) {
+    $rows1[] = $r;
+  }
+
+  $account = $rows1[0]['account_ID'];
+
+  $entityBody2['links_table']['account_ID'] = $account;
+  unset($entityBody2["links_table"]["user_email"]);
+  unset($entityBody2["links_table"]["user_security"]);
 	// build query...
    $sql  = "INSERT INTO links";
    // implode keys of $array...
@@ -387,6 +523,24 @@ Flight::route('POST /registrar', function(){
 	$entityBody = str_replace('\\u0000', '', $entityBody);
 	$entityBody2 = json_decode($entityBody,true);
 
+  $email = $entityBody2["registrar_table"]["user_email"];
+  $security = $entityBody2["registrar_table"]["user_security"];
+  $sql_security = "SELECT account.account_ID FROM registration
+  LEFT JOIN `account` ON registration.account_ID = account.account_ID
+  where user_security = '" .$security. "'
+  AND user_email = '" .$email. "';";
+
+  $qry_result_security = mysqli_query($con, $sql_security) or die(mysqli_error($con));
+  $rows1 = array();
+  while($r = mysqli_fetch_assoc($qry_result_security)) {
+    $rows1[] = $r;
+  }
+
+  $account = $rows1[0]['account_ID'];
+
+  $entityBody2['registrar_table']['account_ID'] = $account;
+  unset($entityBody2["registrar_table"]["user_email"]);
+  unset($entityBody2["registrar_table"]["user_security"]);
 
 	// build query...
    $sql  = "INSERT INTO registrar";
@@ -410,97 +564,154 @@ Flight::route('POST /registrar', function(){
 
 Flight::route('GET /hosting', function(){
 
-	include "../inc/connection.php";
-	$limit = $_GET['limit'];
-	$filter = $_GET['filter'];
-	$filter = htmlspecialchars($filter);
-	$filter = mysqli_real_escape_string($con, $filter);
-	$order = $_GET['order'];
-	$orderOrder = "";
-	if (strpos($order, '-') !== false) {
-    $orderOrder = "DESC";
-		} else {$orderOrder = "ASC";}
-	$order = htmlspecialchars($order);
-	$order = mysqli_real_escape_string($con, $order);
-	$page = $_GET['page'];
+  	include "../inc/connection.php";
+  	$limit = $_GET['limit'];
+  	$filter = $_GET['filter'];
+  	$filter = htmlspecialchars($filter);
+  	$filter = mysqli_real_escape_string($con, $filter);
+    $email = $_GET['email'];
 
-	$all = $_GET['all'];
-	if ($all ==='true'){
-		$limit = '';
-	};
+    $jwt = substr($_SERVER['HTTP_AUTHORIZATION'],7);
+    try{
+      $validator = new \Gamegos\JWT\Validator();
+      $token = $validator->validate($jwt, $jwt_key);
 
-	$start_from = ($page-1) * $limit;
+      $request->data->user = json_decode($token->getClaims()['sub']);
+      //Used to check the token information being injected into the request object of Flight PHP
+      var_dump($request->data->user);
+      // die();
+    }
 
-
-
-	$sql_query = "SELECT SQL_CALC_FOUND_ROWS hosting_name,login_url,username,password,date_started,expiration_date,creditcard_last_4,setup_domain,hosting_ID FROM hosting
-
-					WHERE (`hosting_name` LIKE '%".$filter."%')
-					OR (`login_url` LIKE '%".$filter."%')
-					OR (`username` LIKE '%".$filter."%')
-					OR (`password` LIKE '%".$filter."%')
-					OR (`date_started` LIKE '%".$filter."%')
-					OR (`expiration_date` LIKE '%".$filter."%')
-					OR (`creditcard_last_4` LIKE '%".$filter."%')
-					OR (`setup_domain` LIKE '%".$filter."%')";
-					if($all !=='true'){
-						$sql_query .=
-				"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
-				" LIMIT ".$start_from.",". $limit."";
-					};
-
-
-    	$qry_result = mysqli_query($con, $sql_query) or die(mysqli_error($con));
-
-	$rows = array();
-			while($r = mysqli_fetch_assoc($qry_result)) {
-    			$rows[] = $r;
-				}
-
-
-		$qry_result = mysqli_query($con, "SELECT FOUND_ROWS()");
-		$num_rows = mysqli_fetch_array($qry_result);
-		$newArray = array('page'=>$page,'count'=>$num_rows[0],'data'=>$rows);
-
-
-	Flight::json($newArray);
-	//echo (str_replace('\u0000', '', json_encode($newArray)));
+  //   $email = htmlspecialchars($email);
+  //   $email = mysqli_real_escape_string($con, $email);
+  //   $security = $_GET['security'];
+  //   $security = htmlspecialchars($security);
+  //   $security = mysqli_real_escape_string($con, $security);
+  // 	$order = $_GET['order'];
+  // 	$orderOrder = "";
+  // 	if (strpos($order, '-') !== false) {
+  //     $orderOrder = "DESC";
+  // 		} else {$orderOrder = "ASC";}
+  // 	$order = htmlspecialchars($order);
+  // 	$order = mysqli_real_escape_string($con, $order);
+  // 	$page = $_GET['page'];
+  // 	$all = $_GET['all'];
+  // 	if ($all ==='true'){
+  // 		$limit = '';
+  // 	};
+  //
+  //   $sql_security = "SELECT rt.user_type, rt.account_ID FROM registration rt
+  //   where user_security = '" .$security. "'
+  //   AND user_email = '" .$email. "';";
+  //
+  //     // var_dump($sql_security);
+  //   $qry_result_security = mysqli_query($con, $sql_security) or die(mysqli_error($con));
+  //   $rows1 = array();
+  //   while($r = mysqli_fetch_assoc($qry_result_security)) {
+  //     $rows1[] = $r;
+  //   }
+  //
+  // if($rows1[0]['user_type'] === 'superuser'){
+  //   $alpha = "LIKE '%'";
+  // } else {
+  //   $alpha = $rows1[0]['account_ID'];
+  //   $alpha = "= '".$alpha."'";
+  // }
+  //
+  // $start_from = ($page-1) * $limit;
+  //
+  //
+  //
+	// $sql_query = "SELECT SQL_CALC_FOUND_ROWS hosting_name,login_url,username,password,date_started,expiration_date,creditcard_last_4,setup_domain,hosting_ID FROM hosting ht
+  //         WHERE (ht.account_ID ".$alpha. ")
+	// 				AND ((`hosting_name` LIKE '%".$filter."%')
+	// 				OR (`login_url` LIKE '%".$filter."%')
+	// 				OR (`username` LIKE '%".$filter."%')
+	// 				OR (`password` LIKE '%".$filter."%')
+	// 				OR (`date_started` LIKE '%".$filter."%')
+	// 				OR (`expiration_date` LIKE '%".$filter."%')
+	// 				OR (`creditcard_last_4` LIKE '%".$filter."%')
+	// 				OR (`setup_domain` LIKE '%".$filter."%'))";
+	// 				if($all !=='true'){
+	// 					$sql_query .=
+	// 			"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
+	// 			" LIMIT ".$start_from.",". $limit."";
+	// 				};
+  //
+  //
+  //   	$qry_result = mysqli_query($con, $sql_query) or die(mysqli_error($con));
+  //
+	// $rows = array();
+	// 		while($r = mysqli_fetch_assoc($qry_result)) {
+  //   			$rows[] = $r;
+	// 			}
+  //
+  //
+	// 	$qry_result = mysqli_query($con, "SELECT FOUND_ROWS()");
+	// 	$num_rows = mysqli_fetch_array($qry_result);
+	// 	$newArray = array('page'=>$page,'count'=>$num_rows[0],'data'=>$rows);
+  //
+  //
+	// Flight::json($newArray);
+	// //echo (str_replace('\u0000', '', json_encode($newArray)));
 
 });
 
 Flight::route('GET /person', function(){
 
+  	include "../inc/connection.php";
+  	$limit = $_GET['limit'];
+  	$filter = $_GET['filter'];
+  	$filter = htmlspecialchars($filter);
+  	$filter = mysqli_real_escape_string($con, $filter);
+    $email = $_GET['email'];
+
+    $email = htmlspecialchars($email);
+    $email = mysqli_real_escape_string($con, $email);
+    $security = $_GET['security'];
+    $security = htmlspecialchars($security);
+    $security = mysqli_real_escape_string($con, $security);
+  	$order = $_GET['order'];
+  	$orderOrder = "";
+  	if (strpos($order, '-') !== false) {
+      $orderOrder = "DESC";
+  		} else {$orderOrder = "ASC";}
+  	$order = htmlspecialchars($order);
+  	$order = mysqli_real_escape_string($con, $order);
+  	$page = $_GET['page'];
+  	$all = $_GET['all'];
+  	if ($all ==='true'){
+  		$limit = '';
+  	};
+
+    $sql_security = "SELECT rt.user_type, rt.account_ID FROM registration rt
+    where user_security = '" .$security. "'
+    AND user_email = '" .$email. "';";
+
+      // var_dump($sql_security);
+    $qry_result_security = mysqli_query($con, $sql_security) or die(mysqli_error($con));
+    $rows1 = array();
+    while($r = mysqli_fetch_assoc($qry_result_security)) {
+      $rows1[] = $r;
+    }
+
+  if($rows1[0]['user_type'] === 'superuser'){
+    $alpha = "LIKE '%'";
+  } else {
+    $alpha = $rows1[0]['account_ID'];
+    $alpha = "= '".$alpha."'";
+  }
+
+  $start_from = ($page-1) * $limit;
 
 
-	include "../inc/connection.php";
-	$limit = $_GET['limit'];
-	$filter = $_GET['filter'];
-	$filter = htmlspecialchars($filter);
-	$filter = mysqli_real_escape_string($con, $filter);
-	$order = $_GET['order'];
-	$orderOrder = "";
-	if (strpos($order, '-') !== false) {
-    $orderOrder = "DESC";
-		} else {$orderOrder = "ASC";}
-	$order = htmlspecialchars($order);
-	$order = mysqli_real_escape_string($con, $order);
-	$page = $_GET['page'];
-
-	$all = $_GET['all'];
-	if ($all ==='true'){
-		$limit = '';
-	};
-
-	$start_from = ($page-1) * $limit;
-
-
-	$sql_query = "SELECT SQL_CALC_FOUND_ROWS user_name,user_email,user_address,user_phone,user_type,user_ID FROM registration
-
-					WHERE (`user_name` LIKE '%".$filter."%')
+	$sql_query = "SELECT SQL_CALC_FOUND_ROWS user_name,user_email,user_address,user_phone,user_type,user_ID FROM registration rgt
+          WHERE (rgt.account_ID ".$alpha. ")
+					AND ((`user_name` LIKE '%".$filter."%')
 					OR (`user_email` LIKE '%".$filter."%')
 					OR (`user_address` LIKE '%".$filter."%')
 					OR (`user_phone` LIKE '%".$filter."%')
-					OR (`user_type` LIKE '%".$filter."%')";
+					OR (`user_type` LIKE '%".$filter."%'))";
 					if($all !=='true'){
 						$sql_query .=
 				"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
@@ -528,40 +739,62 @@ Flight::route('GET /person', function(){
 
 Flight::route('GET /links', function(){
 
+  	include "../inc/connection.php";
+  	$limit = $_GET['limit'];
+  	$filter = $_GET['filter'];
+  	$filter = htmlspecialchars($filter);
+  	$filter = mysqli_real_escape_string($con, $filter);
+    $email = $_GET['email'];
+
+    $email = htmlspecialchars($email);
+    $email = mysqli_real_escape_string($con, $email);
+    $security = $_GET['security'];
+    $security = htmlspecialchars($security);
+    $security = mysqli_real_escape_string($con, $security);
+  	$order = $_GET['order'];
+  	$orderOrder = "";
+  	if (strpos($order, '-') !== false) {
+      $orderOrder = "DESC";
+  		} else {$orderOrder = "ASC";}
+  	$order = htmlspecialchars($order);
+  	$order = mysqli_real_escape_string($con, $order);
+  	$page = $_GET['page'];
+  	$all = $_GET['all'];
+  	if ($all ==='true'){
+  		$limit = '';
+  	};
+
+    $sql_security = "SELECT rt.user_type, rt.account_ID FROM registration rt
+    where user_security = '" .$security. "'
+    AND user_email = '" .$email. "';";
+
+      // var_dump($sql_security);
+    $qry_result_security = mysqli_query($con, $sql_security) or die(mysqli_error($con));
+    $rows1 = array();
+    while($r = mysqli_fetch_assoc($qry_result_security)) {
+      $rows1[] = $r;
+    }
+
+  if($rows1[0]['user_type'] === 'superuser'){
+    $alpha = "LIKE '%'";
+  } else {
+    $alpha = $rows1[0]['account_ID'];
+    $alpha = "= '".$alpha."'";
+  }
+
+  $start_from = ($page-1) * $limit;
 
 
-	include "../inc/connection.php";
-	$limit = $_GET['limit'];
-	$filter = $_GET['filter'];
-	$filter = htmlspecialchars($filter);
-	$filter = mysqli_real_escape_string($con, $filter);
-	$order = $_GET['order'];
-	$orderOrder = "";
-	if (strpos($order, '-') !== false) {
-    $orderOrder = "DESC";
-		} else {$orderOrder = "ASC";}
-	$order = htmlspecialchars($order);
-	$order = mysqli_real_escape_string($con, $order);
-	$page = $_GET['page'];
-
-	$all = $_GET['all'];
-	if ($all ==='true'){
-		$limit = '';
-	};
-
-	$start_from = ($page-1) * $limit;
-
-
-	$sql_query = "SELECT SQL_CALC_FOUND_ROWS source_url,target_url,anchor_text,alt_text,follow_link,date_created,title,comment,link_ID FROM links
-
-					WHERE (`source_url` LIKE '%".$filter."%')
+	$sql_query = "SELECT SQL_CALC_FOUND_ROWS source_url,target_url,anchor_text,alt_text,follow_link,date_created,title,comment,link_ID FROM links lk
+          WHERE (lk.account_ID ".$alpha. ")
+					AND ((`source_url` LIKE '%".$filter."%')
 					OR (`target_url` LIKE '%".$filter."%')
 					OR (`anchor_text` LIKE '%".$filter."%')
 					OR (`alt_text` LIKE '%".$filter."%')
 					OR (`follow_link` LIKE '%".$filter."%')
 					OR (`date_created` LIKE '%".$filter."%')
 					OR (`title` LIKE '%".$filter."%')
-					OR (`comment` LIKE '%".$filter."%')";
+					OR (`comment` LIKE '%".$filter."%'))";
 					if($all !=='true'){
 						$sql_query .=
 				"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
@@ -642,40 +875,64 @@ Flight::route('GET /change_log', function(){
 
 Flight::route('GET /registrar', function(){
 
+  	include "../inc/connection.php";
+  	$limit = $_GET['limit'];
+  	$filter = $_GET['filter'];
+  	$filter = htmlspecialchars($filter);
+  	$filter = mysqli_real_escape_string($con, $filter);
+    $email = $_GET['email'];
 
-	include "../inc/connection.php";
-	$limit = $_GET['limit'];
-	$filter = $_GET['filter'];
-	$filter = htmlspecialchars($filter);
-	$filter = mysqli_real_escape_string($con, $filter);
-	$order = $_GET['order'];
-	$orderOrder = "";
-	if (strpos($order, '-') !== false) {
-    $orderOrder = "DESC";
-		} else {$orderOrder = "ASC";}
-	$order = htmlspecialchars($order);
-	$order = mysqli_real_escape_string($con, $order);
-	$page = $_GET['page'];
-	$all = $_GET['all'];
-	if ($all ==='true'){
-		$limit = '';
-	};
+    $email = htmlspecialchars($email);
+    $email = mysqli_real_escape_string($con, $email);
+    $security = $_GET['security'];
+    $security = htmlspecialchars($security);
+    $security = mysqli_real_escape_string($con, $security);
+  	$order = $_GET['order'];
+  	$orderOrder = "";
+  	if (strpos($order, '-') !== false) {
+      $orderOrder = "DESC";
+  		} else {$orderOrder = "ASC";}
+  	$order = htmlspecialchars($order);
+  	$order = mysqli_real_escape_string($con, $order);
+  	$page = $_GET['page'];
+  	$all = $_GET['all'];
+  	if ($all ==='true'){
+  		$limit = '';
+  	};
 
-	$start_from = ($page-1) * $limit;
+    $sql_security = "SELECT rt.user_type, rt.account_ID FROM registration rt
+    where user_security = '" .$security. "'
+    AND user_email = '" .$email. "';";
+
+      // var_dump($sql_security);
+    $qry_result_security = mysqli_query($con, $sql_security) or die(mysqli_error($con));
+    $rows1 = array();
+    while($r = mysqli_fetch_assoc($qry_result_security)) {
+      $rows1[] = $r;
+    }
+
+  if($rows1[0]['user_type'] === 'superuser'){
+    $alpha = "LIKE '%'";
+  } else {
+    $alpha = $rows1[0]['account_ID'];
+    $alpha = "= '".$alpha."'";
+  }
+
+  $start_from = ($page-1) * $limit;
 
 
-	$sql_query = "SELECT SQL_CALC_FOUND_ROWS registrar.registrar_name,registrar.login_url,registrar.login_username,registrar.login_password,registrar.credit_card_last_4,registrar.registrar_ID,registration.user_name,registration.user_email FROM registrar
+	$sql_query = "SELECT SQL_CALC_FOUND_ROWS rgt.registrar_name,rgt.login_url,rgt.login_username,rgt.login_password,rgt.credit_card_last_4,rgt.registrar_ID,regit.user_name,regit.user_email FROM registrar rgt
 
 
-					LEFT JOIN `registration` ON registrar.user_ID = registration.user_ID
-
-					WHERE (`registrar_name` LIKE '%".$filter."%')
+					LEFT JOIN `registration` regit ON rgt.user_ID = regit.user_ID
+          WHERE (rgt.account_ID ".$alpha. ")
+					AND ((`registrar_name` LIKE '%".$filter."%')
 					OR (`login_url` LIKE '%".$filter."%')
 					OR (`login_username` LIKE '%".$filter."%')
 					OR (`login_password` LIKE '%".$filter."%')
 					OR (`credit_card_last_4` LIKE '%".$filter."%')
 					OR (`user_name` LIKE '%".$filter."%')
-					OR (`user_email` LIKE '%".$filter."%')";
+					OR (`user_email` LIKE '%".$filter."%'))";
 					if($all !=='true'){
 						$sql_query .=
 				"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
@@ -699,8 +956,6 @@ Flight::route('GET /registrar', function(){
 	//echo (str_replace('\u0000', '', json_encode($newArray)));
 
 });
-
-
 
 Flight::route('GET /url_data', function(){
 
@@ -731,10 +986,9 @@ Flight::route('GET /url_data', function(){
 
 	$sql_query ="SELECT SQL_CALC_FOUND_ROWS u.*,ose1.domain_authority,ose1.page_authority,ose1.ose_num_links,ose1.ose_status_code,ose1.ose_external_equity,maj1.trust_flow,maj1.citation_flow,maj1.majestic_num_links
 
-FROM url_data u
-LEFT JOIN `ose_metrics` ose1 ON u.ose_metrics_ID = ose1.ose_metrics_ID
-LEFT JOIN `majestic_metrics` maj1 ON u.majestic_metrics_ID = maj1.majestic_metrics_ID
-
+        FROM url_data u
+        LEFT JOIN `ose_metrics` ose1 ON u.ose_metrics_ID = ose1.ose_metrics_ID
+        LEFT JOIN `majestic_metrics` maj1 ON u.majestic_metrics_ID = maj1.majestic_metrics_ID
 
  					WHERE (`url_name` LIKE '%".$filter."%')
 					OR (`crawl_frequency` LIKE '%".$filter."%')
@@ -746,10 +1000,7 @@ LEFT JOIN `majestic_metrics` maj1 ON u.majestic_metrics_ID = maj1.majestic_metri
 					OR (`ose_num_links` LIKE '%".$filter."%')
 					OR (`majestic_num_links` LIKE '%".$filter."%')";
 
-
-
-
-if($all !=='true'){
+          if($all !=='true'){
 						$sql_query .=
 				"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
 				" LIMIT ".$start_from.",". $limit."";
@@ -758,7 +1009,7 @@ if($all !=='true'){
 
   	$qry_result = mysqli_query($con, $sql_query) or die(mysqli_error($con));
 
-	$rows = array();
+	   $rows = array();
 			while($r = mysqli_fetch_assoc($qry_result)) {
     			$rows[] = $r;
 				}
@@ -774,41 +1025,64 @@ if($all !=='true'){
 
 });
 
-
-
 Flight::route('GET /resource_login', function(){
 
-	include "../inc/connection.php";
-	$limit = $_GET['limit'];
-	$filter = $_GET['filter'];
-	$filter = htmlspecialchars($filter);
-	$filter = mysqli_real_escape_string($con, $filter);
-	$order = $_GET['order'];
-	$orderOrder = "";
-	if (strpos($order, '-') !== false) {
-    $orderOrder = "DESC";
-		} else {$orderOrder = "ASC";}
-	$order = htmlspecialchars($order);
-	$order = mysqli_real_escape_string($con, $order);
-	$page = $_GET['page'];
-	$all = $_GET['all'];
-	if ($all ==='true'){
-		$limit = '';
-	};
+  	include "../inc/connection.php";
+  	$limit = $_GET['limit'];
+  	$filter = $_GET['filter'];
+  	$filter = htmlspecialchars($filter);
+  	$filter = mysqli_real_escape_string($con, $filter);
+    $email = $_GET['email'];
 
-	$start_from = ($page-1) * $limit;
+    $email = htmlspecialchars($email);
+    $email = mysqli_real_escape_string($con, $email);
+    $security = $_GET['security'];
+    $security = htmlspecialchars($security);
+    $security = mysqli_real_escape_string($con, $security);
+  	$order = $_GET['order'];
+  	$orderOrder = "";
+  	if (strpos($order, '-') !== false) {
+      $orderOrder = "DESC";
+  		} else {$orderOrder = "ASC";}
+  	$order = htmlspecialchars($order);
+  	$order = mysqli_real_escape_string($con, $order);
+  	$page = $_GET['page'];
+  	$all = $_GET['all'];
+  	if ($all ==='true'){
+  		$limit = '';
+  	};
 
-	$sql_query = "SELECT SQL_CALC_FOUND_ROWS resource_login.resource_url_name,resource_login.name_of_product,resource_login.username,resource_login.password,resource_login.product_description,resource_login.resource_url_ID,registration.user_name,registration.user_email FROM resource_login
+    $sql_security = "SELECT rt.user_type, rt.account_ID FROM registration rt
+    where user_security = '" .$security. "'
+    AND user_email = '" .$email. "';";
 
-					LEFT JOIN `registration` ON resource_login.user_ID = registration.user_ID
+      // var_dump($sql_security);
+    $qry_result_security = mysqli_query($con, $sql_security) or die(mysqli_error($con));
+    $rows1 = array();
+    while($r = mysqli_fetch_assoc($qry_result_security)) {
+      $rows1[] = $r;
+    }
 
-					WHERE (`resource_url_name` LIKE '%".$filter."%')
+  if($rows1[0]['user_type'] === 'superuser'){
+    $alpha = "LIKE '%'";
+  } else {
+    $alpha = $rows1[0]['account_ID'];
+    $alpha = "= '".$alpha."'";
+  }
+
+  $start_from = ($page-1) * $limit;
+
+	$sql_query = "SELECT SQL_CALC_FOUND_ROWS rlt.resource_url_name,rlt.name_of_product,rlt.username,rlt.password,rlt.product_description,rlt.resource_url_ID,rgt.user_name,rgt.user_email FROM resource_login rlt
+
+					LEFT JOIN `registration` rgt ON rlt.user_ID = rgt.user_ID
+          WHERE (rlt.account_ID ".$alpha. ")
+					AND ((`resource_url_name` LIKE '%".$filter."%')
 					OR (`name_of_product` LIKE '%".$filter."%')
 					OR (`username` LIKE '%".$filter."%')
 					OR (`password` LIKE '%".$filter."%')
 					OR (`product_description` LIKE '%".$filter."%')
 					OR (`user_name` LIKE '%".$filter."%')
-					OR (`user_email` LIKE '%".$filter."%')";
+					OR (`user_email` LIKE '%".$filter."%'))";
 					if($all !=='true'){
 						$sql_query .=
 				"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
@@ -830,40 +1104,64 @@ Flight::route('GET /resource_login', function(){
 
 });
 
-
 Flight::route('GET /software_keys', function(){
 
-	include "../inc/connection.php";
-	$limit = $_GET['limit'];
-	$filter = $_GET['filter'];
-	$filter = htmlspecialchars($filter);
-	$filter = mysqli_real_escape_string($con, $filter);
-	$order = $_GET['order'];
-	$orderOrder = "";
-	if (strpos($order, '-') !== false) {
-    $orderOrder = "DESC";
-		} else {$orderOrder = "ASC";}
-	$order = htmlspecialchars($order);
-	$order = mysqli_real_escape_string($con, $order);
-	$page = $_GET['page'];
-	$all = $_GET['all'];
-	if ($all ==='true'){
-		$limit = '';
-	};
+  	include "../inc/connection.php";
+  	$limit = $_GET['limit'];
+  	$filter = $_GET['filter'];
+  	$filter = htmlspecialchars($filter);
+  	$filter = mysqli_real_escape_string($con, $filter);
+    $email = $_GET['email'];
 
-	$start_from = ($page-1) * $limit;
+    $email = htmlspecialchars($email);
+    $email = mysqli_real_escape_string($con, $email);
+    $security = $_GET['security'];
+    $security = htmlspecialchars($security);
+    $security = mysqli_real_escape_string($con, $security);
+  	$order = $_GET['order'];
+  	$orderOrder = "";
+  	if (strpos($order, '-') !== false) {
+      $orderOrder = "DESC";
+  		} else {$orderOrder = "ASC";}
+  	$order = htmlspecialchars($order);
+  	$order = mysqli_real_escape_string($con, $order);
+  	$page = $_GET['page'];
+  	$all = $_GET['all'];
+  	if ($all ==='true'){
+  		$limit = '';
+  	};
 
-  $sql_query = "SELECT SQL_CALC_FOUND_ROWS software_keys.software_name,software_keys.license_key,software_keys.serial_number,software_keys.comments,software_keys.software_keys_ID,registration.user_name,registration.user_email FROM software_keys
+    $sql_security = "SELECT rt.user_type, rt.account_ID FROM registration rt
+    where user_security = '" .$security. "'
+    AND user_email = '" .$email. "';";
 
-					LEFT JOIN `registration` ON software_keys.user_ID = registration.user_ID
+      // var_dump($sql_security);
+    $qry_result_security = mysqli_query($con, $sql_security) or die(mysqli_error($con));
+    $rows1 = array();
+    while($r = mysqli_fetch_assoc($qry_result_security)) {
+      $rows1[] = $r;
+    }
 
-					WHERE (`software_name` LIKE '%".$filter."%')
+  if($rows1[0]['user_type'] === 'superuser'){
+    $alpha = "LIKE '%'";
+  } else {
+    $alpha = $rows1[0]['account_ID'];
+    $alpha = "= '".$alpha."'";
+  }
+
+  $start_from = ($page-1) * $limit;
+
+  $sql_query = "SELECT SQL_CALC_FOUND_ROWS skt.software_name,skt.license_key,skt.serial_number,skt.comments,skt.software_keys_ID,rgt.user_name,rgt.user_email FROM software_keys skt
+
+					LEFT JOIN `registration` rgt ON skt.user_ID = rgt.user_ID
+          WHERE (skt.account_ID ".$alpha. ")
+					AND ((`software_name` LIKE '%".$filter."%')
 					OR (`license_key` LIKE '%".$filter."%')
 					OR (`serial_number` LIKE '%".$filter."%')
 					OR (`software_keys_ID` LIKE '%".$filter."%')
 					OR (`user_name` LIKE '%".$filter."%')
           OR (`comments` LIKE '%".$filter."%')
-					OR (`user_email` LIKE '%".$filter."%')";
+					OR (`user_email` LIKE '%".$filter."%'))";
 					if($all !=='true'){
 						$sql_query .=
 				"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
@@ -885,43 +1183,67 @@ Flight::route('GET /software_keys', function(){
 
 });
 
-
-
 Flight::route('GET /W2_accounts', function(){
 
-	include "../inc/connection.php";
-	$limit = $_GET['limit'];
-	$filter = $_GET['filter'];
-	$filter = htmlspecialchars($filter);
-	$filter = mysqli_real_escape_string($con, $filter);
-	$order = $_GET['order'];
-	$orderOrder = "";
-	if (strpos($order, '-') !== false) {
-    $orderOrder = "DESC";
-		} else {$orderOrder = "ASC";}
-	$order = htmlspecialchars($order);
-	$order = mysqli_real_escape_string($con, $order);
-	$page = $_GET['page'];
-	$all = $_GET['all'];
-	if ($all ==='true'){
-		$limit = '';
-	};
 
-	$start_from = ($page-1) * $limit;
+  	include "../inc/connection.php";
+  	$limit = $_GET['limit'];
+  	$filter = $_GET['filter'];
+  	$filter = htmlspecialchars($filter);
+  	$filter = mysqli_real_escape_string($con, $filter);
+    $email = $_GET['email'];
+
+    $email = htmlspecialchars($email);
+    $email = mysqli_real_escape_string($con, $email);
+    $security = $_GET['security'];
+    $security = htmlspecialchars($security);
+    $security = mysqli_real_escape_string($con, $security);
+  	$order = $_GET['order'];
+  	$orderOrder = "";
+  	if (strpos($order, '-') !== false) {
+      $orderOrder = "DESC";
+  		} else {$orderOrder = "ASC";}
+  	$order = htmlspecialchars($order);
+  	$order = mysqli_real_escape_string($con, $order);
+  	$page = $_GET['page'];
+  	$all = $_GET['all'];
+  	if ($all ==='true'){
+  		$limit = '';
+  	};
+
+    $sql_security = "SELECT rt.user_type, rt.account_ID FROM registration rt
+    where user_security = '" .$security. "'
+    AND user_email = '" .$email. "';";
+
+      // var_dump($sql_security);
+    $qry_result_security = mysqli_query($con, $sql_security) or die(mysqli_error($con));
+    $rows1 = array();
+    while($r = mysqli_fetch_assoc($qry_result_security)) {
+      $rows1[] = $r;
+    }
+
+  if($rows1[0]['user_type'] === 'superuser'){
+    $alpha = "LIKE '%'";
+  } else {
+    $alpha = $rows1[0]['account_ID'];
+    $alpha = "= '".$alpha."'";
+  }
+
+  $start_from = ($page-1) * $limit;
 
 
-	$sql_query = "SELECT SQL_CALC_FOUND_ROWS W2_accounts.login_url_name,W2_accounts.login,W2_accounts.password,W2_accounts.account_url,W2_accounts.attached_domain,W2_accounts.W2_ID,registration.user_name,registration.user_email FROM W2_accounts
+	$sql_query = "SELECT SQL_CALC_FOUND_ROWS w2t.login_url_name,w2t.login,w2t.password,w2t.account_url,w2t.attached_domain,w2t.W2_ID,regt.user_name,regt.user_email FROM W2_accounts w2t
 
 
-					LEFT JOIN `registration` ON W2_accounts.user_ID = registration.user_ID
-
-					WHERE (`login_url_name` LIKE '%".$filter."%')
+					LEFT JOIN `registration` regt ON w2t.user_ID = regt.user_ID
+          WHERE (w2t.account_ID ".$alpha. ")
+					AND ((`login_url_name` LIKE '%".$filter."%')
 					OR (`login` LIKE '%".$filter."%')
 					OR (`account_url` LIKE '%".$filter."%')
 					OR (`password` LIKE '%".$filter."%')
 					OR (`attached_domain` LIKE '%".$filter."%')
 					OR (`user_name` LIKE '%".$filter."%')
-					OR (`user_email` LIKE '%".$filter."%')";
+					OR (`user_email` LIKE '%".$filter."%'))";
 					if($all !=='true'){
 						$sql_query .=
 				"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
@@ -949,15 +1271,18 @@ Flight::route('GET /W2_accounts', function(){
 
 Flight::route('GET /domains', function(){
 
-	// $data = Flight::request()->data;
-	// var_dump(Flight::request()->data->user->user_id);
-	// die();
-
 	include "../inc/connection.php";
 	$limit = $_GET['limit'];
 	$filter = $_GET['filter'];
 	$filter = htmlspecialchars($filter);
 	$filter = mysqli_real_escape_string($con, $filter);
+  $email = $_GET['email'];
+
+  $email = htmlspecialchars($email);
+  $email = mysqli_real_escape_string($con, $email);
+  $security = $_GET['security'];
+  $security = htmlspecialchars($security);
+  $security = mysqli_real_escape_string($con, $security);
 	$order = $_GET['order'];
 	$orderOrder = "";
 	if (strpos($order, '-') !== false) {
@@ -971,12 +1296,32 @@ Flight::route('GET /domains', function(){
 		$limit = '';
 	};
 
-	$start_from = ($page-1) * $limit;
+  $sql_security = "SELECT rt.user_type, rt.account_ID FROM registration rt
+  where user_security = '" .$security. "'
+  AND user_email = '" .$email. "';";
 
-	$sql_query = "SELECT SQL_CALC_FOUND_ROWS domains.domain_name,domains.ip_address,domains.nameserver_1,domains.ns1_IP,domains.nameserver_2,domains.ns2_IP,domains.nameserver_3,domains.ns3_IP,domains.date_purchased,domains.expiration_date,domains.registrar_ID,domains.hosting_ID,domains.registrar_301,domains.registrar_301_target,domains.whois_protected,domains.domain_ID,registrar.registrar_name,hosting.hosting_name FROM domains
-						LEFT JOIN `registrar` ON domains.registrar_ID = registrar.registrar_ID
-						LEFT JOIN `hosting` ON domains.hosting_ID = hosting.hosting_ID
-						WHERE (`domain_name` LIKE '%".$filter."%')
+    // var_dump($sql_security);
+  $qry_result_security = mysqli_query($con, $sql_security) or die(mysqli_error($con));
+  $rows1 = array();
+  while($r = mysqli_fetch_assoc($qry_result_security)) {
+    $rows1[] = $r;
+  }
+
+if($rows1[0]['user_type'] === 'superuser'){
+  $alpha = "LIKE '%'";
+} else {
+  $alpha = $rows1[0]['account_ID'];
+  $alpha = "= '".$alpha."'";
+}
+
+  $start_from = ($page-1) * $limit;
+
+    $sql_query = "SELECT SQL_CALC_FOUND_ROWS
+    dt.account_ID,dt.domain_name,dt.ip_address,dt.nameserver_1,dt.ns1_IP,dt.nameserver_2,dt.ns2_IP,dt.nameserver_3,dt.ns3_IP,dt.date_purchased,dt.expiration_date,dt.registrar_ID,dt.hosting_ID,dt.registrar_301,dt.registrar_301_target,dt.whois_protected,dt.domain_ID,rt.registrar_name,ht.hosting_name FROM domains dt
+						LEFT JOIN `registrar` rt ON dt.registrar_ID = rt.registrar_ID
+						LEFT JOIN `hosting` ht ON dt.hosting_ID = ht.hosting_ID
+            WHERE (dt.account_ID ".$alpha. ")
+						AND ((`domain_name` LIKE '%".$filter."%')
 						OR (`ip_address` LIKE '%".$filter."%')
 						OR (`nameserver_1` LIKE '%".$filter."%')
 						OR (`ns1_IP` LIKE '%".$filter."%')
@@ -988,13 +1333,14 @@ Flight::route('GET /domains', function(){
 						OR (`hosting_name` LIKE '%".$filter."%')
 						OR (`registrar_301` LIKE '%".$filter."%')
 						OR (`registrar_301_target` LIKE '%".$filter."%')
-						OR (`whois_protected` LIKE '%".$filter."%')";
+						OR (`whois_protected` LIKE '%".$filter."%'))";
 						if($all !=='true'){
 							$sql_query .=
 					"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
-					" LIMIT ".$start_from.",". $limit."";
+					" LIMIT " . $start_from. "," . $limit. "";
 						};
 
+            // echo($sql_query);
    	$qry_result = mysqli_query($con, $sql_query) or die(mysqli_error($con));
 
 		$rows = array();
@@ -1006,43 +1352,63 @@ Flight::route('GET /domains', function(){
 		$num_rows =	mysqli_fetch_array($qry_result);
 
 		$newArray = array('page'=>$page,'count'=>$num_rows[0],'data'=>$rows);
-
-
 	Flight::json($newArray);
-	// echo (str_replace('\u0000', '', json_encode($newArray)));
 
 });
 
 Flight::route('GET /cms_login', function(){
 
+  	include "../inc/connection.php";
+  	$limit = $_GET['limit'];
+  	$filter = $_GET['filter'];
+  	$filter = htmlspecialchars($filter);
+  	$filter = mysqli_real_escape_string($con, $filter);
+    $email = $_GET['email'];
+
+    $email = htmlspecialchars($email);
+    $email = mysqli_real_escape_string($con, $email);
+    $security = $_GET['security'];
+    $security = htmlspecialchars($security);
+    $security = mysqli_real_escape_string($con, $security);
+  	$order = $_GET['order'];
+  	$orderOrder = "";
+  	if (strpos($order, '-') !== false) {
+      $orderOrder = "DESC";
+  		} else {$orderOrder = "ASC";}
+  	$order = htmlspecialchars($order);
+  	$order = mysqli_real_escape_string($con, $order);
+  	$page = $_GET['page'];
+  	$all = $_GET['all'];
+  	if ($all ==='true'){
+  		$limit = '';
+  	};
+
+    $sql_security = "SELECT rt.user_type, rt.account_ID FROM registration rt
+    where user_security = '" .$security. "'
+    AND user_email = '" .$email. "';";
+
+      // var_dump($sql_security);
+    $qry_result_security = mysqli_query($con, $sql_security) or die(mysqli_error($con));
+    $rows1 = array();
+    while($r = mysqli_fetch_assoc($qry_result_security)) {
+      $rows1[] = $r;
+    }
+
+  if($rows1[0]['user_type'] === 'superuser'){
+    $alpha = "LIKE '%'";
+  } else {
+    $alpha = $rows1[0]['account_ID'];
+    $alpha = "= '".$alpha."'";
+  }
+
+  $start_from = ($page-1) * $limit;
 
 
-	include "../inc/connection.php";
-	$limit = $_GET['limit'];
-	$filter = $_GET['filter'];
-	$filter = htmlspecialchars($filter);
-	$filter = mysqli_real_escape_string($con, $filter);
-	$order = $_GET['order'];
-	$orderOrder = "";
-	if (strpos($order, '-') !== false) {
-    $orderOrder = "DESC";
-		} else {$orderOrder = "ASC";}
-	$order = htmlspecialchars($order);
-	$order = mysqli_real_escape_string($con, $order);
-	$page = $_GET['page'];
-	$all = $_GET['all'];
-	if ($all ==='true'){
-		$limit = '';
-	};
+	$sql_query = "SELECT SQL_CALC_FOUND_ROWS cmt.install_site_url_name,cmt.login_url,cmt.username,cmt.password,cmt.recovery_email,cmt.cpanel_url,cmt.cpanel_username,cmt.cpanel_password,cmt.domain_ID,cmt.install_site_url_ID,dt.domain_name FROM cms_login cmt
 
-	$start_from = ($page-1) * $limit;
-
-
-	$sql_query = "SELECT SQL_CALC_FOUND_ROWS cms_login.install_site_url_name,cms_login.login_url,cms_login.username,cms_login.password,cms_login.recovery_email,cms_login.cpanel_url,cms_login.cpanel_username,cms_login.cpanel_password,cms_login.domain_ID,cms_login.install_site_url_ID,domains.domain_name FROM cms_login
-
-					LEFT JOIN `domains` ON cms_login.domain_ID = domains.domain_ID
-
-					WHERE (`install_site_url_name` LIKE '%".$filter."%')
+					LEFT JOIN `domains` dt ON cmt.domain_ID = dt.domain_ID
+          WHERE (cmt.account_ID ".$alpha. ")
+					AND ((`install_site_url_name` LIKE '%".$filter."%')
 					OR (`login_url` LIKE '%".$filter."%')
 					OR (`username` LIKE '%".$filter."%')
 					OR (`password` LIKE '%".$filter."%')
@@ -1050,13 +1416,13 @@ Flight::route('GET /cms_login', function(){
 					OR (`cpanel_url` LIKE '%".$filter."%')
 					OR (`cpanel_username` LIKE '%".$filter."%')
 					OR (`cpanel_password` LIKE '%".$filter."%')
-					OR (`domain_name` LIKE '%".$filter."%')";
+					OR (`domain_name` LIKE '%".$filter."%'))";
 					if($all !=='true'){
 						$sql_query .=
 				"	ORDER BY `". str_replace("-",'',$order) ."` ".$orderOrder .
 				" LIMIT ".$start_from.",". $limit."";
 					};
-
+// var_dump($sql_query);
 
   	$qry_result = mysqli_query($con, $sql_query) or die(mysqli_error($con));
 
@@ -1070,7 +1436,6 @@ Flight::route('GET /cms_login', function(){
 		$newArray = array('page'=>$page,'count'=>$num_rows[0],'data'=>$rows);
 
 	Flight::json($newArray);
-	//echo (str_replace('\u0000', '', json_encode($newArray)));
 
 });
 

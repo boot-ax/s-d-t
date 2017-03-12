@@ -1,8 +1,8 @@
-angular.module('SE_App').controller('cms_loginController', ['$mdDialog','$cms_login', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $cms_login, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
+angular.module('SE_App').controller('cms_loginController', ['$mdDialog','$cms_login', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService','$auth',function ($mdDialog, $cms_login, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService,$auth) {
   'use strict';
 
   var bookmark;
-
+var payload = JSON.parse($auth.getPayload().sub);
       $scope.$on('locationUpdate', function (event, data) {
 	  if(data.location == 'cms_login'){
 	  	$scope.getDesserts();
@@ -25,7 +25,10 @@ angular.module('SE_App').controller('cms_loginController', ['$mdDialog','$cms_lo
     filter: '',
     limit: '15',
     order: 'install_site_url_name',
-    page: 1
+    page: 1,
+    name: payload.user_name,
+    email: payload.user_email,
+    security:payload.user_security
   };
 
   $scope.dbTableInfo = {

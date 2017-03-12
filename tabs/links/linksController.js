@@ -1,8 +1,8 @@
-angular.module('SE_App').controller('linksController', ['$mdDialog','$links', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $links, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
+angular.module('SE_App').controller('linksController', ['$mdDialog','$links', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService','$auth',function ($mdDialog, $links, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService,$auth) {
   'use strict';
 
   var bookmark;
-
+var payload = JSON.parse($auth.getPayload().sub);
   $scope.$file = 'links.csv';
   $scope.$header = ['source_url','target_url','anchor_text','alt_text','follow_link','date_created','title','comment','link_ID'];
   $scope.$location = '/service/links';
@@ -19,7 +19,10 @@ angular.module('SE_App').controller('linksController', ['$mdDialog','$links', '$
     filter: '',
     limit: '15',
     order: 'source_url',
-    page: 1
+    page: 1,
+    name: payload.user_name,
+    email: payload.user_email,
+    security:payload.user_security
   };
 
   $scope.dbTableInfo = {

@@ -1,7 +1,8 @@
-angular.module('SE_App').controller('resource_loginController', ['$mdDialog','$resource_login', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $resource_login, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
+angular.module('SE_App').controller('resource_loginController', ['$mdDialog','$resource_login', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService','$auth',function ($mdDialog, $resource_login, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService,$auth) {
   'use strict';
 
   var bookmark;
+  var payload = JSON.parse($auth.getPayload().sub);
   $scope.$firstSpan = '<span class="firstSpan">';
   $scope.$secondSpan = '<span class="secondSpan">';
   $scope.$file = 'resource_login.csv';
@@ -27,7 +28,10 @@ angular.module('SE_App').controller('resource_loginController', ['$mdDialog','$r
     filter: '',
     limit: '15',
     order: 'resource_url_name',
-    page: 1
+    page: 1,
+    name: payload.user_name,
+    email: payload.user_email,
+    security:payload.user_security
   };
 
   $scope.dbTableInfo = {

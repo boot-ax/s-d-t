@@ -8,9 +8,9 @@ angular.module('SE_App').factory('$resource_login', ['$resource', function ($res
 
 //===========================================================
 
-angular.module('SE_App').controller('addResource_loginController', ['$mdDialog', '$resource_login', '$scope' , '$http', '$mdToast',function ($mdDialog, $resource_login, $scope, $http,$mdToast) {
+angular.module('SE_App').controller('addResource_loginController', ['$mdDialog', '$resource_login', '$scope' , '$http', '$mdToast','$auth',function ($mdDialog, $resource_login, $scope, $http,$mdToast,$auth) {
   'use strict';
-
+  var payload = JSON.parse($auth.getPayload().sub);
 $scope.myDate = new Date();
 
 $scope.getOwnersFunc = function(){
@@ -41,6 +41,8 @@ $scope.getOwnersFunc = function(){
   }
 
   this.addItem = function () {
+    $scope.resource_login_table.user_email =  payload.user_email;
+    $scope.resource_login_table.user_security = payload.user_security;
     $scope.item.form.$setSubmitted();
 
     if($scope.item.form.$valid) {

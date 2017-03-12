@@ -8,9 +8,9 @@ angular.module('SE_App').factory('$person', ['$resource', function ($resource) {
 
 //===========================================================
 
-angular.module('SE_App').controller('addPersonController', ['$mdDialog', '$person', '$scope' , '$http', '$mdToast', function ($mdDialog, $person, $scope, $http,$mdToast) {
+angular.module('SE_App').controller('addPersonController', ['$mdDialog', '$person', '$scope' , '$http', '$mdToast','$auth', function ($mdDialog, $person, $scope, $http,$mdToast,$auth) {
   'use strict';
-
+var payload = JSON.parse($auth.getPayload().sub);
 $scope.myDate = new Date();
 
 $scope.getPersonsFunc = function(){
@@ -41,6 +41,8 @@ $scope.getPersonsFunc = function(){
   }
 
   this.addItem = function () {
+    $scope.person_table.user_email =  payload.user_email;
+    $scope.person_table.user_security = payload.user_security;
     $scope.item.form.$setSubmitted();
 
     if($scope.item.form.$valid) {
