@@ -8,9 +8,8 @@ angular.module('SE_App').factory('$hosting', ['$resource', function ($resource) 
 
 //===========================================================
 
-angular.module('SE_App').controller('addHostingController', ['$mdDialog', '$hosting', '$scope' , '$http', '$mdToast', '$auth',function ($mdDialog, $hosting, $scope, $http, $mdToast,$auth) {
+angular.module('SE_App').controller('addHostingController', ['$mdDialog', '$hosting', '$scope' , '$http', '$mdToast',function ($mdDialog, $hosting, $scope, $http, $mdToast) {
   'use strict';
-  var payload = JSON.parse($auth.getPayload().sub);
 $scope.myDate = new Date();
 
   this.cancel = $mdDialog.cancel;
@@ -35,8 +34,6 @@ $scope.myDate = new Date();
 
 
 this.addItem = function () {
-  $scope.hosting_table.user_email =  payload.user_email;
-  $scope.hosting_table.user_security = payload.user_security;
     $scope.item.form.$setSubmitted();
 
     var data = angular.copy($scope.hosting_table);

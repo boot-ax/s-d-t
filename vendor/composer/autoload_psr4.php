@@ -8,4 +8,5 @@ $baseDir = dirname($vendorDir);
 return array(
     'Gamegos\\JWT\\' => array($vendorDir . '/gamegos/jwt/src', $vendorDir . '/gamegos/jwt/tests'),
     'Gamegos\\JWS\\' => array($vendorDir . '/gamegos/jws/src', $vendorDir . '/gamegos/jws/tests'),
+    'Firebase\\JWT\\' => array($vendorDir . '/firebase/php-jwt/src'),
 );

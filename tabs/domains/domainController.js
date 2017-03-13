@@ -1,14 +1,10 @@
 
 angular.module('SE_App').controller('domainController', ['$mdDialog','$domains', '$scope', '$mdEditDialog', '$http','$mdToast',
-'$q','changeCellServices','upDownloadService','$auth',
-function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q,changeCellServices,upDownloadService,$auth) {
+'$q','changeCellServices','upDownloadService',
+function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q,changeCellServices,upDownloadService) {
   'use strict';
 
   var bookmark;
-
-  var payload = JSON.parse($auth.getPayload().sub);
-
-
 
   $scope.$file = 'domains.csv';
   $scope.$header = ['domain_name','ip_address','nameserver_1','ns1_IP','nameserver_2','ns2_IP','nameserver_3','ns3_IP','date_purchased','expiration_date','registrar_ID','hosting_ID','registrar_301','registrar_301_target','whois_protected','domain_ID','registrar_name','hosting_name'];
@@ -33,9 +29,6 @@ function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q,changeCe
     limit: '15',
     order: 'domain_name',
     page: 1,
-    name: payload.user_name,
-    email: payload.user_email,
-    security:payload.user_security
   };
 
   $scope.dbTableInfo = {

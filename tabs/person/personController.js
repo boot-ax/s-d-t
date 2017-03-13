@@ -1,8 +1,7 @@
-angular.module('SE_App').controller('personController', ['$mdDialog','$person', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService','$mdToast','$auth',function ($mdDialog, $person, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService,$mdToast,$auth) {
+angular.module('SE_App').controller('personController', ['$mdDialog','$person', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService','$mdToast',function ($mdDialog, $person, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService,$mdToast) {
   'use strict';
 
   var bookmark;
-var payload = JSON.parse($auth.getPayload().sub);
   $scope.$file = 'person.csv';
   $scope.$header = ['user_name','user_email','user_address','user_phone','user_type','user_ID'];
 
@@ -27,9 +26,6 @@ var payload = JSON.parse($auth.getPayload().sub);
     limit: '15',
     order: 'user_name',
     page: 1,
-    name: payload.user_name,
-    email: payload.user_email,
-    security:payload.user_security
   };
 
   $scope.dbTableInfo = {

@@ -17,6 +17,10 @@ class ComposerStaticInite2173f46ac6cd7f7432bb30c478fe4dd
             'Gamegos\\JWT\\' => 12,
             'Gamegos\\JWS\\' => 12,
         ),
+        'F' => 
+        array (
+            'Firebase\\JWT\\' => 13,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
@@ -29,6 +33,10 @@ class ComposerStaticInite2173f46ac6cd7f7432bb30c478fe4dd
         array (
             0 => __DIR__ . '/..' . '/gamegos/jws/src',
             1 => __DIR__ . '/..' . '/gamegos/jws/tests',
+        ),
+        'Firebase\\JWT\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
         ),
     );
 

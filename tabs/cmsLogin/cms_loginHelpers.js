@@ -8,9 +8,8 @@ angular.module('SE_App').factory('$cms_login', ['$resource', function ($resource
 
 //===========================================================
 
-angular.module('SE_App').controller('addCMSController', ['$mdDialog', '$cms_login', '$scope' , '$http', '$q', '$mdToast','$auth',  function ($mdDialog, $cms_login, $scope, $http, $q, $mdToast,$auth) {
+angular.module('SE_App').controller('addCMSController', ['$mdDialog', '$cms_login', '$scope' , '$http', '$q', '$mdToast',function ($mdDialog, $cms_login, $scope, $http, $q, $mdToast) {
   'use strict';
-var payload = JSON.parse($auth.getPayload().sub);
 
 
 $scope.myDate = new Date();
@@ -44,8 +43,6 @@ $scope.getDomainsFunc = function(){
   }
 
   this.addItem = function () {
-    $scope.cms_login_table.user_email =  payload.user_email;
-    $scope.cms_login_table.user_security = payload.user_security;
     $scope.item.form.$setSubmitted();
     if($scope.item.form.$valid) {
 

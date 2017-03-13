@@ -8,9 +8,8 @@ angular.module('SE_App').factory('$W2_accounts', ['$resource', function ($resour
 
 //===========================================================
 
-angular.module('SE_App').controller('addW2_AccountsController', ['$mdDialog', '$W2_accounts', '$scope' , '$http','$mdToast', '$auth',function ($mdDialog, $W2_accounts, $scope, $http,$mdToast,$auth) {
+angular.module('SE_App').controller('addW2_AccountsController', ['$mdDialog', '$W2_accounts', '$scope' , '$http','$mdToast',function ($mdDialog, $W2_accounts, $scope, $http,$mdToast) {
   'use strict';
-  var payload = JSON.parse($auth.getPayload().sub);
 $scope.myDate = new Date();
 
 $scope.getOwnersFunc = function(){
@@ -41,8 +40,6 @@ $scope.getOwnersFunc = function(){
   }
 
   this.addItem = function () {
-    $scope.W2_accounts_table.user_email =  payload.user_email;
-    $scope.W2_accounts_table.user_security = payload.user_security;
     $scope.item.form.$setSubmitted();
 
     if($scope.item.form.$valid) {

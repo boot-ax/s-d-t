@@ -8,9 +8,8 @@ angular.module('SE_App').factory('$registrar', ['$resource', function ($resource
 
 //===========================================================
 
-angular.module('SE_App').controller('addRegistrarController', ['$mdDialog', '$registrar', '$scope' , '$http', '$mdToast', '$auth',function ($mdDialog, $registrar, $scope, $http, $mdToast,$auth) {
+angular.module('SE_App').controller('addRegistrarController', ['$mdDialog', '$registrar', '$scope' , '$http', '$mdToast',function ($mdDialog, $registrar, $scope, $http, $mdToast) {
   'use strict';
-  var payload = JSON.parse($auth.getPayload().sub);
 $scope.myDate = new Date();
 
 $scope.getOwnersFunc = function(){
@@ -41,8 +40,6 @@ $scope.getOwnersFunc = function(){
   }
 
   this.addItem = function () {
-    $scope.registrar_table.user_email =  payload.user_email;
-    $scope.registrar_table.user_security = payload.user_security;
     $scope.item.form.$setSubmitted();
 
     if($scope.item.form.$valid) {

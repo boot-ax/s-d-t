@@ -8,9 +8,8 @@ angular.module('SE_App').factory('$software_keys', ['$resource', function ($reso
 
 //===========================================================
 
-angular.module('SE_App').controller('addSoftware_keysController', ['$mdDialog', '$software_keys', '$scope' , '$http', '$mdToast','$auth',function ($mdDialog, $software_keys, $scope, $http,$mdToast,$auth) {
+angular.module('SE_App').controller('addSoftware_keysController', ['$mdDialog', '$software_keys', '$scope' , '$http', '$mdToast',function ($mdDialog, $software_keys, $scope, $http,$mdToast) {
   'use strict';
-  var payload = JSON.parse($auth.getPayload().sub);
 $scope.myDate = new Date();
 
 $scope.getOwnersFunc = function(){
@@ -41,8 +40,6 @@ $scope.getOwnersFunc = function(){
   }
 
   this.addItem = function () {
-    $scope.software_keys_table.user_email =  payload.user_email;
-    $scope.software_keys_table.user_security = payload.user_security;
     $scope.item.form.$setSubmitted();
 
     if($scope.item.form.$valid) {
