@@ -1,5 +1,43 @@
+<div class="box" layout="row" layout-align="center center">
+	<md-card layout="column" ng-show="busy" layout-align="center center">
+		<md-progress-circular md-mode="indeterminate"></md-progress-circular>
+	</md-card>
 
-<div layout="row" layout-align="center center">
+	<md-card class="login-form" ng-hide="busy" layout="column" layout-align="center center">
+		       <form layout="row">
+		         <span flex></span>
+		           <div layout="column">
+		             <div style="margin-top:20px">
+		                 <md-input-container layout="row" style="margin-left:-40px">
+		                   <label class="loginLabel">Email</label>
+		                   <md-icon class="md-icons iconOff">email</md-icon>
+											 <input ng-model="user.email" type="email" ng-required="true" autocomplete="off">
+		                 </md-input-container>
+		             </div>
+		             <div>
+		               <md-input-container layout="row" style="margin-left:-40px">
+		                   <label class="loginLabel">Password</label>
+		                   <md-icon class="md-icons iconOff">lock</md-icon>
+											 <input ng-model="user.password" type="password" ng-required="true" ng-keydown="$event.which === 13 && login(user)" autocomplete="off">
+		                 </md-input-container>
+		             </div>
+								 <section style="margin-top:20px" layout="row" layout-align="center center">
+						 			<md-button class="md-raised md-primary" ng-click="login(user)">Login</md-button>
+									<span layout="column" layout-align="center center"> or </span>
+								 <md-button class="md-raised md-primary md-hue-3" ng-click="signUp()">Register</md-button>
+							 </section>
+		         </div>
+		       <span flex></span>
+		     </form>
+
+
+<p style="text-align: center;"><a href="/reset-password">Forgot your password?</a></p>
+	</md-card>
+</div>
+
+
+
+<!-- <div layout="row" layout-align="center center">
 	<md-card layout="column" ng-show="busy" layout-align="center center">
 		<md-progress-circular md-mode="indeterminate"></md-progress-circular>
 	</md-card>
@@ -27,4 +65,4 @@
 </div>
 
 
-<p style="text-align: center;"><a href="/reset-password">Forgot your password?</a></p>
+<p style="text-align: center;"><a href="/reset-password">Forgot your password?</a></p> -->

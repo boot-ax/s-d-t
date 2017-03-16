@@ -1,15 +1,16 @@
 <md-toolbar class="md-hue-2">
   <div class="md-toolbar-tools">
-    <md-button aria-label="Settings" ng-click="toggleLeft()">
+    <!-- <md-button aria-label="Settings" ng-click="toggleLeft()">
       <md-icon>menu</md-icon>
-    </md-button>
+    </md-button> -->
 
-    <h2 flex md-truncate>Zipps</h2>
+    <span><h2 flex style="margin-left:10px">Zipps</h2></span>
 
 
 
 <div flex style="padding-right:20px"></div>
-{{payload.user_email}}
+<span flex></span>
+<span class="flex-child long-and-truncated">{{payload.user_email}}</span>
     <div class="md-menu-demo" ng-cloak>
       <div>
         <md-menu>
@@ -19,14 +20,16 @@
           <md-menu-content width="4">
             <md-menu-item>
               <md-button ng-click="userSettings()">
-                <i class="material-icons">settings</i>
-                User Settings
+                <i style="color:#6100A0" class="material-icons">settings</i>
+                Profile Settings
               </md-button>
             </md-menu-item>
             <md-menu-divider></md-menu-divider>
+
+  
             <md-menu-item>
               <md-button ng-click="logout()">
-                <i class="material-icons">&#xE8AC;</i>
+                <i style="color:green" class="material-icons">&#xE8AC;</i>
                 Logout
               </md-button>
             </md-menu-item>
@@ -68,7 +71,7 @@
   </md-tabs>
 
 
-  <md-sidenav class="md-sidenav-left" md-component-id="left" md-whiteframe="4">
+  <!-- <md-sidenav class="md-sidenav-left" md-component-id="left" md-whiteframe="4">
     <md-toolbar class="md-hue-2">
       <h1 class="md-toolbar-tools">Choose Wisely</h1>
     </md-toolbar>
@@ -77,7 +80,7 @@
         <a href="/jordan.php">Jordan's Method</a>
       </p>
     </md-content>
-  </md-sidenav>
+  </md-sidenav> -->
   <md-card>
     <md-card-content ui-view />
   </md-card>

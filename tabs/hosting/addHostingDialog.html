@@ -31,7 +31,7 @@
         <input style="" aria-invalid="true" name="username" ng-model="hosting_table.username" required="true">
         <div class="md-errors-spacer"></div>
       </md-input-container>
-      
+
             <md-input-container class="flex" flex="">
         <label>Password&#42;</label>
         <input style="" aria-invalid="true" name="password" ng-model="hosting_table.password" required="true">
@@ -42,22 +42,22 @@
     <h3 class="md-subhead">Other Information</h3>
 
     <!--Enter Date Here Below-->
-    
+
     <div layout="row" class="input-row layout-row">
-  
+
       <div layout-gt-xs="row">
-        
+
           <div layout="column" flex style="font-size:.8em; color:grey">
             <label>Date Purchased&#42;</label>
             <md-datepicker ng-init="hosting_table.date_started = myDate" ng-model="hosting_table.date_started" name="dateStartedField" required=""></md-datepicker>
           </div>
-        
- 
+        <div class="md-errors-spacer"></div>
+
           <div layout="column" flex style="font-size:.8em; color:grey">
             <label>Expiration Date&#42;</label>
             <md-datepicker ng-model="hosting_table.expiration_date" ng-init="hosting_table.expiration_date = myDate" name="expirationDateField" required=""></md-datepicker>
           </div>
-       
+
   </div>
   </div>
 
@@ -88,4 +88,3 @@
 
   <div tabindex="0" class="md-dialog-focus-trap"></div>
 </md-dialog-content>
-

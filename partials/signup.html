@@ -1,4 +1,4 @@
-<form class="form" ua-signup>
+<!-- <form class="form" ua-signup>
   <h2 class="form-heading">Please Sign Up</h2>
   <div class="form-fields">
     <input name="first_name" placeholder="First Name" type="text" class="form-control">
@@ -13,4 +13,62 @@
   <div ng-show="verificationEmailSent" class="alert alert-success">An email has been sent to your inbox. Click on the link to verify your account.</div>
 </form>
 
-<p style="text-align: center;"><a href="" ua-oauth-link="facebook">Or sign up with Facebook</a></p>
+<p style="text-align: center;"><a href="" ua-oauth-link="facebook">Or sign up with Facebook</a></p> -->
+
+<md-dialog aria-label="Dialog for Signup" style="height:800px;width:400px;">
+      <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2>Registar</h2>
+        <span flex></span>
+        <md-button class="md-icon-button" ng-click="cancel()">
+          <md-icon class="material-icons" aria-label="Close dialog">close</md-icon>
+        </md-button>
+      </div>
+    </md-toolbar>
+       <form layout="row" name="register.form">
+         <span flex ></span>
+           <div layout="column" style="margin-top:25px">
+             <div>
+                 <md-input-container layout="row" class="input-row layout-row rowOffset">
+                   <label class="loginLabel">Full Name&#42;</label>
+                   <md-icon class="md-icons iconOff">person</md-icon>
+                   <input ng-required="true" type="text" ng-model="signUp.fullName" autocomplete="off">
+                 </md-input-container>
+             </div>
+             <div>
+                 <md-input-container layout="row" class="input-row layout-row rowOffset">
+                   <label class="loginLabel">Email&#42;</label>
+                   <md-icon class="md-icons iconOff">email</md-icon>
+                   <input ng-required="true" type="email" ng-model="signUp.email" autocomplete="off">
+                 </md-input-container>
+             </div>
+             <div>
+               <md-input-container layout="row" class="input-row layout-row rowOffset">
+                   <label class="loginLabel">Password&#42;</label>
+                   <md-icon class="material-icons iconOff">lock</md-icon>
+                   <input ng-required="true" type="password" ng-model="signUp.password">
+                 </md-input-container>
+             </div>
+             <div>
+                 <md-input-container layout="row" class="input-row layout-row rowOffset">
+                   <label class="loginLabel">Phone Number</label>
+                   <md-icon class="md-icons iconOff">phone</md-icon>
+                   <input type="text" ng-model="signUp.phone" autocomplete="off">
+                 </md-input-container>
+             </div>
+
+               <div class="md-errors-spacer"></div>
+               <div>
+                 <md-input-container layout="row" class="input-row layout-row rowOffset">
+                   <label class="loginLabel">Address</label>
+                   <md-icon class="md-icons iconOff">assignment_ind</md-icon>
+                   <textarea type="text" ng-model="signUp.address" autocomplete="off"></textarea>
+                 </md-input-container>
+               </div>
+               <section style="margin-top:20px" layout="row" layout-align="center center">
+                <md-button disabled="disabled" ng-disabled="register.form.$invalid" class="md-raised md-primary" ng-click="sUpCtrl.register(signUp)" type="button">Sign Up</md-button>
+               </section>
+         </div>
+       <span flex></span>
+     </form>
+</md-dialog>

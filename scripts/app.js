@@ -8,7 +8,7 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
     $compileProvider.debugInfoEnabled(false);
     $mdThemingProvider.theme('default')
       .primaryPalette('blue')
-      .accentPalette('pink');
+      .accentPalette('deep-purple');
 
     $stateProvider
     .state('home', {
@@ -112,13 +112,16 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
         templateUrl: 'partials/login.html',
         controller: 'loginController'
       })
-      .state('signup', {
-        url: '/signup',
-        templateUrl: 'partials/signup.html',
-        controller: 'signupController'
+      .state('profile', {
+        url: '/profile',
+        templateUrl: 'partials/profile.html',
+        controller: 'profileController',
+        resolve: {
+          loginRequired: loginRequired
+        }
       });
 
-      $authProvider.loginUrl = '/service/auth/login';
+      $authProvider.loginUrl = 'service/auth/login';
 
       $urlRouterProvider.otherwise('/domains');
 
@@ -339,17 +342,13 @@ this.changeDropdown = function($column, $value, $table,db_table,db_ID){
 
    $scope.payload = JSON.parse($auth.getPayload().sub);
 
-
-
-
-$scope.logout = function(){
-
-  $auth.logout();
+   $scope.logout = function(){
+      $auth.logout();
   $location.path('/login');
 }
 
 $scope.userSettings = function(){
-
+  $location.path('/profile')
 }
 
 	$scope.toggleLeft = buildToggler('left');

@@ -1,0 +1,79 @@
+<!-- <form class="form" ua-signup>
+  <h2 class="form-heading">Please Sign Up</h2>
+  <div class="form-fields">
+    <input name="first_name" placeholder="First Name" type="text" class="form-control">
+    <input name="login" placeholder="Email" type="text" class="form-control" ua-is-email>
+    <input name="password" placeholder="Password" type="password" class="form-control">
+  </div>
+  <button class="btn btn-lg btn-primary btn-block" type="submit" ng-disabled="loading">
+    <span ng-show="!loading">Sign Up</span>
+    <img ng-show="loading" src="img/ajax-loader-blue.gif">
+  </button>
+  <div ng-show="error" class="alert alert-danger">{{ error.message }}</div>
+  <div ng-show="verificationEmailSent" class="alert alert-success">An email has been sent to your inbox. Click on the link to verify your account.</div>
+</form>
+
+<p style="text-align: center;"><a href="" ua-oauth-link="facebook">Or sign up with Facebook</a></p> -->
+
+<div flex layout="row">
+  <div flex flex-xs="5" layout="row"></div>
+<md-card class="login-form" ng-hide="busy" layout="column" layout-align="center center">
+      <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2>Zipps Profile</h2>
+        <span flex></span>
+        <md-button class="md-icon-button" ng-click="cancel()">
+          <md-icon class="material-icons" aria-label="Close dialog">close</md-icon>
+        </md-button>
+      </div>
+    </md-toolbar>
+       <form flex layout="row" name="register.form" style="padding:15px">
+         <span flex ></span>
+           <div layout="column" style="margin-top:25px">
+             <div>
+                 <md-input-container flex layout="row" class="input-row layout-row rowOffset">
+                   <label class="loginLabel">Full Name&#42;</label>
+                   <md-icon class="md-icons iconOff">person</md-icon>
+                   <input ng-required="true" type="text" ng-model="signUp.fullName" autocomplete="off">
+                 </md-input-container>
+             </div>
+             <div>
+                 <md-input-container flex layout="row" class="input-row layout-row rowOffset">
+                   <label class="loginLabel">Email&#42;</label>
+                   <md-icon class="md-icons iconOff">email</md-icon>
+                   <input ng-required="true" type="email" ng-model="signUp.email" autocomplete="off">
+                 </md-input-container>
+             </div>
+             <div>
+               <md-input-container flex layout="row" class="input-row layout-row rowOffset">
+                   <label class="loginLabel">Password&#42;</label>
+                   <md-icon class="material-icons iconOff">lock</md-icon>
+                   <input ng-required="true" type="password" ng-model="signUp.password">
+                 </md-input-container>
+             </div>
+             <div>
+                 <md-input-container flex layout="row" class="input-row layout-row rowOffset">
+                   <label class="loginLabel">Phone Number</label>
+                   <md-icon class="md-icons iconOff">phone</md-icon>
+                   <input type="text" ng-model="signUp.phone" autocomplete="off">
+                 </md-input-container>
+             </div>
+
+               <div class="md-errors-spacer"></div>
+               <div>
+                 <md-input-container flex layout="row" class="input-row layout-row rowOffset">
+                   <label class="loginLabel">Address</label>
+                   <md-icon class="md-icons iconOff">assignment_ind</md-icon>
+                   <textarea type="text" ng-model="signUp.address" autocomplete="off"></textarea>
+                 </md-input-container>
+               </div>
+               <section flex style="margin-top:20px" layout="row" layout-align="center center">
+                <md-button disabled="disabled" ng-disabled="register.form.$invalid" class="md-raised md-primary" ng-click="register(signUp)" type="button">Change Profile</md-button>
+                <md-button class="cancel button" ng-click="cancelAccount()">Cancel Account</md-button>
+               </section>
+         </div>
+       <span flex></span>
+     </form>
+</md-card>
+<div flex flex-xs="5" layout="row"></div>
+</div>

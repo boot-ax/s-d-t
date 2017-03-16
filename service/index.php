@@ -1,6 +1,7 @@
 <?php
 include '../inc/functions2.php';
 require '../vendor/autoload.php';
+use Mailgun\Mailgun;
 
 
 //date_default_timezone_set('UTC');
@@ -11,7 +12,8 @@ Flight::before('start', function(&$params, &$output){
     global $jwt_key;
 
     $request = Flight::request();
-    if($request->url != '/auth/login'){
+    $url = $request->url;
+    if($url !== '/auth/login' & $url !== '/signup/'){
       $jwt = substr($_SERVER['HTTP_AUTHORIZATION'],7);
       try{
 				$validator = new \Gamegos\JWT\Validator();
@@ -22,6 +24,7 @@ Flight::before('start', function(&$params, &$output){
 				// var_dump($request->data->user);
 				// die();
       }catch(Exception $e){
+        // Flight::redirect('https://dev.webwright.io', [401]) // Redirects to another URL.
         Flight::halt(401,"User not authorized");
       }
     }
@@ -166,34 +169,42 @@ Flight::route('POST /domains', function(){
 
 Flight::route('POST /url_data', function(){
 
+  $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
+  $domain = "zipps.webwright.io";
 
-	$entityBody = Flight::request()->getBody();
+  # Now, compose and send your message.
+  $mg->sendMessage($domain, array('from'    => 'holyCow@example.com',
+                                  'to'      => 'jkolnik@mac.com',
+                                  'subject' => 'The PHP SDK is awesome!',
+                                  'text'    => 'My first programatically sent email list.   It is so simple to send a message.'));
 
-
-
-	include "../inc/connection.php";
-
-	$entityBody = str_replace('\\u0000', '', $entityBody);
-	$entityBody2 = json_decode($entityBody,true);
-
-	// build query...
-   $sql  = "INSERT INTO url_data";
-   // implode keys of $array...
-   $sql .= " (`".implode("`, `", array_keys($entityBody2['url_data_table']))."`)";
-   // implode values of $array...
-	 $sql .= " VALUES (\"".implode("\", \"", $entityBody2['url_data_table'])."\");";
-
-
- // execute query...
-  $qry_result = mysqli_query($con, $sql);
-  if($qry_result){
-	  Flight::halt(200,"Resource login Added.");
-  }else{
-	  Flight::halt(500,mysqli_error($con));
-	  //die(mysqli_error($con));
-  }
-
-});
+// 	$entityBody = Flight::request()->getBody();
+//
+//
+//
+// 	include "../inc/connection.php";
+//
+// 	$entityBody = str_replace('\\u0000', '', $entityBody);
+// 	$entityBody2 = json_decode($entityBody,true);
+//
+// 	// build query...
+//    $sql  = "INSERT INTO url_data";
+//    // implode keys of $array...
+//    $sql .= " (`".implode("`, `", array_keys($entityBody2['url_data_table']))."`)";
+//    // implode values of $array...
+// 	 $sql .= " VALUES (\"".implode("\", \"", $entityBody2['url_data_table'])."\");";
+//
+//
+//  // execute query...
+//   $qry_result = mysqli_query($con, $sql);
+//   if($qry_result){
+// 	  Flight::halt(200,"Resource login Added.");
+//   }else{
+// 	  Flight::halt(500,mysqli_error($con));
+// 	  //die(mysqli_error($con));
+//   }
+//
+ });
 
 Flight::route('POST /software_keys', function(){
   global $jwt_key;
@@ -461,7 +472,6 @@ Flight::route('POST /links', function(){
 	include "../inc/connection.php";
 
 	$entityBody = str_replace('\\u0000', '', $entityBody);
-	var_dump($entityBody);
 	$entityBody2 = json_decode($entityBody,true);
 
   $jwt = substr($_SERVER['HTTP_AUTHORIZATION'],7);
@@ -539,16 +549,17 @@ Flight::route('POST /registrar', function(){
   global $jwt_key;
 
 	$entityBody = Flight::request()->getBody();
-
-
-
 	include "../inc/connection.php";
 
 	$entityBody = str_replace('\\u0000', '', $entityBody);
 	$entityBody2 = json_decode($entityBody,true);
 
-  $email = $entityBody2["registrar_table"]["user_email"];
-  $security = $entityBody2["registrar_table"]["user_security"];
+  $jwt = substr($_SERVER['HTTP_AUTHORIZATION'],7);
+  $validator = new \Gamegos\JWT\Validator();
+  $token = $validator->validate($jwt, $jwt_key);
+  $goodData = json_decode($token->getClaims()['sub']);
+  $email = $goodData->user_email;
+  $security = $goodData->user_security;
   $sql_security = "SELECT account.account_ID FROM registration
   LEFT JOIN `account` ON registration.account_ID = account.account_ID
   where user_security = '" .$security. "'
@@ -1978,13 +1989,6 @@ Flight::route('/updateItem', function(){
       $alpha = "= '".$alpha."'";
     }
 
-  // if($entityBody2['column'] = 'user_type'){
-  // var_dump($entityBody2);
-  //   if($entityBody2['user_type'] != 'no_access'){
-  //     $sql  = "UPDATE " . $entityBody2['table'] . " SET " . $entityBody2['column'] . "=\"" . $entityBody2['value'] . "\",user_password=\"".md5($entityBody2['pwrd'])."\"";
-  //     $sql .= " WHERE " . $entityBody2['identifier']. "=" . $entityBody2['id'];
-  //   }
-  // } else {
   if($entityBody2['table'] == 'change_log' || $entityBody2['table'] == 'url_data'){
    $sql  = "UPDATE " . $entityBody2['table'] . " SET " . $entityBody2['column'] . "=\"" . $entityBody2['value'] . "\"";
    $sql .= " WHERE " . $entityBody2['identifier']. "=" . $entityBody2['id'];
@@ -1992,19 +1996,23 @@ Flight::route('/updateItem', function(){
    $sql  = "UPDATE " . $entityBody2['table'] . " SET " . $entityBody2['column'] . "=\"" . $entityBody2['value'] . "\"";
    $sql .= " WHERE " . $entityBody2['identifier']. "=" . $entityBody2['id']." AND (account_ID ".$alpha. ");";
  }
-// };
-var_dump($sql);
-  // $qry_result = mysqli_query($con, $sql);
-  // if($qry_result){
-	//   Flight::halt(200,$entityBody2['column'] . ": Updated");
-  // }else{
-	//   Flight::halt(500,mysqli_error($con));
-  // }
+  $qry_result = mysqli_query($con, $sql);
+  if($qry_result){
+	  Flight::halt(200,$entityBody2['column'] . ": Updated");
+  }else{
+	  Flight::halt(500,mysqli_error($con));
+  }
 
 });
 
 Flight::route('/9736644323hc4e34', function(){
 
+});
+
+
+Flight::route('POST /signup/', function(){
+echo 'shit';
+Flight::halt(200,'shit');
 });
 
 Flight::route('/getowners', function(){
