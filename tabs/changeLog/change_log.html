@@ -75,7 +75,7 @@
 
 
         <td md-cell>
-        <md-select md-on-open="getOwnersFunc()" ng-change="changeDropdown('user_ID','user_ID',W2_accounts_table,dbTableInfo.db_table,dbTableInfo.db_ID)"
+        <md-select md-on-open="getOwnersFunc()" ng-change="changeDropdown('user_ID','user_ID',change_log_table,dbTableInfo.db_table,dbTableInfo.db_ID)"
             ng-model="change_log_table.user_ID" placeholder="{{$firstSpan}}{{change_log_table.user_name}}</span></br>{{$secondSpan}}{{change_log_table.user_email}}</span>">
           <md-option ng-value="variable.user_ID"
                 ng-repeat="variable in getOwners.data"><span class="firstSpan">{{variable.user_name}}</span></br><span class="secondSpan">{{variable.user_email}}</span></md-option>

@@ -89,7 +89,7 @@ function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q) {
       .catch(function(response) {
         // $scope.busy = false;
         console.log(response);
-        $mdToast.show($mdToast.simple().textContent(response.data).hideDelay(3000));
+        $mdToast.show($mdToast.simple().textContent(response.data).hideDelay(6000));
       });
 
     }

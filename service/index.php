@@ -135,7 +135,7 @@ Flight::before('start', function(&$params, &$output){
 
     $request = Flight::request();
     $url = $request->url;
-    if($url !== '/auth/login' & $url !== '/signup/'){
+    if($url !== '/auth/login' & $url !== '/signup/' & $url !== '/stripe-991c8971ff31a83c454f371f55c85be5'){
       $jwt = substr($_SERVER['HTTP_AUTHORIZATION'],7);
       try{
 				$validator = new \Gamegos\JWT\Validator();
@@ -160,6 +160,7 @@ Flight::route('POST /auth/login', function(){
 	$entityBody = str_replace('\\u0000', '', $entityBody);
 	$entityBody2 = json_decode($entityBody,true);
 	// build query...
+
 
     $sql  = "SELECT user_name, user_email,user_security FROM registration
 		WHERE (`user_email` = ?)
@@ -405,6 +406,7 @@ Flight::route('POST /person', function(){
   $sqlArray = Flight::basicSecurity();
   $entityBody2 = $sqlArray['entityBody2'];
   $account = $sqlArray['account_ID'];
+  $entityBody2['person_table']['user_password'] = md5($entityBody2['person_table']['user_password']);
   $entityBody2['person_table']['account_ID'] = $account;
   $entityBody2['person_table']['user_security'] = randomPassword();
   $entityBody2['person_table']['user_email'] = $entityBody2['person_table']['user_email2'];
@@ -1289,98 +1291,11 @@ Flight::route('/updateItem', function(){
     if($qry_result){
   	  Flight::halt(200,$entityBody2['column'] . ": Updated");
     }else{
-  	  Flight::halt(500,$qry_result->error());
+  	  Flight::halt(500,$qry_result->error);
     }
 
 });
 
-Flight::route('/9736644323hc4e34', function(){
-
-});
-
-
-Flight::route('POST /signup/', function(){
-  $entityBody = Flight::request()->getBody();
-	include "../inc/connection.php";
-	$entityBody = str_replace('\\u0000', '', $entityBody);
-	$entityBody2 = json_decode($entityBody,true);
-  $token = $entityBody2['$token']['id'];
-  $card = $entityBody2['$token']['card']['id'];
-  $email = $entityBody2['signUp']['email'];
-  $stripe = array(
-    "secret_key"      =>  "sk_test_tN4uGQsemjKrJ2tLpqg3VgIe",
-    "publishable_key" =>  "pk_test_DDqS4Ps7loF2JzJPH5JinfPW"
-  );
-
-  Stripe::setApiKey($stripe['secret_key']);
-  try {
-
-
-
-    $customer = \Stripe\Customer::create(array(
-      'email' =>  $email,
-      'source'    =>  $token,
-      'plan'  =>'HhQ88aKJ4qDKccsYsq62c'
-    ));
-
-
-    $charge = \Stripe\Charge::create(array(
-      'customer' => $customer->id,
-      'amount'   => 700,
-      "description" => "Monthy Subscription",
-      'currency' => 'usd'
-  ));
-  } catch (Exception $e) {
-    Flight::halt(401,"unable to sign up customer:" . $email.
-      ", error:" . $e->getMessage()
-    );
-  }
-
-  echo '<h1>Successfully charged $7.00!</h1>';
-
-});
-
-Flight::route('POST /stripe-events/', function(){
-  $entityBody = Flight::request()->getBody();
-	include "../inc/connection.php";
-	$entityBody = str_replace('\\u0000', '', $entityBody);
-	$entityBody2 = json_decode($entityBody,true);
-  $token = $entityBody2['$token']['id'];
-  $card = $entityBody2['$token']['card']['id'];
-  $email = $entityBody2['signUp']['email'];
-
-  $stripe = array(
-    "secret_key"      =>  "sk_test_tN4uGQsemjKrJ2tLpqg3VgIe",
-    "publishable_key" =>  "pk_test_DDqS4Ps7loF2JzJPH5JinfPW"
-  );
-
-  Stripe::setApiKey($stripe['secret_key']);
-  try {
-
-
-
-  $customer = \Stripe\Customer::create(array(
-    'email' =>  $email,
-    'source'    =>  $token,
-    'plan'  =>'HhQ88aKJ4qDKccsYsq62c'
-  ));
-
-
-  $charge = \Stripe\Charge::create(array(
-    'customer' => $customer->id,
-    'amount'   => 700,
-    "description" => "Monthy Subscription",
-    'currency' => 'usd'
-  ));
-  } catch (Exception $e) {
-  Flight::halt(401,"unable to sign up customer:" . $email.
-    ", error:" . $e->getMessage()
-  );
-  }
-
-  echo '<h1>Successfully charged $7.00!</h1>';
-
-});
 
 Flight::route('/getowners', function(){
   include "../inc/connection2.php";
@@ -1406,6 +1321,185 @@ Flight::route('/getowners', function(){
 
 });
 
+
+
+Flight::route('/9736644323hc4e34', function(){
+
+});
+
+
+Flight::route('POST /signup/', function(){
+  $entityBody = Flight::request()->getBody();
+	include "../inc/connection2.php";
+	$entityBody = json_decode($entityBody,true);
+  $accountName = $entityBody['signUp']['accountName'];
+  $user_email = $entityBody['signUp']['email'];
+  if($accountName == 'Individual'){
+    $accountName = $user_emial."-account";
+  }
+  $account_name = $entityBody['signUp']['account_name'];
+  $user_password = md5($entityBody['signUp']['password2']);
+  $user_name = $entityBody['signUp']['fullName'];
+  $user_phone= $entityBody['signUp']['phone'];
+  $user_address= $entityBody['signUp']['address'];
+  $user_stripe_token = $entityBody['$token']['id'];
+  $user_security = randomPassword();
+
+  $stripe = array(
+    "secret_key"      =>  "sk_test_tN4uGQsemjKrJ2tLpqg3VgIe",
+    "publishable_key" =>  "pk_test_DDqS4Ps7loF2JzJPH5JinfPW"
+  );
+
+  Stripe::setApiKey($stripe['secret_key']);
+  try {
+    $customer = \Stripe\Customer::create(array(
+      'email' =>  $user_email,
+      'source'    =>  $user_stripe_token,
+      'plan'  =>'HhQ88aKJ4qDKccsYsq62c'
+    ));
+
+  } catch (Exception $e) {
+    Flight::halt(401,"Unable to sign up customer:" . $email.
+      "  , error:  " . $e->getMessage()
+    );
+  }
+
+  $sql = "INSERT INTO account (account_name,good_til_date,stripe_customer_ID)
+          VALUES (?,?,?)";
+
+  $stmt = $mysqli->prepare($sql);
+  $stmt->bind_param('sis', $account_name, $customer->created,$customer->id);
+  if(!$stmt->execute()){
+            Flight::halt(500,$stmt->error);
+          }
+  $stmt->close();
+
+  $sql2 = "SELECT account_ID FROM account WHERE stripe_customer_ID = ?";
+  $stmt2 = $mysqli->prepare($sql2);
+  $stmt2->bind_param('s', $customer->id);
+  if(!$result = $stmt2->execute()){
+            Flight::halt(500,$stmt->error);
+          }
+  $result = $stmt2->get_result();
+  $account_ID = $result->fetch_assoc();
+  $stmt2->close();
+  $account_ID = $account_ID['account_ID'];
+
+
+  $sql3 = "INSERT INTO registration (user_name,user_email,user_password,
+                        user_phone,user_address,user_status,user_stripe_token,
+                        user_type,account_ID,user_security,user_access)
+          VALUES (?,?,?,?,?,2,?,'admin',?,?,'yes')";
+
+  $stmt3 = $mysqli->prepare($sql3);
+  $stmt3->bind_param('ssssssis', $user_name,$user_email,$user_password,$user_phone,$user_address,$user_stripe_token,$account_ID,$user_security);
+
+  if(!$stmt3->execute()){
+    Flight::halt(500,$stmt->error);
+  }
+  $stmt3->close();
+
+  Flight::halt(200,"Successfully Signed Up and charged $7.00!");
+
+
+});
+
+Flight::route('POST /stripe-991c8971ff31a83c454f371f55c85be5', function(){
+  include "../inc/connection2.php";
+  $stripe = array(
+    "secret_key"      =>  "sk_test_tN4uGQsemjKrJ2tLpqg3VgIe",
+    "publishable_key" =>  "pk_test_DDqS4Ps7loF2JzJPH5JinfPW"
+  );
+  Stripe::setApiKey($stripe['secret_key']);
+  $stripe_event = Flight::request()->getBody();
+  $event_json = json_decode($stripe_event);
+  $event = \Stripe\Event::retrieve($event_json->id);
+
+  if (isset($event) && $event->type == "customer.subscription.created") {
+  $customer = \Stripe\Customer::retrieve($event->data->object->customer);
+  $email = $customer->email;
+  // Sending your customers the amount in pennies is weird, so convert to dollars
+  $amount = sprintf('$%0.2f', $event->data->object->amount_due / 100.0);
+
+  $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
+  $domain = "zipps.webwright.io";
+  $result = $mg->sendMessage($domain, array(
+  // Be sure to replace the from address with the actual email address you're sending from
+  'from'    => 'billing@zipps.webwright.io',
+  'to'      => 'jkolnik@mac.com',
+  'subject' => 'Thank you for your subscription',
+  'html'    => 'Hi there,
+
+  Thank you for your subscription
+
+  Please update your payment information as soon as possible by logging in here:
+  https://zipps.webwright.io/login'
+));
+Flight::halt(200,"Successfull Payment");
+
+// Flight::halt(200,"Payment succeeded");
+}
+
+elseif (isset($event) && $event->type == "invoice.payment_failed") {
+$customer = \Stripe\Customer::retrieve($event->data->object->customer);
+$email = $customer->email;
+// Sending your customers the amount in pennies is weird, so convert to dollars
+$amount = sprintf('$%0.2f', $event->data->object->amount_due / 100.0);
+
+$mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
+$domain = "zipps.webwright.io";
+$result = $mg->sendMessage($domain, array(
+// Be sure to replace the from address with the actual email address you're sending from
+'from'    => 'billing@zipps.webwright.io',
+'to'      => 'jkolnik@mac.com',
+'subject' => 'Your most recent invoice payment failed',
+  'text'    => 'Hi there,
+
+  Unfortunately your most recent invoice payment for ' . $amount . ' was declined.
+  This could be due to a change in your card number or your card expiring, cancelation of your credit card,
+  or the bank not recognizing the payment and taking action to prevent it.
+
+  Please update your payment information as soon as possible by logging in here:
+https://zipps.webwright.io/login'
+));
+Flight::halt(200,"Failed Payment");
+
+// Flight::halt(200,"Payment succeeded");
+}
+
+elseif (isset($event) && $event->type == "charge.failed") {
+// Sending your customers the amount in pennies is weird, so convert to dollars
+
+$amount = sprintf('$%0.2f', $event->data->object->amount_due / 100.0);
+$email = $event->data->object->receipt_email;
+$mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
+$domain = "zipps.webwright.io";
+$result = $mg->sendMessage($domain, array(
+// Be sure to replace the from address with the actual email address you're sending from
+'from'    => 'billing@zipps.webwright.io',
+'to'      => 'jkolnik@mac.com',
+'subject' => 'Your Charge failed to go thru',
+  'text'    => 'Hi there,
+
+  Unfortunately your most recent invoice payment for ' . $amount . ' was declined.
+  This could be due to a change in your card number or your card expiring, cancelation of your credit card,
+  or the bank not recognizing the payment and taking action to prevent it.
+
+  Please update your payment information as soon as possible by trying to register with a different card here:
+https://zipps.webwright.io/login'
+));
+Flight::halt(200,"Failed Payment");
+
+// Flight::halt(200,"Payment succeeded");
+}
+
+else {
+  Flight::halt(500,"Nothing Worked");
+
+}
+
+
+});
 Flight::start();
 
 ?>
