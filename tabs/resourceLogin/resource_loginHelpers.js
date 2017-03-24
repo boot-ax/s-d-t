@@ -51,13 +51,14 @@ $scope.getOwnersFunc = function(){
 
 // =======================================================
 
-angular.module('SE_App').controller('deleteResource_loginController', ['$authorize', 'resource_login_tables', '$mdDialog', '$resource_login', '$scope', '$q', function ($authorize, resource_login_tables, $mdDialog, $resource_login, $scope, $q) {
+angular.module('SE_App').controller('deleteResource_loginController', ['$authorize', 'resource_login_tables', '$mdDialog', '$resource_login', '$scope', '$q', '$mdToast',function ($authorize, resource_login_tables, $mdDialog, $resource_login, $scope, $q,$mdToast) {
   'use strict';
 
   this.cancel = $mdDialog.cancel;
 
   function deleteDessert(resource_login_table, index) {
-    var deferred = $resource_login.resource_login_tables.remove({id: resource_login_table.resource_url_ID});
+    var deferred = $resource_login.resource_login_tables.remove({id: resource_login_table.resource_url_ID}, success, error);
+
 
     deferred.$promise.then(function () {
       resource_login_tables.splice(index, 1);
@@ -70,16 +71,23 @@ angular.module('SE_App').controller('deleteResource_loginController', ['$authori
     $mdDialog.hide();
   }
 
-  function error() {
-    $scope.error = 'Invalid secret.';
-  }
-
   function success() {
-    $q.all(resource_login_tables.forEach(deleteDessert)).then(onComplete);
-  }
+    $mdToast.show(
+        $mdToast.simple()
+          .textContent('Successfully Deleted')
+          .hideDelay(3000)
+      );
+    }
 
-  this.authorizeUser = function () {
-    $authorize.get({secret: $scope.authorize.secret}, success, error);
-  };
+  function error(response) {
+    $mdToast.show(
+        $mdToast.simple()
+          .textContent(response.data)
+          .hideDelay(3000)
+      );
+    }
+    this.authorizeUser = function () {
+      $q.all(resource_login_tables.forEach(deleteDessert)).then(onComplete);
+    };
 
-}]);
+  }]);

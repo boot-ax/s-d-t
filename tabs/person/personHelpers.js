@@ -51,13 +51,14 @@ $scope.getPersonsFunc = function(){
 
 // =======================================================
 
-angular.module('SE_App').controller('deletePersonController', ['$authorize', 'person_tables', '$mdDialog', '$person', '$scope', '$q', function ($authorize, person_tables, $mdDialog, $person, $scope, $q) {
+angular.module('SE_App').controller('deletePersonController', ['$authorize', 'person_tables', '$mdDialog', '$person', '$scope', '$q', '$mdToast',function ($authorize, person_tables, $mdDialog, $person, $scope, $q,$mdToast) {
   'use strict';
 
   this.cancel = $mdDialog.cancel;
 
   function deleteDessert(person_table, index) {
-    var deferred = $person.person_tables.remove({id: person_table.user_ID});
+    var deferred = $person.person_tables.remove({id: person_table.user_ID}, success, error);
+
 
     deferred.$promise.then(function () {
       person_tables.splice(index, 1);
@@ -70,19 +71,26 @@ angular.module('SE_App').controller('deletePersonController', ['$authorize', 'pe
     $mdDialog.hide();
   }
 
-  function error() {
-    $scope.error = 'Invalid secret.';
-  }
-
   function success() {
-    $q.all(person_tables.forEach(deleteDessert)).then(onComplete);
-  }
+    $mdToast.show(
+        $mdToast.simple()
+          .textContent('Successfully Deleted')
+          .hideDelay(3000)
+      );
+    }
 
-  this.authorizeUser = function () {
-    $authorize.get({secret: $scope.authorize.secret}, success, error);
-  };
+  function error(response) {
+    $mdToast.show(
+        $mdToast.simple()
+          .textContent(response.data)
+          .hideDelay(3000)
+      );
+    }
+    this.authorizeUser = function () {
+      $q.all(person_tables.forEach(deleteDessert)).then(onComplete);
+    };
 
-}]);
+  }]);
 
 // =======================================================
 

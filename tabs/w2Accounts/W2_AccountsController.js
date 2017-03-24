@@ -59,7 +59,7 @@ angular.module('SE_App').controller('W2_accountsController', ['$mdDialog','$W2_a
       focusOnOpen: false,
       targetEvent: event,
       locals: { W2_accounts_tables: $scope.selected },
-      templateUrl: 'tabs/w2Accounts/deleteW2_AccountsDialog.html',
+      templateUrl: 'inc/delete.html',
     }).then($scope.getDesserts);
   };
 

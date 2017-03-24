@@ -52,13 +52,14 @@ $scope.getPersonsFunc = function(){
 
 // =======================================================
 
-angular.module('SE_App').controller('deleteUrl_dataController', ['$authorize', 'url_data_tables', '$mdDialog', '$url_data', '$scope', '$q', function ($authorize, url_data_tables, $mdDialog, $url_data, $scope, $q) {
+angular.module('SE_App').controller('deleteUrl_dataController', ['$authorize', 'url_data_tables', '$mdDialog', '$url_data', '$scope', '$q', '$mdToast',function ($authorize, url_data_tables, $mdDialog, $url_data, $scope, $q,$mdToast) {
   'use strict';
 
   this.cancel = $mdDialog.cancel;
 
   function deleteDessert(url_data_table, index) {
-    var deferred = $url_data.url_data_tables.remove({id: url_data_table.url_hash});
+    var deferred = $url_data.url_data_tables.remove({id: url_data_table.url_hash}, success, error);
+
 
     deferred.$promise.then(function () {
       url_data_tables.splice(index, 1);
@@ -71,16 +72,23 @@ angular.module('SE_App').controller('deleteUrl_dataController', ['$authorize', '
     $mdDialog.hide();
   }
 
-  function error() {
-    $scope.error = 'Invalid secret.';
-  }
-
   function success() {
-    $q.all(url_data_tables.forEach(deleteDessert)).then(onComplete);
-  }
+    $mdToast.show(
+        $mdToast.simple()
+          .textContent('Successfully Deleted')
+          .hideDelay(3000)
+      );
+    }
 
-  this.authorizeUser = function () {
-    $authorize.get({secret: $scope.authorize.secret}, success, error);
-  };
+  function error(response) {
+    $mdToast.show(
+        $mdToast.simple()
+          .textContent(response.data)
+          .hideDelay(3000)
+      );
+    }
+    this.authorizeUser = function () {
+      $q.all(url_data_tables.forEach(deleteDessert)).then(onComplete);
+    };
 
-}]);
+  }]);

@@ -51,13 +51,14 @@ $scope.getOwnersFunc = function(){
 
 // =======================================================
 
-angular.module('SE_App').controller('deleteSoftware_keysController', ['$authorize', 'software_keys_tables', '$mdDialog', '$software_keys', '$scope', '$q', function ($authorize, software_keys_tables, $mdDialog, $software_keys, $scope, $q) {
+angular.module('SE_App').controller('deleteSoftware_keysController', ['$authorize', 'software_keys_tables', '$mdDialog', '$software_keys', '$scope', '$q', '$mdToast',function ($authorize, software_keys_tables, $mdDialog, $software_keys, $scope, $q,$mdToast) {
   'use strict';
 
   this.cancel = $mdDialog.cancel;
 
   function deleteDessert(software_keys_table, index) {
-    var deferred = $software_keys.software_keys_tables.remove({id: software_keys_table.software_keys_ID});
+    var deferred = $software_keys.software_keys_tables.remove({id: software_keys_table.software_keys_ID}, success, error);
+
 
     deferred.$promise.then(function () {
       software_keys_tables.splice(index, 1);
@@ -70,16 +71,23 @@ angular.module('SE_App').controller('deleteSoftware_keysController', ['$authoriz
     $mdDialog.hide();
   }
 
-  function error() {
-    $scope.error = 'Invalid secret.';
-  }
-
   function success() {
-    $q.all(software_keys_tables.forEach(deleteDessert)).then(onComplete);
-  }
+    $mdToast.show(
+        $mdToast.simple()
+          .textContent('Successfully Deleted')
+          .hideDelay(3000)
+      );
+    }
 
-  this.authorizeUser = function () {
-    $authorize.get({secret: $scope.authorize.secret}, success, error);
-  };
+  function error(response) {
+    $mdToast.show(
+        $mdToast.simple()
+          .textContent(response.data)
+          .hideDelay(3000)
+      );
+    }
+    this.authorizeUser = function () {
+      $q.all(software_keys_tables.forEach(deleteDessert)).then(onComplete);
+    };
 
-}]);
+  }]);

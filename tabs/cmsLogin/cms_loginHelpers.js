@@ -54,13 +54,14 @@ $scope.getDomainsFunc = function(){
 
 // =======================================================
 
-angular.module('SE_App').controller('deleteCMSController', ['$authorize', 'cms_login_tables', '$mdDialog', '$cms_login', '$scope', '$q', function ($authorize, cms_login_tables, $mdDialog, $cms_login, $scope, $q) {
+angular.module('SE_App').controller('deleteCMSController', ['$authorize', 'cms_login_tables', '$mdDialog', '$cms_login', '$scope', '$q', '$mdToast',function ($authorize, cms_login_tables, $mdDialog, $cms_login, $scope, $q, $mdToast) {
   'use strict';
 
   this.cancel = $mdDialog.cancel;
 
   function deleteDessert(cms_login_table, index) {
-    var deferred = $cms_login.cms_login_tables.remove({id: cms_login_table.install_site_url_ID});
+    var deferred = $cms_login.cms_login_tables.remove({id: cms_login_table.install_site_url_ID}, success, error);
+
 
     deferred.$promise.then(function () {
       cms_login_tables.splice(index, 1);
@@ -73,16 +74,23 @@ angular.module('SE_App').controller('deleteCMSController', ['$authorize', 'cms_l
     $mdDialog.hide();
   }
 
-  function error() {
-    $scope.error = 'Invalid secret.';
-  }
-
   function success() {
-    $q.all(cms_login_tables.forEach(deleteDessert)).then(onComplete);
-  }
+    $mdToast.show(
+        $mdToast.simple()
+          .textContent('Successfully Deleted')
+          .hideDelay(3000)
+      );
+    }
 
-  this.authorizeUser = function () {
-    $authorize.get({secret: $scope.authorize.secret}, success, error);
-  };
+  function error(response) {
+    $mdToast.show(
+        $mdToast.simple()
+          .textContent(response.data)
+          .hideDelay(3000)
+      );
+    }
+    this.authorizeUser = function () {
+      $q.all(cms_login_tables.forEach(deleteDessert)).then(onComplete);
+    };
 
-}]);
+  }]);

@@ -40,6 +40,7 @@ $scope.getRegistrarsFunc = function(){
 
     function fedup(data){
   	//console.log('FAILED!',data);
+    console.log(data.data);
 	$mdToast.show(
       $mdToast.simple()
         .textContent(data.data)
@@ -68,13 +69,13 @@ $scope.getRegistrarsFunc = function(){
 
 // =======================================================
 
-angular.module('SE_App').controller('deleteDomainController', ['$authorize', 'domains_tables', '$mdDialog', '$domains', '$scope', '$q', function ($authorize, domains_tables, $mdDialog, $domains, $scope, $q) {
+angular.module('SE_App').controller('deleteDomainController', ['$authorize', 'domains_tables', '$mdDialog', '$domains', '$scope', '$q', '$mdToast',function ($authorize, domains_tables, $mdDialog, $domains, $scope, $q,$mdToast) {
   'use strict';
 
   this.cancel = $mdDialog.cancel;
 
   function deleteDessert(domains_table, index) {
-    var deferred = $domains.domains_tables.remove({id: domains_table.domain_ID});
+    var deferred = $domains.domains_tables.remove({id: domains_table.domain_ID}, success, error);
 
     deferred.$promise.then(function () {
       domains_tables.splice(index, 1);
@@ -87,16 +88,23 @@ angular.module('SE_App').controller('deleteDomainController', ['$authorize', 'do
     $mdDialog.hide();
   }
 
-  function error() {
-    $scope.error = 'Invalid secret.';
+function success() {
+  $mdToast.show(
+      $mdToast.simple()
+        .textContent('Successfully Deleted')
+        .hideDelay(3000)
+    );
   }
 
-  function success() {
-    $q.all(domains_tables.forEach(deleteDessert)).then(onComplete);
+function error(response) {
+  $mdToast.show(
+      $mdToast.simple()
+        .textContent(response.data)
+        .hideDelay(3000)
+    );
   }
-
   this.authorizeUser = function () {
-    $authorize.get({secret: $scope.authorize.secret}, success, error);
+    $q.all(domains_tables.forEach(deleteDessert)).then(onComplete);
   };
 
 }]);

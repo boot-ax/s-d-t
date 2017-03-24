@@ -8,17 +8,19 @@ function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q,changeCe
 			$scope.busy = true;
 			$auth.login($user)
 			.then(function(response) {
-				$scope.busy = false;
+				// $scope.busy = false;
 				//var payload = $auth.getPayload();
 				//if(payload.admin === true){
 				$state.go('home.domains');
 			})
 			.catch(function(response) {
 				$scope.busy = false;
-        console.log(response);
-				$mdToast.show($mdToast.simple().textContent(response.data).hideDelay(3000));
+				$mdToast.show($mdToast.simple().textContent(response.data).hideDelay(6000));
 			});
     }
+
+
+
 
     $scope.signUp = function (event) {
       $mdDialog.show({
@@ -41,14 +43,42 @@ angular.module('SE_App').controller('signupController', ['$mdDialog','$domains',
 function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q) {
   'use strict';
 
-    this.register = function(signUp){
+
+  // this.doCheckout = function(token){
+  //   alert("Got Stripe token: " + token.id);
+  // }
+
+  // this.doCheckout = function(token,signUp) {
+  //   alert("Got Stripe token: " + token.id);
+  // };
+  function stripeResponse(response) {
+    $mdDialog.show({
+      clickOutsideToClose: true,
+      controller: 'stripeResponseController',
+      controllerAs: 'respCtrl',
+      focusOnOpen: false,
+      templateUrl: 'partials/stripeResponse.html',
+      resolve: {
+           $response: function () {
+             return response;
+           }
+         }
+    })
+    // .then($scope.getChangeLog);
+  };
+
+  this.register = function(token){
+    // console.log(token);
+    // console.log($scope.signUp);
+
+
       // $scope.busy = true;
       $scope.register.form.$setSubmitted();
       if($scope.register.form.$valid) {
-        console.log('Here');
-        console.log(signUp);
-      $http.post('/service/signup/',{signUp: signUp}).then(function(response){
-
+      $http.post('/service/signup/',{signUp: $scope.signUp,$token: token}).then(function(response){
+        // $scope.busy = false;
+        console.log(response);
+        stripeResponse(response);
       //   success(response);
       //   deferred.resolve();
       // },function(response){
@@ -56,18 +86,14 @@ function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q) {
       //   deferred.reject();
     })
 
-      // .then(function(response) {
+      .catch(function(response) {
         // $scope.busy = false;
-        //var payload = $auth.getPayload();
-        //if(payload.admin === true){
-        // $state.go('home.domains');
-      // .catch(function(response) {
-      //   $scope.busy = false;
-      //   console.log(response);
-      //   $mdToast.show($mdToast.simple().textContent(response.data).hideDelay(3000));
-      // });
-      }
+        console.log(response);
+        $mdToast.show($mdToast.simple().textContent(response.data).hideDelay(3000));
+      });
+
     }
+  }
 
     function success(signUp) {
       $mdToast.show(
@@ -172,5 +198,23 @@ function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q,$locatio
     $scope.answer = function(answer) {
       $mdDialog.hide(answer);
     };
+
+}]);
+
+
+angular.module('SE_App').controller('stripeResponseController', ['$mdDialog','$domains', '$scope', '$mdEditDialog', '$http','$mdToast',
+'$q', '$response',
+function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q,$response) {
+  'use strict';
+
+  $scope.response = $response.data;
+
+  $scope.hide = function() {
+    $mdDialog.hide();
+  };
+
+  $scope.cancel = function() {
+    $mdDialog.cancel();
+  };
 
 }]);

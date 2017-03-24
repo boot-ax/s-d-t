@@ -95,9 +95,14 @@ label { float:right;}
 		    padding-right: 0;
 }
 
+
 #loading-bar-spinner .spinner-icon {
-  border-top-color:  #EE3124;
-  border-left-color: #EE3124;
+width: 20px;
+height: 20px;
+border: solid 6px transparent;
+border-top-color:  #EE3124;
+border-left-color: #EE3124;
+border-radius: 12px;
 }
 
 .md-select-value *:first-child {
@@ -139,6 +144,18 @@ h2 {
 	margin-left:-40px;
 }
 
+.rowOffset2{
+	margin-left:-1px;
+}
+
 .iconOff{
 	margin-right:10px;
+}
+
+md-toast.md-success-toast-theme .md-toast-content {
+    background-color: green;
+}
+
+md-toast.md-error-toast-theme .md-toast-content {
+    background-color: maroon;
 }

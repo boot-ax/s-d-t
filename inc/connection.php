@@ -12,5 +12,4 @@
 
    //Select Database
    mysqli_select_db($con, $dbname) or die(mysqli_error($con));
-
    ?>

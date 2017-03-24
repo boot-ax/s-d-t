@@ -17,6 +17,7 @@
          		<title>WebWright Data Management</title>
             <base href="/">
         	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+          <link rel="stylesheet" href="https://checkout.stripe.com/v3/checkout/button.css"></link>
             <link href="css/angular-material.min.css" rel="stylesheet" type="text/css"/>
             <link href="bower_components/angular-loading-bar/build/loading-bar.css" rel="stylesheet" type="text/css"/>
             <link href="css/md-data-table.min.css" rel="stylesheet" type="text/css"/>
@@ -45,10 +46,15 @@
             <script type="text/javascript" src="bower_components/satellizer/dist/satellizer.js"></script>
             <script type="text/javascript" src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
             <script type="text/javascript" src="bower_components/angular-loading-bar/build/loading-bar.js"></script>
+            <script type="text/javascript" src="bower_components/angular-password/angular-password.min.js"></script>
+
+
+
             <script type="text/javascript" src="scripts/md-data-table.js"></script>
 
         		<script type="text/javascript" src="scripts/app.js"></script>
             <script type="text/javascript" src="scripts/authcontroller.js"></script>
+            <script type="text/javascript" src="scripts/angular-stripe-checkout.min.js"></script>
             <script type="text/javascript" src="tabs/domains/domainHelpers.js"></script>
             <script type="text/javascript" src="tabs/domains/domainController.js"></script>
             <script type="text/javascript" src="tabs/hosting/hostingHelpers.js"></script>

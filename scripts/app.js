@@ -1,4 +1,4 @@
-angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute','ngclipboard','ngSanitize', 'ngCsv','satellizer','ui.router','angular-loading-bar'])
+angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute','ngclipboard','ngSanitize', 'ngCsv','satellizer','ui.router','angular-loading-bar','stripe.checkout','ngPassword'])
   .config(['$compileProvider', '$mdThemingProvider','$mdAriaProvider','$stateProvider', '$locationProvider','$urlRouterProvider','$authProvider','cfpLoadingBarProvider', function ($compileProvider, $mdThemingProvider,$mdAriaProvider, $stateProvider, $locationProvider,$urlRouterProvider,$authProvider,cfpLoadingBarProvider) {
     'use strict';
     // cfpLoadingBarProvider.parentSelector = '#loading-bar-container';

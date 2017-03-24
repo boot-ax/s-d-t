@@ -1,0 +1,24 @@
+{
+  "name": "public",
+  "version": "1.0.0",
+  "description": "npm runner",
+  "main": "plugin.js",
+  "dependencies": {
+    "angular-stripe": "^4.2.12",
+    "bower": "^1.8.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "sure"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/boot-ax/seo-data-tracking.git"
+  },
+  "author": "joseph kolnik",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/boot-ax/seo-data-tracking/issues"
+  },
+  "homepage": "https://github.com/boot-ax/seo-data-tracking#readme"
+}

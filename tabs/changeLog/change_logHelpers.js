@@ -60,13 +60,14 @@ $scope.getOwnersFunc = function(){
 
 // =======================================================
 
-angular.module('SE_App').controller('deleteChange_logController', ['$authorize', 'change_log_tables', '$mdDialog', '$change_log', '$scope', '$q', function ($authorize, change_log_tables, $mdDialog, $change_log, $scope, $q) {
+angular.module('SE_App').controller('deleteChange_logController', ['$authorize', 'change_log_tables', '$mdDialog', '$change_log', '$scope', '$q', '$mdToast',function ($authorize, change_log_tables, $mdDialog, $change_log, $scope, $q,$mdToast) {
   'use strict';
 
   this.cancel = $mdDialog.cancel;
 
   function deleteDessert(change_log_table, index) {
-    var deferred = $change_log.change_log_tables.remove({id: change_log_table.change_log_ID});
+    var deferred = $change_log.change_log_tables.remove({id: change_log_table.change_log_ID}, success, error);
+
 
     deferred.$promise.then(function () {
       change_log_tables.splice(index, 1);
@@ -79,19 +80,26 @@ angular.module('SE_App').controller('deleteChange_logController', ['$authorize',
     $mdDialog.hide();
   }
 
-  function error() {
-    $scope.error = 'Invalid secret.';
-  }
-
   function success() {
-    $q.all(change_log_tables.forEach(deleteDessert)).then(onComplete);
-  }
+    $mdToast.show(
+        $mdToast.simple()
+          .textContent('Successfully Deleted')
+          .hideDelay(3000)
+      );
+    }
 
-  this.authorizeUser = function () {
-    $authorize.get({secret: $scope.authorize.secret}, success, error);
-  };
+  function error(response) {
+    $mdToast.show(
+        $mdToast.simple()
+          .textContent(response.data)
+          .hideDelay(3000)
+      );
+    }
+    this.authorizeUser = function () {
+      $q.all(change_log_tables.forEach(deleteDessert)).then(onComplete);
+    };
 
-}]);
+  }]);
 
 // =======================================================
 
