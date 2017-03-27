@@ -1,5 +1,7 @@
 
-<md-dialog aria-label="Dialog for Signup" style="min-width:350px;">
+<md-dialog aria-label="Dialog for Signup" style="max-width:380px">
+  <md-dialog-content>
+<div flex layout="column">
       <md-toolbar>
       <div class="md-toolbar-tools">
         <h2>Register / Pay</h2>
@@ -9,17 +11,16 @@
         </md-button>
       </div>
     </md-toolbar>
-       <form layout="row" name="register.form">
+       <form flex layout="row" name="register.form" layout-padding>
          <span flex ></span>
            <div layout="column" style="margin-top:25px">
              <div>
-                 <md-input-container layout="row" class="input-row layout-row rowOffset">
-                   <label class="loginLabel">Email (Used For Login)&#42;</label>
+                 <md-input-container flex layout="row" class="input-row layout-row rowOffset">
+                   <label class="loginLabel">Email&#42;</label>
                    <md-icon class="md-icons iconOff">email</md-icon>
                    <input ng-required="true" type="email" ng-model="signUp.email" autocomplete="off">
                  </md-input-container>
              </div>
-             <span flex ></span>
              <div>
                <md-input-container layout="row" class="input-row layout-row rowOffset">
                    <label class="loginLabel">Password&#42;</label>
@@ -35,11 +36,8 @@
                      <input match-password="newPassword" type="password" name="confirmPassword" ng-required="true" ng-model="signUp.password2">
                    </md-input-container>
              </div>
-
-
              <div layout="row">
-
-                 <md-input-container layout="row" class="input-row layout-row rowOffset flex" flex="">
+                 <md-input-container layout="row" class="input-row layout-row rowOffset">
                    <label class="loginLabel">Account Type</label>
                    <md-icon class="md-icons iconOff">supervisor_account</md-icon>
                        <md-select
@@ -49,33 +47,27 @@
                        </md-select>
                  </md-input-container>
 
-                 <md-input-container layout="row" ng-show="access">
+                 <md-input-container layout="row" ng-show="access" class="input-row layout-row rowOffset" style="margin-left:10px">
                    <label class="loginLabel">Account Name&#42;</label>
                    <input ng-required="access" type="text" ng-model="signUp.account_name" class="rowOffset2 flex" autocomplete="off">
                  </md-input-container>
               </div>
-
-
              <div>
-                 <md-input-container layout="row" class="input-row layout-row rowOffset flex">
+                 <md-input-container layout="row" class="input-row layout-row rowOffset">
                    <label class="loginLabel">Full Name</label>
                    <md-icon class="md-icons iconOff">person</md-icon>
                    <input ng-required="" type="text" ng-model="signUp.fullName" autocomplete="off">
                  </md-input-container>
              </div>
              <div>
+                <md-input-container layout="row" class="input-row layout-row rowOffset">
+                  <label class="loginLabel">Phone Number</label>
+                  <md-icon class="md-icons iconOff">phone</md-icon>
+                  <input type="text" ng-model="signUp.phone" autocomplete="off">
+                </md-input-container>
+            </div>
 
-        </div>
-
-              <div>
-                 <md-input-container layout="row" class="input-row layout-row rowOffset">
-                   <label class="loginLabel">Phone Number</label>
-                   <md-icon class="md-icons iconOff">phone</md-icon>
-                   <input type="text" ng-model="signUp.phone" autocomplete="off">
-                 </md-input-container>
-             </div>
-
-
+               <div class="md-errors-spacer"></div>
                <div>
                  <md-input-container layout="row" class="input-row layout-row rowOffset">
                    <label class="loginLabel">Address</label>
@@ -83,7 +75,6 @@
                    <textarea type="text" ng-model="signUp.address" autocomplete="off"></textarea>
                  </md-input-container>
                </div>
-               <div>
                <section style="margin-top:20px" layout="row" layout-align="center center">
                 <button disabled="disabled" ng-disabled="register.form.$invalid" class="stripe-button-el" stripe-checkout="sUpCtrl.register"
                          data-key="pk_test_DDqS4Ps7loF2JzJPH5JinfPW"
@@ -93,8 +84,9 @@
                    <span style="display: block; min-height: 30px;">Pay with Card 7/Mo</span>
              </button>
                </section>
-             </div>
          </div>
        <span flex></span>
      </form>
+</div>
+</md-dialog-content>
 </md-dialog>

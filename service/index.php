@@ -162,7 +162,7 @@ Flight::route('POST /auth/login', function(){
 	// build query...
 
 
-    $sql  = "SELECT user_name, user_email,user_security FROM registration
+    $sql  = "SELECT user_name,user_email,user_security,user_status FROM registration
 		WHERE (`user_email` = ?)
 		AND (`user_password` = md5(?))
     AND (`user_type` != 'no_access');";
@@ -262,7 +262,20 @@ Flight::route('POST /url_data', function(){
   $mg->sendMessage($domain, array('from'    => 'holyCow@example.com',
                                   'to'      => 'jkolnik@mac.com',
                                   'subject' => 'The PHP SDK is awesome!',
-                                  'text'    => 'My first programatically sent email list.   It is so simple to send a message.'));
+
+
+                                  // 'from'    => 'Excited User <YOU@YOUR_DOMAIN_NAME>',
+                                  // 'to'      => 'foo@example.com',
+                                  // 'cc'      => 'baz@example.com',
+                                  // 'bcc'     => 'bar@example.com',
+                                  // 'subject' => 'Hello',
+                                  // 'text'    => 'Testing some Mailgun awesomness!',
+                                  // 'html'    => emailSignup()
+
+                                  'html'    => emailSignup('<img src="cid:Mountain.png" alt="" border="0"  width="261" height="146">')
+                              ), array(
+                                  'inline' => array('../media/Mountain.png')
+                              ));
 
       // 	$entityBody = Flight::request()->getBody();
       //
@@ -1327,6 +1340,82 @@ Flight::route('/9736644323hc4e34', function(){
 
 });
 
+
+Flight::route('POST /profileinfo/', function(){
+  // $entityBody = Flight::request()->getBody();
+  include "../inc/connection2.php";
+  global $jwt_key;
+  // $entityBody = str_replace('\\u0000', '', $entityBody);
+  // $entityBody2 = json_decode($entityBody,true);
+  $jwt = substr($_SERVER['HTTP_AUTHORIZATION'],7);
+  $validator = new \Gamegos\JWT\Validator();
+  $token = $validator->validate($jwt, $jwt_key);
+  $goodData = json_decode($token->getClaims()['sub']);
+  $email = $goodData->user_email;
+  $security = $goodData->user_security;
+
+  $sql = "SELECT rt.user_phone,rt.user_address FROM registration rt
+  where user_security = ?
+  AND user_email = ?";
+  $stmt = $mysqli->prepare($sql);
+  $stmt->bind_param('ss', $security, $email);
+  if(!$stmt->execute()){
+    Flight::halt(401,"User not authorized");
+  }
+  $result = $stmt->get_result();
+  while ($row = $result->fetch_assoc()) {
+      $sql_result[] = $row;
+    }
+  $stmt->close();
+  $newArray2 = array('profile'=>$sql_result);
+  Flight::json($newArray2);
+
+});
+
+Flight::route('POST /newprofileinfo/', function(){
+  $entityBody = Flight::request()->getBody();
+  include "../inc/connection2.php";
+  global $jwt_key;
+  $entityBody = str_replace('\\u0000', '', $entityBody);
+  $entityBody2 = json_decode($entityBody,true);
+  $jwt = substr($_SERVER['HTTP_AUTHORIZATION'],7);
+  $validator = new \Gamegos\JWT\Validator();
+  $token = $validator->validate($jwt, $jwt_key);
+  $goodData = json_decode($token->getClaims()['sub']);
+  $email = $goodData->user_email;
+  $security = $goodData->user_security;
+  $sql_security = "SELECT rt.account_ID,rt.user_password FROM registration rt
+  where user_security = ?
+  AND user_email = ?";
+  $stmt = $mysqli->prepare($sql_security);
+  $stmt->bind_param('ss', $security, $email);
+  if(!$stmt->execute()){
+    Flight::halt(401,"User not authorized");
+  }
+  $sql_array = array();
+  $result = $stmt->get_result();
+  $result = $result->fetch_assoc();
+  $stmt->close();
+
+  if (!empty($entityBody2['newProfile']['password'])) {
+    $entityBody2['newProfile']['password'] = md5($entityBody2['newProfile']['password']);
+  } else {
+    $entityBody2['newProfile']['password'] = $result['user_password'];
+  }
+
+$sql = "UPDATE registration SET user_name = ?, user_email = ?, user_password = ?, user_phone = ?, user_address = ? WHERE (user_email = ? AND user_security = ?)";
+
+$stmt = $mysqli->prepare($sql);
+$stmt->bind_param('sssssss',$entityBody2['newProfile']['user_name'],$entityBody2['newProfile']['user_email'],$entityBody2['newProfile']['password'],$entityBody2['newProfile']['user_phone'],$entityBody2['newProfile']['user_address'],$email,$security);
+
+if(!$stmt->execute()){
+  Flight::halt(500,$mysqli->error);
+  $stmt->close();
+}
+  $stmt->close();
+   Flight::halt(200,"Profile Updated");
+
+});
 
 Flight::route('POST /signup/', function(){
   $entityBody = Flight::request()->getBody();

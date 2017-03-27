@@ -11,4 +11,10 @@ function randomPassword() {
     return md5(implode($pass)); //turn the array into a string
 }
 
+function emailSignup($test){
+$body = '<html><img '.$test.'</html>';
+
+return $body;
+}
+
 ?>

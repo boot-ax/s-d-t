@@ -43,14 +43,6 @@ angular.module('SE_App').controller('signupController', ['$mdDialog','$domains',
 function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q) {
   'use strict';
 
-
-  // this.doCheckout = function(token){
-  //   alert("Got Stripe token: " + token.id);
-  // }
-
-  // this.doCheckout = function(token,signUp) {
-  //   alert("Got Stripe token: " + token.id);
-  // };
   function stripeResponse(response) {
     $mdDialog.show({
       clickOutsideToClose: true,
@@ -68,16 +60,13 @@ function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q) {
   };
 
   this.register = function(token){
-    // console.log(token);
-    // console.log($scope.signUp);
-
 
       // $scope.busy = true;
       $scope.register.form.$setSubmitted();
       if($scope.register.form.$valid) {
       $http.post('/service/signup/',{signUp: $scope.signUp,$token: token}).then(function(response){
         // $scope.busy = false;
-        console.log(response);
+
         stripeResponse(response);
       //   success(response);
       //   deferred.resolve();
@@ -88,7 +77,7 @@ function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q) {
 
       .catch(function(response) {
         // $scope.busy = false;
-        console.log(response);
+
         $mdToast.show($mdToast.simple().textContent(response.data).hideDelay(6000));
       });
 
@@ -128,35 +117,40 @@ function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q) {
 }]);
 
 angular.module('SE_App').controller('profileController', ['$mdDialog','$domains', '$scope', '$mdEditDialog', '$http','$mdToast',
-'$q','$location',
-function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q,$location) {
+'$q','$location','$auth',
+function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q,$location,$auth) {
   'use strict';
 
-    this.register = function(signUp){
+// function runProfile(){
+//   $scope.profile = JSON.parse($auth.getPayload().sub);
+//   currentProfile();
+// }
+//
+// $scope.profile = JSON.parse($auth.getPayload().sub);
+
+function currentProfile(){
+    $scope.profile = JSON.parse($auth.getPayload().sub);
+    $http.post('/service/profileinfo/').then(function(response){
+    $scope.profile.user_phone = response.data.profile[0].user_phone;
+    $scope.profile.user_address = response.data.profile[0].user_address;
+    // console.log($scope.profile);
+    });
+};
+currentProfile();
+
+    $scope.profileChange = function($profile){
       // $scope.busy = true;
       $scope.register.form.$setSubmitted();
       if($scope.register.form.$valid) {
-        console.log('Here');
-        console.log(signUp);
-      $http.post('/service/signup/',{signUp: signUp}).then(function(response){
 
-      //   success(response);
-      //   deferred.resolve();
-      // },function(response){
-      //   failure(response);
-      //   deferred.reject();
-    })
+      $http.post('/service/newprofileinfo/',{newProfile: $profile}).then(function(response){
+        $mdToast.show(
+            $mdToast.simple()
+              .textContent(response.data)
+              .hideDelay(3000)
+          );
+    });
 
-      // .then(function(response) {
-        // $scope.busy = false;
-        //var payload = $auth.getPayload();
-        //if(payload.admin === true){
-        // $state.go('home.domains');
-      // .catch(function(response) {
-      //   $scope.busy = false;
-      //   console.log(response);
-      //   $mdToast.show($mdToast.simple().textContent(response.data).hideDelay(3000));
-      // });
       }
     }
 

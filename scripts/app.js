@@ -348,8 +348,10 @@ this.changeDropdown = function($column, $value, $table,db_table,db_ID){
 }
 
 $scope.userSettings = function(){
-  $location.path('/profile')
-}
+$location.path('/profile');
+};
+
+
 
 	$scope.toggleLeft = buildToggler('left');
     $scope.toggleRight = buildToggler('right');
