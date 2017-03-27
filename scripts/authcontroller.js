@@ -121,13 +121,6 @@ angular.module('SE_App').controller('profileController', ['$mdDialog','$domains'
 function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q,$location,$auth) {
   'use strict';
 
-// function runProfile(){
-//   $scope.profile = JSON.parse($auth.getPayload().sub);
-//   currentProfile();
-// }
-//
-// $scope.profile = JSON.parse($auth.getPayload().sub);
-
 function currentProfile(){
     $scope.profile = JSON.parse($auth.getPayload().sub);
     $http.post('/service/profileinfo/').then(function(response){
@@ -138,77 +131,54 @@ function currentProfile(){
 };
 currentProfile();
 
-    $scope.profileChange = function($profile){
-      // $scope.busy = true;
-      $scope.register.form.$setSubmitted();
-      if($scope.register.form.$valid) {
 
-      $http.post('/service/newprofileinfo/',{newProfile: $profile}).then(function(response){
-        $mdToast.show(
-            $mdToast.simple()
-              .textContent(response.data)
-              .hideDelay(3000)
-          );
-    });
-
-      }
-    }
-
-  //   $scope.cancelAccount(){
-  //
-  //     // <md-button ng-click="cancelAccount()">
-  //     //   <i style="color:red" class="material-icons">do_not_disturb</i>
-  //     //   Cancel Account
-  //     // </md-button>
-  //
-  // }
-
-    function success(signUp) {
-      $mdToast.show(
-          $mdToast.simple()
-            .textContent('New Content Added')
-            .hideDelay(3000)
-        );
-      $mdDialog.hide(software_keys_table);
-    }
-
-      function fedup(data){
-    	//console.log('FAILED!',data);
-  	$mdToast.show(
-        $mdToast.simple()
-          .textContent(data.data)
-          .hideDelay(3000)
-      );
-    }
-
-    $scope.hide = function() {
-      $mdDialog.hide();
-    };
+$scope.profileChange = function (event,profile) {
+  $scope.register.form.$setSubmitted();
+  if($scope.register.form.$valid) {
+  $mdDialog.show({
+    clickOutsideToClose: true,
+    controller: 'profileChangeController',
+    controllerAs: 'pctrl',
+    skipHide: true,
+    // focusOnOpen: false,
+    targetEvent: event,
+    templateUrl: 'partials/verifyChangeProfileDialog.html',
+    resolve: {
+         $profile: function () {
+           return profile;
+       }
+     }
+  });
+}
+};
 
     $scope.cancel = function() {
       $location.path('/domain');
-    };
-
-    $scope.answer = function(answer) {
-      $mdDialog.hide(answer);
-    };
+    }
 
 }]);
 
 
-angular.module('SE_App').controller('stripeResponseController', ['$mdDialog','$domains', '$scope', '$mdEditDialog', '$http','$mdToast',
-'$q', '$response',
-function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q,$response) {
+angular.module('SE_App').controller('profileChangeController', ['$mdDialog','$domains', '$scope', '$mdEditDialog', '$http','$mdToast',
+'$q', '$profile',
+function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q,$profile) {
   'use strict';
 
-  $scope.response = $response.data;
 
-  $scope.hide = function() {
-    $mdDialog.hide();
-  };
 
-  $scope.cancel = function() {
-    $mdDialog.cancel();
-  };
+  this.profileChange2 = function(){
+    $http.post('/service/newprofileinfo/',{newProfile: $profile}).then(function(response){
+      $mdToast.show(
+          $mdToast.simple()
+            .textContent(response.data)
+            .hideDelay(3000)
+        );
+        $mdDialog.hide();
+  });
+  }
+
+this.cancel = $mdDialog.cancel;
+
+
 
 }]);
