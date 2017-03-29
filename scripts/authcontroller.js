@@ -1,7 +1,7 @@
 
-angular.module('SE_App').controller('loginController', ['$mdDialog','$domains', '$scope', '$mdEditDialog', '$http','$mdToast',
+angular.module('SE_App').controller('loginController', ['$mdDialog','$scope', '$mdEditDialog', '$http','$mdToast',
 '$q','changeCellServices','upDownloadService','$auth','$state',
-function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q,changeCellServices,upDownloadService,$auth,$state) {
+function ($mdDialog,$scope, $mdEditDialog, $http,$mdToast,$q,changeCellServices,upDownloadService,$auth,$state) {
   'use strict';
 
   $scope.login = function($user){
@@ -19,8 +19,17 @@ function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q,changeCe
 			});
     }
 
-
-
+    $scope.forgotPassword = function (event) {
+      $mdDialog.show({
+        clickOutsideToClose: true,
+        controller: 'forgotPasswordController',
+        controllerAs: 'fgpCtrl',
+        focusOnOpen: false,
+        targetEvent: event,
+        templateUrl: 'partials/forgotPassword.html',
+      })
+      // .then($scope.getChangeLog);
+    };
 
     $scope.signUp = function (event) {
       $mdDialog.show({
@@ -34,13 +43,12 @@ function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q,changeCe
       // .then($scope.getChangeLog);
     };
 
+
 }]);
 
-
-
-angular.module('SE_App').controller('signupController', ['$mdDialog','$domains', '$scope', '$mdEditDialog', '$http','$mdToast',
+angular.module('SE_App').controller('signupController', ['$mdDialog','$scope', '$mdEditDialog', '$http','$mdToast',
 '$q',
-function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q) {
+function ($mdDialog,$scope, $mdEditDialog, $http,$mdToast,$q) {
   'use strict';
 
   function stripeResponse(response) {
@@ -65,18 +73,11 @@ function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q) {
       $scope.register.form.$setSubmitted();
       if($scope.register.form.$valid) {
       $http.post('/service/signup/',{signUp: $scope.signUp,$token: token}).then(function(response){
-        // $scope.busy = false;
 
         stripeResponse(response);
-      //   success(response);
-      //   deferred.resolve();
-      // },function(response){
-      //   failure(response);
-      //   deferred.reject();
     })
 
       .catch(function(response) {
-        // $scope.busy = false;
 
         $mdToast.show($mdToast.simple().textContent(response.data).hideDelay(6000));
       });
@@ -116,9 +117,9 @@ function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q) {
 
 }]);
 
-angular.module('SE_App').controller('profileController', ['$mdDialog','$domains', '$scope', '$mdEditDialog', '$http','$mdToast',
+angular.module('SE_App').controller('profileController', ['$mdDialog','$scope', '$mdEditDialog', '$http','$mdToast',
 '$q','$location','$auth',
-function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q,$location,$auth) {
+function ($mdDialog,$scope, $mdEditDialog, $http,$mdToast,$q,$location,$auth) {
   'use strict';
 
 function currentProfile(){
@@ -152,6 +153,18 @@ $scope.profileChange = function (event,profile) {
 }
 };
 
+$scope.cancelAccount = function (event) {
+  $mdDialog.show({
+    clickOutsideToClose: true,
+    controller: 'deleteAccountController',
+    controllerAs: 'dctrl',
+    skipHide: true,
+    // focusOnOpen: false,
+    targetEvent: event,
+    templateUrl: 'partials/deleteAccountDialog.html'
+  });
+};
+
     $scope.cancel = function() {
       $location.path('/domain');
     }
@@ -159,9 +172,9 @@ $scope.profileChange = function (event,profile) {
 }]);
 
 
-angular.module('SE_App').controller('profileChangeController', ['$mdDialog','$domains', '$scope', '$mdEditDialog', '$http','$mdToast',
+angular.module('SE_App').controller('profileChangeController', ['$mdDialog','$scope', '$mdEditDialog', '$http','$mdToast',
 '$q', '$profile',
-function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q,$profile) {
+function ($mdDialog, $scope, $mdEditDialog, $http,$mdToast,$q,$profile) {
   'use strict';
 
 
@@ -182,3 +195,105 @@ this.cancel = $mdDialog.cancel;
 
 
 }]);
+
+angular.module('SE_App').controller('deleteAccountController', ['$mdDialog','$scope', '$mdEditDialog', '$http','$mdToast',
+'$q',
+function ($mdDialog, $scope, $mdEditDialog, $http,$mdToast,$q) {
+  'use strict';
+
+  this.cancelAccount = function(){
+    $http.post('/service/delete-account/').then(function(response){
+      $mdToast.show({
+        hideDelay   : 9000,
+        position    : 'bottom left',
+        controller  : 'ToastCtrl',
+        templateUrl : '/partials/toast-template.html',
+        resolve: {
+             $response: function () {
+               return response;
+           }
+         }
+      });
+        $mdDialog.hide();
+  });
+  }
+
+this.cancel = $mdDialog.cancel;
+
+}]);
+
+angular.module('SE_App').controller('ToastCtrl', ['$mdDialog','$scope','$mdToast','$response',
+function ($mdDialog, $scope, $mdToast,$response) {
+  $scope.response = $response.data;
+  $scope.closeToast = function() {
+          $mdToast
+            .hide()
+        };
+  }]);
+
+  angular.module('SE_App').controller('stripeResponseController', ['$mdDialog', '$scope', '$mdEditDialog', '$http','$mdToast',
+  '$q', '$response',
+  function ($mdDialog, $scope, $mdEditDialog, $http,$mdToast,$q,$response) {
+    'use strict';
+
+    $scope.response = $response.data;
+
+    $scope.hide = function() {
+      $mdDialog.hide();
+    };
+
+    this.cancel = function() {
+      $mdDialog.cancel();
+    };
+
+  }]);
+
+  angular.module('SE_App').controller('forgotPasswordController', ['$mdDialog','$scope', '$mdEditDialog', '$http','$mdToast',
+  function ($mdDialog, $scope, $mdEditDialog, $http,$mdToast) {
+    'use strict';
+
+    $scope.resetPassword = function($user){
+      $scope.forgotPassword.form.$setSubmitted();
+      $http.post('/service/password-reset/',{user: $user}).then(function(response){
+        $mdToast.show(
+            $mdToast.simple()
+              .textContent(response.data)
+              .hideDelay(3000)
+          );
+          $mdDialog.hide();
+    });
+    }
+
+
+    this.cancel = function() {
+      $mdDialog.cancel();
+    };
+
+  }]);
+
+  angular.module('SE_App').controller('password-resetController', ['$mdDialog','$scope', '$mdEditDialog', '$http','$mdToast',
+  '$q','$state','$location',
+  function ($mdDialog,$scope, $mdEditDialog, $http,$mdToast,$q,$state,$location) {
+    'use strict';
+
+    $scope.passwordReset = function($user){
+  			$scope.busy = true;
+  			      $http.post('/service/password-reset',{user: $user}).then(function(response){
+                $mdToast.show(
+                    $mdToast.simple()
+                      .textContent(response.data)
+                      .hideDelay(3000)
+                  );
+                  $mdDialog.hide();
+            })
+  			.catch(function(response) {
+  				$scope.busy = false;
+  				$mdToast.show($mdToast.simple().textContent(response.data).hideDelay(6000));
+  			});
+      }
+
+$scope.cancel = function() {
+  $location.path('/domain');
+}
+
+  }]);

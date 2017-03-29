@@ -71,10 +71,10 @@
                  </md-input-container>
                </div>
                <section flex style="margin-top:20px" layout="row" layout-align="center center">
-                <md-button disabled="disabled" ng-disabled="register.form.$invalid" class="md-raised md-primary" ng-click="profileChange(event,profile)" type="button">Change Profile</md-button>
+                <md-button disabled="disabled" ng-disabled="register.form.$invalid" class="md-raised md-primary" ng-click="profileChange($event,profile)" type="button">Change Profile</md-button>
 </section>
                 <section style="margin: 20px 0 -15px -30px">
-                <a id="cancelAccountCss" ng-click="cancelAccount()">Cancel Account</a>
+                <a id="cancelAccountCss" ng-click="cancelAccount($event)">Cancel Account</a>
                </section>
          </div>
        <span flex></span>

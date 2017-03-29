@@ -112,6 +112,11 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
         templateUrl: 'partials/login.html',
         controller: 'loginController'
       })
+        .state('password-reset', {
+        url: '/password-reset',
+        templateUrl: 'partials/password-reset.php',
+        controller: 'password-resetController'
+      })
       .state('profile', {
         url: '/profile',
         templateUrl: 'partials/profile.html',

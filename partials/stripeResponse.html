@@ -1,13 +1,13 @@
 
-<md-dialog aria-label="Dialog for Signup" style="min-width:350px;">
-      <md-toolbar>
-      <div class="md-toolbar-tools">
-        <h2>Response</h2>
-        <span flex></span>
-        <md-button class="md-icon-button" ng-click="cancel()">
-          <md-icon class="material-icons" aria-label="Close dialog">close</md-icon>
-        </md-button>
-      </div>
-    </md-toolbar>
-       {{response}}
-</md-dialog>
+
+<md-dialog role="dialog" tabindex="-1" class="md-transition-in" style="" aria-label="Submit Items ...">
+  <md-dialog-content class="md-dialog-content">
+    <h2 class="md-title">Thanks for Signing Up</h2>
+    <p>You should have recieved two emails.  One to verifiy your email the other to thank you for your subscription.</p>
+    <p>If you don't verify your email, you can't use features like lost password recovery.   You should do it!</p>
+    <p>{{response}}</p>
+  </md-dialog-content>
+  <div class="md-actions">
+    <button aria-label="Close" ng-click="respCtrl.cancel()" class="md-primary md-button md-ink-ripple" type="button"><span>Close</span></button>
+  </div>
+<div class="md-dialog-focus-trap" tabindex="0"></div></md-dialog>
