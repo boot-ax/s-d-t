@@ -38,7 +38,7 @@
                    Change Password
              </md-checkbox> -->
              <div ng-show="access">
-               <md-input-container ng-show="access" layout="row" class="input-row layout-row rowOffset">
+               <md-input-container class="input-row layout-row rowOffset">
                    <label class="loginLabel">Password&#42;</label>
                    <md-icon class="material-icons iconOff">lock</md-icon>
                    <input name="newPassword" type="password" ng-model="profile.password">
@@ -71,7 +71,7 @@
                  </md-input-container>
                </div>
                <section flex style="margin-top:20px" layout="row" layout-align="center center">
-                <md-button disabled="disabled" ng-disabled="register.form.$invalid" class="md-raised md-primary" ng-click="profileChange($event,profile)" type="button">Change Profile</md-button>
+                <md-button ng-disabled="register.form.$invalid" class="md-raised md-primary" ng-click="profileChange($event,profile)" type="button">Change Profile</md-button>
 </section>
                 <section style="margin: 20px 0 -15px -30px">
                 <a id="cancelAccountCss" ng-click="cancelAccount($event)">Cancel Account</a>

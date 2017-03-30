@@ -1,6 +1,16 @@
-RewriteEngine On
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_URI} !^/service/
-RewriteCond %{REQUEST_URI} !^/jordan/
-RewriteRule ^(.*)$ /index.php [QSA,L]
+#RewriteEngine On
+#RewriteCond %{REQUEST_FILENAME} !-f
+#RewriteCond %{REQUEST_FILENAME} !-d
+#RewriteCond %{REQUEST_URI} !^/service/
+#RewriteCond %{REQUEST_URI} !^/jordan/
+#RewriteRule ^(.*)$ /index.php [QSA,L]
+
+
+RewriteEngine on
+#let flight do its thing
+ RewriteRule ^(service/.*)$ index.php?url=$1 [QSA,L,NC]
+ RewriteRule ^(app/.*)$ index.php?url=$1 [QSA,L,NC]
+#let angular do its thing
+ RewriteCond %{REQUEST_FILENAME} !-f
+ RewriteCond %{REQUEST_FILENAME} !-d
+ RewriteRule ^(.*) index.html [NC,L]

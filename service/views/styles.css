@@ -1,0 +1,176 @@
+.data-card {
+width:100%;
+}
+
+.scroll {
+overflow: scroll;
+}
+
+.mdl-card__supporting-text{
+overflow: scroll;
+}
+
+.mdl-icon-toggle__label material-icons {
+	align:left;
+}
+
+label { float:right;}
+
+.inputdemoBasicUsage .md-datepicker-button {
+  width: 20px;
+}
+/*.inputdemoBasicUsage .md-datepicker-input-container {
+  margin-left: 2px;
+}
+.md-datepicker-input-container {
+  display: block;
+}*/
+.md-datepicker-input[placeholder] {
+  color:red;
+}
+.padding-top-0 {
+  padding-top: 0px;
+}
+.padding-bottom-0 {
+  padding-bottom: 0px;
+}
+
+.addButtonInModl{
+	color:#2196F3;
+	text-transform: lowercase;}
+
+	.md-content .copy-button{
+		font-size: 1em;
+		margin-top: 8px;
+		color:#4286f4;
+		-webkit-transition: font-size 0.3s; /* For Safari 3.1 to 6.0 */
+    transition: font-size 0.3s;
+	}
+
+	.md-content .copy-button:hover{
+		font-size:1.5em;
+		text-shadow: .3px .3px grey;}
+
+		.firstSpan {
+			font-size: 0.8em;
+		}
+
+		.secondSpan {
+			color: #6100A0;
+		}
+
+
+		.box {
+		   position: relative;
+		   top: 0;
+		   opacity: 1;
+		   float: left;
+		   padding: 60px 50px 40px 50px;
+		   width: 100%;
+		   background: #fff;
+		   transform: scale(1);
+		   -webkit-transform: scale(1);
+		   -ms-transform: scale(1);
+		   z-index: 5;
+		}
+
+
+
+		.box {
+		   background-image: url(https://lh4.googleusercontent.com/-XplyTa1Za-I/VMSgIyAYkHI/AAAAAAAADxM/oL-rD6VP4ts/w1184-h666/Android-Lollipop-wallpapers-Google-Now-Wallpaper-2.png);
+		   background-position: center;
+		   background-size: cover;
+		   background-repeat: no-repeat;
+		   min-height: 100vh;
+
+		}
+
+		.login-form{
+			min-height: 300px;
+			min-width: 300px;
+		}
+
+		.md-input-container.md-icon-left {
+		    padding-left: 0;
+		    padding-right: 0;
+}
+
+
+#loading-bar-spinner .spinner-icon {
+width: 20px;
+height: 20px;
+border: solid 6px transparent;
+border-top-color:  #EE3124;
+border-left-color: #EE3124;
+border-radius: 12px;
+}
+
+.md-select-value *:first-child {
+    flex: 1 0 auto;
+    height: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transform: translate3d(0px, 2px, 0px);
+    white-space: nowrap;
+}
+
+.flex-parent {
+  display: flex;
+  align-items: right;
+  padding: 10px;
+  margin: 10px 0;
+}
+h2 {
+  font-size: 1rem;
+  font-weight: normal;
+}
+
+
+.long-and-truncated {
+  flex: 6;
+	align-items: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+	text-align:right;
+}
+
+.loginLabel{
+	/*margin-right:15px;*/
+	margin-left:12%;
+}
+
+.rowOffset{
+	margin-left:-40px;
+}
+
+.rowOffset2{
+	margin-left:-1px;
+}
+
+.iconOff{
+	margin-right:10px;
+}
+
+.md-toast.md-success-toast-theme .md-toast-content {
+    background-color: green;
+}
+
+.md-toast.md-error-toast-theme .md-toast-content {
+    background-color: maroon;
+}
+
+#cancelAccountCss {
+	margin-top:80px;
+	text-align: right;
+}
+
+#cancelAccountCss:hover{
+	text-decoration: none;
+	color:red;
+}
+
+md-input-container.md-default-theme label,
+ md-input-container.md-default-theme .md-placeholder{
+    color:red !important;
+}

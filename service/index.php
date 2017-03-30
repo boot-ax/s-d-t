@@ -5,6 +5,8 @@ include '../inc/functions2.php';
 use Stripe\Stripe;
 use Mailgun\Mailgun;
 
+// Flight::set('flight.views.path', '/vendor/mikecao/flight/flight/template/views');
+
 
 
 
@@ -174,7 +176,7 @@ Flight::route('POST /auth/login', function(){
     }
     $sql_array = array();
     $result = $stmt->get_result();
-    var_dump($result->num_rows);
+    // var_dump($result->num_rows);
 
 		if($result->num_rows>0){
 			$user = $result->fetch_assoc();
@@ -1826,8 +1828,14 @@ Flight::route('POST|GET /password-reset', function(){
     // Flight::redirect('https://dev.webwright.io', [401]) // Redirects to another URL.
         Flight::halt(401,"User not authorized - first");
         }
+        // Flight::redirect('../password-reset.php',301);
+        // Flight::render('service/password-reset');
 
-//Need Router to send to new password page with token
+        Flight::render('password-reset', array('token' => $jwt));
+        // Flight::render('/password-reset',array('parameter' => 'test'));
+
+
+
 
 
         } else {
@@ -1835,6 +1843,22 @@ Flight::route('POST|GET /password-reset', function(){
       	include "../inc/connection2.php";
       	$entityBody = json_decode($entityBody,true);
         $user_email = $entityBody['user']['email'];
+        if(empty($entityBody['user']['token'])){
+        $sql = "SELECT user_security FROM registration WHERE user_email = ?";
+        $stmt = $mysqli->prepare($sql);
+        $stmt->bind_param('s',$user_email);
+        if(!$stmt->execute()){
+          Flight::halt(500,$stmt->error);
+        }
+        $result = $stmt->get_result();
+        if($result->num_rows>0){
+    			// $user = $result->fetch_assoc();
+          $stmt->close();
+        }else{
+          $stmt->close();
+          Flight::halt(401,"That email is not in the system.");
+        }
+}
               if(empty($entityBody['user']['password'])){
               $sql = "SELECT user_security FROM registration WHERE user_email = ?";
               $stmt = $mysqli->prepare($sql);
@@ -1862,7 +1886,7 @@ Flight::route('POST|GET /password-reset', function(){
               // Be sure to replace the from address with the actual email address you're sending from
               'from'    => 'support@login.webwright.io',
               'to'      => 'jkolnik@mac.com',
-              'subject' => 'Email Verification',
+              'subject' => 'Resetting Password',
               'o:tag'   => array('Resetting Password'),
                 // 'o:tracking-clicks' => 'htmlonly',
               'html'    => 'Resetting Password!
@@ -1884,15 +1908,15 @@ Flight::route('POST|GET /password-reset', function(){
                       Flight::halt(401,"User not authorized - almost last");
                     }
                     $sql = "UPDATE registration SET user_password = ? WHERE (user_email = ? AND user_security = ?)";
-                    var_dump($user_password);
-                    var_dump($user_email);
+                    // var_dump($user_password);
+                    // var_dump($user_email);
                     $stmt = $mysqli->prepare($sql);
-                    $stmt->bind_param('sss',$email_password,$user_email,$user_security);
+                    $stmt->bind_param('sss',$user_password,$user_email,$user_security);
                     if(!$stmt->execute()){
                       Flight::halt(500,$stmt->error);
                     }
                     $stmt->close();
-                    Flight::halt(200,"Successfully Updated Password");
+                    Flight::halt(200,"Successfully Updated Password.  You will be redirected to login page shortly.");
                   } else {
                     Flight::halt(401,"User not authorized - last");
                   }

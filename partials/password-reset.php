@@ -1,4 +1,5 @@
-<div class="box" layout="row" layout-align="center center">
+<?php
+$body ='<div class="box" layout="row" layout-align="center center">
 	<!-- <md-card layout="column" ng-show="busy" layout-align="center center">
 		<md-progress-circular md-mode="indeterminate"></md-progress-circular>
 	</md-card> -->
@@ -6,7 +7,7 @@
 <md-card class="login-form" ng-hide="busy" layout="column" layout-align="center center">
 		<md-toolbar>
 		<div class="md-toolbar-tools">
-			<h2>Lōgïn Password Reset</h2>
+			<h2>Lōgïn Password Reset'.$name.'</h2>
 			<span flex></span>
 			<md-button class="md-icon-button" ng-click="cancel()">
 				<md-icon class="material-icons" aria-label="Close dialog">close</md-icon>
@@ -37,4 +38,8 @@
 		       <span flex></span>
 		     </form>
 	</md-card>
-</div>
+</div>';
+
+echo $body;
+
+?>

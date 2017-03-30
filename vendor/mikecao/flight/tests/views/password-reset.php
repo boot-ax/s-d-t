@@ -1,4 +1,5 @@
-<div class="box" layout="row" layout-align="center center">
+<?php
+$body ='<div class="box" layout="row" layout-align="center center">
 	<!-- <md-card layout="column" ng-show="busy" layout-align="center center">
 		<md-progress-circular md-mode="indeterminate"></md-progress-circular>
 	</md-card> -->
@@ -13,30 +14,32 @@
 			</md-button>
 		</div>
 	</md-toolbar>
-		       <form layout="row" name="register.form" style="padding:15px">
+		       <form layout="row" name="item.form" style="padding:15px">
 		         <span flex></span>
 		           <div layout="column">
-								 <div>
+		             <div>
 		               <md-input-container layout="row" class="input-row layout-row rowOffset">
 		                   <label class="loginLabel">Password&#42;</label>
 		                   <md-icon class="material-icons iconOff">lock</md-icon>
-		                   <input name="newPassword" type="password" ng-required="true" ng-model="signUp.password">
+		                   <input name="newPassword" type="password" ng-model="reset.password">
 		                 </md-input-container>
 		               </div>
-
 		               <div>
-		                 <md-input-container layout="row" class="input-row layout-row rowOffset">
+		                 <md-input-container class="input-row layout-row rowOffset">
 		                     <label class="loginLabel">Confirm Password&#42;</label>
 		                     <md-icon class="material-icons iconOff">lock_outline</md-icon>
-		                     <input match-password="newPassword" type="password" name="confirmPassword" ng-required="true" ng-model="signUp.password2">
+		                     <input match-password="newPassword" type="password" name="confirmPassword" ng-model="reset.password2">
 		                   </md-input-container>
 		             </div>
 								 <section style="margin-top:20px" layout="row" layout-align="center center">
-						 			<button disabled="disabled" ng-disabled="register.form.$invalid" class="md-raised md-primary" ng-click="passwordReset(reset)">Reset Password</button>
-									<button disabled="disabled" aria-disabled="true" aria-label="Add Item" ng-click="ctrl.addItem()" ng-disabled="item.form.$invalid" class="md-primary md-button md-ink-ripple" type="button"><span>Add Item</span></button>
+						 			<md-button ng-disabled="item.form.$invalid" class="md-raised md-primary" ng-click="passwordReset(reset)">Reset Password</md-button>
 							 </section>
 		         </div>
 		       <span flex></span>
 		     </form>
 	</md-card>
-</div>
+</div>';
+
+echo $body;
+
+?>
