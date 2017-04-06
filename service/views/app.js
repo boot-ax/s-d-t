@@ -19,11 +19,13 @@ angular.module('reset_App', ['ngMaterial','ngSanitize','angular-loading-bar','ng
   function ($mdDialog,$scope, $http,$mdToast,$q,$window) {
     'use strict';
 
-    $scope.passwordReset = function($user){
+    $scope.passwordReset = function(userl,token){
 
+      userl.token = token;
       // $user.reset = "true";
   			// $scope.busy = true;
-  			      $http.post('/service/password-reset',{user: $user}).then(function(response){
+  			      $http.post('/service/password-reset',{user: userl}).then(function(response){
+
                 $mdToast.show(
                     $mdToast.simple()
                       .textContent(response.data)

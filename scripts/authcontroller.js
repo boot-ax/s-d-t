@@ -273,30 +273,3 @@ function ($mdDialog, $scope, $mdToast,$response) {
     };
 
   }]);
-
-//   angular.module('SE_App').controller('password-resetController', ['$mdDialog','$scope', '$mdEditDialog', '$http','$mdToast',
-//   '$q','$state','$location',
-//   function ($mdDialog,$scope, $mdEditDialog, $http,$mdToast,$q,$state,$location) {
-//     'use strict';
-//
-//     $scope.passwordReset = function($user){
-//   			$scope.busy = true;
-//   			      $http.post('/service/password-reset',{user: $user}).then(function(response){
-//                 $mdToast.show(
-//                     $mdToast.simple()
-//                       .textContent(response.data)
-//                       .hideDelay(3000)
-//                   );
-//                   $mdDialog.hide();
-//             })
-//   			.catch(function(response) {
-//   				$scope.busy = false;
-//   				$mdToast.show($mdToast.simple().textContent(response.data).hideDelay(6000));
-//   			});
-//       }
-//
-// $scope.cancel = function() {
-//   $location.path('/domain');
-// }
-//
-//   }]);

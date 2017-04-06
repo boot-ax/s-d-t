@@ -61,16 +61,14 @@
     <md-tab md-on-select="tabClicked()" label="Hosting"></md-tab>
     <md-tab md-on-select="tabClicked()" label="Registrar"></md-tab>
     <md-tab md-on-select="tabClicked()" label="Web 2.0"></md-tab>
-    <md-tab md-on-select="tabClicked()" label="People"></md-tab>
+    <md-tab data-ng-if="showTab" md-on-select="tabClicked()" label="People"></md-tab>
     <md-tab md-on-select="tabClicked()" label="CMS Login"></md-tab>
     <md-tab md-on-select="tabClicked()" label="Resource Login"></md-tab>
     <md-tab md-on-select="tabClicked()" label="Links"></md-tab>
     <md-tab md-on-select="tabClicked()" label="Software Keys"></md-tab>
-    <md-tab md-on-select="tabClicked()" label="URL Data"></md-tab>
-    <md-tab md-on-select="tabClicked()" label="Change Log"></md-tab>
+    <!-- <md-tab md-on-select="tabClicked()" label="URL Data"></md-tab>
+    <md-tab md-on-select="tabClicked()" label="Change Log"></md-tab> -->
   </md-tabs>
-
-
   <!-- <md-sidenav class="md-sidenav-left" md-component-id="left" md-whiteframe="4">
     <md-toolbar class="md-hue-2">
       <h1 class="md-toolbar-tools">Choose Wisely</h1>

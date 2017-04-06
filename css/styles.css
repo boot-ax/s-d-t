@@ -60,7 +60,7 @@ label { float:right;}
 		}
 
 
-		.box {
+		/*.box, .box1 {
 		   position: relative;
 		   top: 0;
 		   opacity: 1;
@@ -72,18 +72,18 @@ label { float:right;}
 		   -webkit-transform: scale(1);
 		   -ms-transform: scale(1);
 		   z-index: 5;
-		}
+		}*/
 
-
-
-		.box {
-		   background-image: url(https://lh4.googleusercontent.com/-XplyTa1Za-I/VMSgIyAYkHI/AAAAAAAADxM/oL-rD6VP4ts/w1184-h666/Android-Lollipop-wallpapers-Google-Now-Wallpaper-2.png);
+		#box {
+		   background-image: url('/media/Mountain.jpg');
 		   background-position: center;
 		   background-size: cover;
 		   background-repeat: no-repeat;
 		   min-height: 100vh;
 
 		}
+
+
 
 		.login-form{
 			min-height: 300px;

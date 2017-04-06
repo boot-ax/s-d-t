@@ -1,6 +1,12 @@
 <!doctype html>
 <html lang="en" ng-app="reset_App">
-<head><meta charset="UTF-8">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="robots" content="noindex">
+	<meta name="description" content="WebWright's Data Collection Software">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<title>WebWright Data Management</title>
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	<link href="views/angular-material.min.css" rel="stylesheet" type="text/css"/>
 	<link href="views/loading-bar.min.css" rel="stylesheet" type="text/css"/>
@@ -34,11 +40,6 @@
 		                   <input name="newPassword" type="password" ng-model="user.password" required>
 		                 </md-input-container>
 		               </div>
-									 <div ng-hide="true">
-			               <md-input-container layout="row" class="input-row layout-row rowOffset">
-												 <input name="hide" ng-init="user.token = '<?php echo $token ?>'" ng-model="user.token">
-			                 </md-input-container>
-			               </div>
 		               <div>
 		                 <md-input-container class="input-row layout-row rowOffset">
 		                     <label class="loginLabel">Confirm Password&#42;</label>
@@ -47,7 +48,7 @@
 		                   </md-input-container>
 		             </div>
 								 <section style="margin-top:20px" layout="row" layout-align="center center">
-						 			<md-button ng-disabled="item.form.$invalid" class="md-raised md-primary" ng-click="passwordReset(user)">Reset Password</md-button>
+						 			<md-button ng-disabled="item.form.$invalid" class="md-raised md-primary" ng-click="passwordReset(user,'<?php echo $token ?>')">Reset Password</md-button>
 							 </section>
 		         </div>
 		       <span flex></span>

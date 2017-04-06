@@ -352,6 +352,14 @@ this.changeDropdown = function($column, $value, $table,db_table,db_ID){
   $location.path('/login');
 }
 
+
+  if($scope.payload.user_type == 'admin' || $scope.payload.user_type == 'superuser'){
+    $scope.showTab = true;
+  } else {
+    $scope.showTab = false;
+  }
+
+
 $scope.userSettings = function(){
 $location.path('/profile');
 };
