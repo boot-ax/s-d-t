@@ -7,4 +7,5 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Mailgun' => array($vendorDir . '/mailgun/mailgun-php/src'),
+    'Authy' => array($vendorDir . '/authy/php/lib'),
 );

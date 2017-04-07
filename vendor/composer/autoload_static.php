@@ -21,6 +21,10 @@ class ComposerStaticInite2173f46ac6cd7f7432bb30c478fe4dd
         array (
             'Stripe\\' => 7,
         ),
+        'R' => 
+        array (
+            'Resty\\' => 6,
+        ),
         'P' => 
         array (
             'Psr\\Http\\Message\\' => 17,
@@ -56,6 +60,10 @@ class ComposerStaticInite2173f46ac6cd7f7432bb30c478fe4dd
         'Stripe\\' => 
         array (
             0 => __DIR__ . '/..' . '/stripe/stripe-php/lib',
+        ),
+        'Resty\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/resty/resty/src',
         ),
         'Psr\\Http\\Message\\' => 
         array (
@@ -124,6 +132,13 @@ class ComposerStaticInite2173f46ac6cd7f7432bb30c478fe4dd
             'Mailgun' => 
             array (
                 0 => __DIR__ . '/..' . '/mailgun/mailgun-php/src',
+            ),
+        ),
+        'A' => 
+        array (
+            'Authy' => 
+            array (
+                0 => __DIR__ . '/..' . '/authy/php/lib',
             ),
         ),
     );

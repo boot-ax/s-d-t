@@ -1,0 +1,28 @@
+
+<md-dialog aria-label="Dialog for Signup" style="max-width:380px">
+  <md-dialog-content>
+<div flex layout="column">
+      <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2>Two Factor Verification</h2>
+        <span flex></span>
+        <md-button class="md-icon-button" ng-click="authyCtrl.cancel()">
+          <md-icon class="material-icons" aria-label="Close dialog">close</md-icon>
+        </md-button>
+      </div>
+    </md-toolbar>
+       <form flex layout="row" name="authy.form" layout-padding>
+         <span flex ></span>
+           <div layout="column">
+
+             <h2>You have opted for two factor identification</h2>
+             <h2>Next time you log in, you will be required to authenticate with a text as well.</h2>
+               <section style="margin-top:20px" layout="row" layout-align="center center">
+                 <md-button ng-disabled="authy.form.$invalid" class="md-raised md-primary" ng-click="authyCtrl.cancel()">Close</md-button>
+               </section>
+         </div>
+       <span flex></span>
+     </form>
+</div>
+</md-dialog-content>
+</md-dialog>

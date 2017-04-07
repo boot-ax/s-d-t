@@ -16,9 +16,9 @@
            <div layout="column" style="margin-top:25px">
              <div>
                  <md-input-container flex layout="row" class="input-row layout-row rowOffset">
-                   <label class="loginLabel">Full Name&#42;</label>
+                   <label class="loginLabel">Full Name</label>
                    <md-icon class="md-icons iconOff">person</md-icon>
-                   <input type="text" ng-model="profile.user_name" autocomplete="off">
+                   <input type="text" ng-model="profile.user_name" autofocus="autofocus" autocomplete="off">
                  </md-input-container>
              </div>
              <div>
@@ -28,40 +28,6 @@
                    <input type="email" ng-model="profile.user_email" autofocus="autofocus" autocomplete="off">
                  </md-input-container>
              </div>
-
-
-             <md-switch layout-align="start" ng-click="access = !access" aria-label="active switch">
-                    Change Password
-              </md-switch>
-
-              <!-- <md-checkbox layout-align="start" ng-model="data.cb1" ng-click="access = !access" aria-label="Checkbox">
-                   Change Password
-             </md-checkbox> -->
-             <div ng-show="access">
-               <md-input-container class="input-row layout-row rowOffset">
-                   <label class="loginLabel">Password&#42;</label>
-                   <md-icon class="material-icons iconOff">lock</md-icon>
-                   <input name="newPassword" type="password" ng-model="profile.password">
-                 </md-input-container>
-               </div>
-
-               <div ng-show="access">
-                 <md-input-container class="input-row layout-row rowOffset">
-                     <label class="loginLabel">Confirm Password&#42;</label>
-                     <md-icon class="material-icons iconOff">lock_outline</md-icon>
-                     <input match-password="newPassword" type="password" name="confirmPassword" ng-model="profile.password2">
-                   </md-input-container>
-             </div>
-
-
-             <div>
-                 <md-input-container flex layout="row" class="input-row layout-row rowOffset">
-                   <label class="loginLabel">Phone Number</label>
-                   <md-icon class="md-icons iconOff">phone</md-icon>
-                   <input type="text" ng-model="profile.user_phone" autocomplete="off">
-                 </md-input-container>
-             </div>
-
                <div class="md-errors-spacer"></div>
                <div>
                  <md-input-container flex layout="row" class="input-row layout-row rowOffset">
@@ -70,10 +36,65 @@
                    <textarea type="text" ng-model="profile.user_address" autocomplete="off"></textarea>
                  </md-input-container>
                </div>
+
+
+                      <div layout="row">
+                                    <md-input-container flex layout="row" class="input-row layout-row rowOffset">
+                                      <md-icon class="md-icons iconOff">phone</md-icon>
+                                      <label ng-class="{'required':profile.authy_id}">Country Code</label>
+                                          <md-select
+                                              ng-model="profile.user_country_code" ng-required="profile.authy_id" placeholder="{{profile.user_country_code}}">
+                                            <md-option ng-value="country+' ('+code+')'"
+                                            ng-repeat="(country,code) in countries">{{country}} ({{ code}})</md-option>
+                                          </md-select>
+
+                                    </md-input-container>
+<span flex="5"></span>
+<div>
+                                    <md-input-container flex layout="row" class="input-row layout-row" style="margin-left:10px">
+                                      <label ng-class="{'required':profile.authy_id}">Phone Number</label>
+                                      <input flex type="phone" ng-required="profile.authy_id" ng-model="profile.user_phone" class="rowOffset2 flex" autocomplete="off">
+                                    </md-input-container>
+                                  </div>
+                        </div>
+
+                        <md-switch ng-model="profile.authy_id" layout-align="start" aria-label="active switch">
+                                   Enable two factor identification
+                             </md-switch>
+
+               <md-switch layout-align="start" ng-click="access = !access" aria-label="active switch">
+                      Change Password
+                </md-switch>
+
+                <!-- <md-checkbox layout-align="start" ng-model="data.cb1" ng-click="access = !access" aria-label="Checkbox">
+                     Change Password
+               </md-checkbox> -->
+               <div ng-hide="true">
+                 <md-input-container class="input-row layout-row rowOffset">
+                     <label class="loginLabel required">Password</label>
+                     <md-icon class="material-icons iconOff">lock</md-icon>
+                     <input name="fakePassword" type="password">
+                   </md-input-container>
+                 </div>
+               <div ng-show="access">
+                 <md-input-container class="input-row layout-row rowOffset">
+                     <label class="loginLabel required">Password</label>
+                     <md-icon class="material-icons iconOff">lock</md-icon>
+                     <input name="newPassword" type="password" ng-model="profile.password" ng-show="access">
+                   </md-input-container>
+                 </div>
+
+                 <div ng-show="access">
+                   <md-input-container class="input-row layout-row rowOffset">
+                       <label class="loginLabel required">Confirm Password</label>
+                       <md-icon class="material-icons iconOff">lock_outline</md-icon>
+                       <input ng-show="access" match-password="newPassword" type="password" name="confirmPassword" ng-model="profile.password2">
+                     </md-input-container>
+               </div>
                <section flex style="margin-top:20px" layout="row" layout-align="center center">
                 <md-button ng-disabled="register.form.$invalid" class="md-raised md-primary" ng-click="profileChange($event,profile)" type="button">Change Profile</md-button>
-</section>
-                <section style="margin: 20px 0 -15px -30px">
+              </section>
+                <section style="margin: 20px 0 -15px 0">
                 <a id="cancelAccountCss" ng-click="cancelAccount($event)">Cancel Account</a>
                </section>
          </div>

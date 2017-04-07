@@ -4,6 +4,7 @@ require '../vendor/autoload.php';
 include '../inc/functions2.php';
 use Stripe\Stripe;
 use Mailgun\Mailgun;
+use Authy\AuthyApi;
 
 // Flight::set('flight.views.path', '/vendor/mikecao/flight/flight/template/views');
 
@@ -157,12 +158,12 @@ Flight::route('POST /auth/login', function(){
 
 	$entityBody = str_replace('\\u0000', '', $entityBody);
 	$entityBody2 = json_decode($entityBody,true);
-	// build query...
+  $authy = $entityBody2['authy'];
 
-
-    $sql  = "SELECT user_name,user_email,user_security,user_status,user_type FROM registration
-		WHERE (`user_email` = ?)
-		AND (`user_password` = md5(?))
+  if(!empty($authy)){
+    $sql  = "SELECT user_name,user_email,user_security,user_status,user_type,authy_id FROM registration
+    WHERE (`user_email` = ?)
+    AND (`user_password` = md5(?))
     AND (`user_type` != 'no_access');";
 
     $stmt = $mysqli->prepare($sql);
@@ -173,26 +174,66 @@ Flight::route('POST /auth/login', function(){
     $sql_array = array();
     $result = $stmt->get_result();
     // var_dump($result->num_rows);
+    $user = $result->fetch_assoc();
+    $stmt->close();
+        $authy_api = new Authy\AuthyApi('PXD03tc5vZbC78OJJbOM61WqDPgbldUB');
+        $verification = $authy_api->verifyToken($user['authy_id'], $authy, array("force" => "true"));
 
-		if($result->num_rows>0){
-			$user = $result->fetch_assoc();
+        if($verification->ok()){
+          $alg = "HS256";
+          unset($user['authy_id']);
+          $token = new \Gamegos\JWT\Token();
+          $token->setClaim('sub', json_encode($user));
+          $token->setClaim('exp', time()+60*60*24*7);
+          $encoder = new \Gamegos\JWT\Encoder();
+          $encoder->encode($token, $jwt_key, $alg);
+          Flight::json(array('token'=>$token->getJWT()));
+      } else {
+        foreach($verification->errors() as $field => $message) {
+          Flight::stop(500,printf("$field = $message"));
+          }
+        }
+}
+  // FLight::stop(401,var_dump($entityBody2));
 
-      $stmt->close();
+  // FLight::stop(401,var_dump($authy));
 
-  	$alg = "HS256";
+  else{
+          $sql  = "SELECT user_name,user_email,user_security,user_status,user_type,authy_id FROM registration
+      		WHERE (`user_email` = ?)
+      		AND (`user_password` = md5(?))
+          AND (`user_type` != 'no_access');";
 
-  	$token = new \Gamegos\JWT\Token();
-  	$token->setClaim('sub', json_encode($user));
-  	$token->setClaim('exp', time()+60*60*24*7);
+          $stmt = $mysqli->prepare($sql);
+          $stmt->bind_param('ss', $entityBody2['email'], $entityBody2['password']);
+          if(!$stmt->execute()){
+            Flight::halt(401,"User not authorized");
+          }
+          $sql_array = array();
+          $result = $stmt->get_result();
+          // var_dump($result->num_rows);
+          $user = $result->fetch_assoc();
+          $stmt->close();
 
-  	$encoder = new \Gamegos\JWT\Encoder();
-  	$encoder->encode($token, $jwt_key, $alg);
+          if($result->num_rows>0 & empty($user['authy_id'])){
+            $alg = "HS256";
+            $token = new \Gamegos\JWT\Token();
+            $token->setClaim('sub', json_encode($user));
+            $token->setClaim('exp', time()+60*60*24*7);
+            $encoder = new \Gamegos\JWT\Encoder();
+            $encoder->encode($token, $jwt_key, $alg);
+            Flight::json(array('token'=>$token->getJWT()));
+          }
 
-  	Flight::json(array('token'=>$token->getJWT()));
-  } else {
-    	FLight::halt(401,"Email or password is incorrect.");
-    }
-
+      		elseif($result->num_rows>0 & empty($authy) & !empty($user['authy_id'])){
+                  // FLight::halt(401,"Here We Are");
+              $authy_api = new Authy\AuthyApi('PXD03tc5vZbC78OJJbOM61WqDPgbldUB');
+              $sms = $authy_api->requestSms($user['authy_id'], array("force" => "true"));
+              FLight::halt(200,"Need Verification");
+            } else {
+              	FLight::halt(401,"Email or password is incorrect.");
+              }
+}
 });
 
 Flight::route('POST /cms_login', function(){
@@ -1340,7 +1381,6 @@ Flight::route('/updateItem', function(){
 
 });
 
-
 Flight::route('/getowners', function(){
   include "../inc/connection2.php";
   $sqlArray = Flight::basicDelete();
@@ -1365,12 +1405,9 @@ Flight::route('/getowners', function(){
 
 });
 
-
-
 Flight::route('/9736644323hc4e34', function(){
 
-});
-
+  });
 
 Flight::route('POST /profileinfo/', function(){
   // $entityBody = Flight::request()->getBody();
@@ -1385,7 +1422,7 @@ Flight::route('POST /profileinfo/', function(){
   $email = $goodData->user_email;
   $security = $goodData->user_security;
 
-  $sql = "SELECT rt.user_phone,rt.user_address FROM registration rt
+  $sql = "SELECT rt.user_phone,rt.user_address,rt.user_name,rt.user_country_code,rt.authy_id FROM registration rt
   where user_security = ?
   AND user_email = ?";
   $stmt = $mysqli->prepare($sql);
@@ -1398,6 +1435,11 @@ Flight::route('POST /profileinfo/', function(){
       $sql_result[] = $row;
     }
   $stmt->close();
+  if(!empty($sql_result[0]['authy_id'])){
+    $sql_result[0]['authy_id'] = true;
+  }
+
+  // Flight::stop(401,var_dump($sql_result));
   $newArray2 = array('profile'=>$sql_result);
   Flight::json($newArray2);
 
@@ -1415,7 +1457,7 @@ Flight::route('POST /newprofileinfo/', function(){
   $goodData = json_decode($token->getClaims()['sub']);
   $email = $goodData->user_email;
   $security = $goodData->user_security;
-  $sql_security = "SELECT rt.account_ID,rt.user_password FROM registration rt
+  $sql_security = "SELECT rt.account_ID,rt.user_password,rt.authy_id FROM registration rt
   where user_security = ?
   AND user_email = ?";
   $stmt = $mysqli->prepare($sql_security);
@@ -1426,6 +1468,7 @@ Flight::route('POST /newprofileinfo/', function(){
   $sql_array = array();
   $result = $stmt->get_result();
   $result = $result->fetch_assoc();
+  $authy_id = $result['authy_id'];
   $stmt->close();
 
   if (!empty($entityBody2['newProfile']['password'])) {
@@ -1434,82 +1477,113 @@ Flight::route('POST /newprofileinfo/', function(){
     $entityBody2['newProfile']['password'] = $result['user_password'];
   }
 
-$sql = "UPDATE registration SET user_name = ?, user_email = ?, user_password = ?, user_phone = ?, user_address = ? WHERE (user_email = ? AND user_security = ?)";
+  $sql = "UPDATE registration SET user_name = ?, user_email = ?, user_password = ?, user_phone = ?, user_address = ?, user_country_code = ? WHERE (user_email = ? AND user_security = ?)";
 
-$stmt = $mysqli->prepare($sql);
-$stmt->bind_param('sssssss',$entityBody2['newProfile']['user_name'],$entityBody2['newProfile']['user_email'],$entityBody2['newProfile']['password'],$entityBody2['newProfile']['user_phone'],$entityBody2['newProfile']['user_address'],$email,$security);
-
-if(!$stmt->execute()){
-  Flight::halt(500,$mysqli->error);
-  $stmt->close();
-}
-  $stmt->close();
-   Flight::halt(200,"Profile Updated");
-
-});
-
-
-Flight::route('POST /delete-account/', function(){
-  $entityBody = Flight::request()->getBody();
-  include "../inc/connection2.php";
-  global $jwt_key;
-  $entityBody = str_replace('\\u0000', '', $entityBody);
-  $entityBody2 = json_decode($entityBody,true);
-  $jwt = substr($_SERVER['HTTP_AUTHORIZATION'],7);
-  $validator = new \Gamegos\JWT\Validator();
-  $token = $validator->validate($jwt, $jwt_key);
-  $goodData = json_decode($token->getClaims()['sub']);
-  $email = $goodData->user_email;
-  $security = $goodData->user_security;
-  $sql = "SELECT rt.account_ID,at.stripe_subscription_ID,at.good_til_date FROM registration rt
-  LEFT JOIN `account` at ON rt.account_ID = at.account_ID
-  where user_security = ?
-  AND user_email = ?";
-  // var_dump($security);
-  // var_dump($email);
-  // var_dump($sql);
   $stmt = $mysqli->prepare($sql);
-  $stmt->bind_param('ss', $security, $email);
+  $stmt->bind_param('ssssssss',$entityBody2['newProfile']['user_name'],$entityBody2['newProfile']['user_email'],$entityBody2['newProfile']['password'],$entityBody2['newProfile']['user_phone'],$entityBody2['newProfile']['user_address'],$entityBody2['newProfile']['user_country_code'],$email,$security);
+
   if(!$stmt->execute()){
     Flight::halt(500,$mysqli->error);
+    $stmt->close();
   }
-  $sql_array = array();
-  $result = $stmt->get_result();
-  $result = $result->fetch_assoc();
-  $stmt->close();
+    $stmt->close();
 
-$sql = "UPDATE account SET flag_delete_date = ?
-        WHERE account_ID = ?";
+    if($entityBody2['newProfile']['authy_id'] & empty($authy_id)){
+      $user_phone = $entityBody2['newProfile']['user_phone'];
+      $user_country_code = filter_var($entityBody2['newProfile']['user_country_code'],FILTER_SANITIZE_NUMBER_INT);
 
-$stmt = $mysqli->prepare($sql);
-$stmt->bind_param('si',$result['good_til_date'],$result['account_ID']);
+      $authy_api = new Authy\AuthyApi('PXD03tc5vZbC78OJJbOM61WqDPgbldUB');
+      $user = $authy_api->registerUser($email, $user_phone, $user_country_code); //email, cellphone, country_code
+      if($user->ok()){
+        $sql3 = "UPDATE registration SET authy_id = ? WHERE (user_email = ? AND user_security = ?)";
+        $stmt3 = $mysqli->prepare($sql3);
+        $stmt3->bind_param('sss',$user->id(),$email,$security);
+        if(!$stmt3->execute()){
+          Flight::stop(500,$mysqli->error);
+        }
+        $stmt3->close();
+          } else
+            foreach($user->errors() as $field => $message) {
+            Flight::stop(500,printf("$field = $message"));
+            }
+      Flight::halt(200,"Verification");
+    } elseif(!$entityBody2['newProfile']['authy_id'] & !empty($authy_id)){
+      $sql4 = "UPDATE registration SET authy_id = NULL WHERE (user_email = ? AND user_security = ?)";
+      $stmt4 = $mysqli->prepare($sql4);
+      $stmt4->bind_param('ss',$email,$security);
+      if(!$stmt4->execute()){
+        Flight::stop(500,$mysqli->error);
+      }
+      $stmt4->close();
+      Flight::halt(200,"Profile Updated And User Removed From Two Factor Auth");
+    } else {
+     Flight::halt(200,"Profile Updated");
+   }
 
-// var_dump($result['good_til_date']);
-// var_dump($result['account_ID']);
 
-$stripe = array(
-  "secret_key"      =>  "sk_test_tN4uGQsemjKrJ2tLpqg3VgIe",
-  "publishable_key" =>  "pk_test_DDqS4Ps7loF2JzJPH5JinfPW"
-);
+  });
 
-try {
-  Stripe::setApiKey($stripe['secret_key']);
 
-  $subscription = \Stripe\Subscription::retrieve($result['stripe_subscription_ID']);
-  $subscription->cancel(array('at_period_end' => true));
-} catch (Exception $e) {
-  Flight::halt(500,$e->error);
-}
+  Flight::route('POST /delete-account/', function(){
+    $entityBody = Flight::request()->getBody();
+    include "../inc/connection2.php";
+    global $jwt_key;
+    $entityBody = str_replace('\\u0000', '', $entityBody);
+    $entityBody2 = json_decode($entityBody,true);
+    $jwt = substr($_SERVER['HTTP_AUTHORIZATION'],7);
+    $validator = new \Gamegos\JWT\Validator();
+    $token = $validator->validate($jwt, $jwt_key);
+    $goodData = json_decode($token->getClaims()['sub']);
+    $email = $goodData->user_email;
+    $security = $goodData->user_security;
+    $sql = "SELECT rt.account_ID,at.stripe_subscription_ID,at.good_til_date FROM registration rt
+    LEFT JOIN `account` at ON rt.account_ID = at.account_ID
+    where user_security = ?
+    AND user_email = ?";
+    // var_dump($security);
+    // var_dump($email);
+    // var_dump($sql);
+    $stmt = $mysqli->prepare($sql);
+    $stmt->bind_param('ss', $security, $email);
+    if(!$stmt->execute()){
+      Flight::halt(500,$mysqli->error);
+    }
+    $sql_array = array();
+    $result = $stmt->get_result();
+    $result = $result->fetch_assoc();
+    $stmt->close();
 
-if(!$stmt->execute()){
-  Flight::halt(500,$mysqli->error);
-  $stmt->close();
-}
-  $stmt->close();
-   Flight::halt(200,"Your account will be deleted ".gmdate("m-d-Y", $result['good_til_date']));
+  $sql = "UPDATE account SET flag_delete_date = ?
+          WHERE account_ID = ?";
 
-});
+  $stmt = $mysqli->prepare($sql);
+  $stmt->bind_param('si',$result['good_til_date'],$result['account_ID']);
 
+  // var_dump($result['good_til_date']);
+  // var_dump($result['account_ID']);
+
+  $stripe = array(
+    "secret_key"      =>  "sk_test_tN4uGQsemjKrJ2tLpqg3VgIe",
+    "publishable_key" =>  "pk_test_DDqS4Ps7loF2JzJPH5JinfPW"
+  );
+
+  try {
+    Stripe::setApiKey($stripe['secret_key']);
+
+    $subscription = \Stripe\Subscription::retrieve($result['stripe_subscription_ID']);
+    $subscription->cancel(array('at_period_end' => true));
+  } catch (Exception $e) {
+    Flight::halt(500,$e->error);
+  }
+
+  if(!$stmt->execute()){
+    Flight::halt(500,$mysqli->error);
+    $stmt->close();
+  }
+    $stmt->close();
+     Flight::halt(200,"Your account will be deleted ".gmdate("m-d-Y", $result['good_til_date']));
+
+  });
 
 Flight::route('POST /signup/', function(){
   global $jwt_key;
@@ -1525,6 +1599,7 @@ Flight::route('POST /signup/', function(){
   $user_password = md5($entityBody['signUp']['password2']);
   $user_name = $entityBody['signUp']['fullName'];
   $user_phone= $entityBody['signUp']['phone'];
+  $user_country_code = $entityBody['signUp']['country_code'];
   $user_address= $entityBody['signUp']['address'];
   $user_stripe_token = $entityBody['$token']['id'];
   $user_security = randomPassword();
@@ -1585,42 +1660,31 @@ Flight::route('POST /signup/', function(){
   }
   $stmt3->close();
 
-  // $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
-  // $domain = "login.webwright.io";
-  // $result = $mg->sendMessage("lists/ist_one@login.webwright.io/members", array(
-  //   'address'     => $user_email,
-  //   'name'        => $user_name,
-  //   'description' => 'Signup',
-  //   'subscribed'  => true,
-  //   'vars'        => '{"plan": $7}'
+    $alg = "HS256";
+    $token = new \Gamegos\JWT\Token();
+    $token->setClaim('sub', json_encode($payload));
+    $token->setClaim('exp', time()+60*60*24*7);
+    $encoder = new \Gamegos\JWT\Encoder();
+    $encoder->encode($token, $jwt_key, $alg);
+    $token = $token->getJWT();
 
-// ));
-
-$alg = "HS256";
-$token = new \Gamegos\JWT\Token();
-$token->setClaim('sub', json_encode($payload));
-$token->setClaim('exp', time()+60*60*24*7);
-$encoder = new \Gamegos\JWT\Encoder();
-$encoder->encode($token, $jwt_key, $alg);
-$token = $token->getJWT();
-
-$mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
-$domain = "login.webwright.io";
-$link = "https://dev.webwright.io/service/mailgun-0f5ac2ac043c5665bf3e2f00638dbdce?token=".$token;
-$result = $mg->sendMessage($domain, array(
-// Be sure to replace the from address with the actual email address you're sending from
-'from'    => 'support@login.webwright.io',
-'to'      => 'jkolnik@mac.com',
-'subject' => 'Email Verification',
-'o:tag'   => array('Email Verification'),
-  // 'o:tracking-clicks' => 'htmlonly',
-'html'    => 'Click the link below to verify your email.</br></br>
-<a href="' .$link. '"><button>Reset Password</button></a></br><br>
-Thanks from the loginners-
-https://app.login.webwright.io/login'
+    $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
+    $domain = "login.webwright.io";
+    $link = "https://dev.webwright.io/service/mailgun-0f5ac2ac043c5665bf3e2f00638dbdce?token=".$token;
+    $result = $mg->sendMessage($domain, array(
+    // Be sure to replace the from address with the actual email address you're sending from
+    'from'    => 'support@login.webwright.io',
+    'to'      => 'jkolnik@mac.com',
+    'subject' => 'Email Verification',
+    'o:tag'   => array('Email Verification'),
+      // 'o:tracking-clicks' => 'htmlonly',
+    'html'    => 'Click the link below to verify your email.</br></br>
+    <a href="' .$link. '"><button>Verify Email</button></a></br><br>
+    Thanks from the loginners-</br>
+    https://app.login.webwright.io/login'
 
 
-));
+  ));
 
   Flight::halt(200,"Successfully Signed Up and charged $7.00!");
 
@@ -1697,69 +1761,45 @@ Flight::route('POST /stripe-991c8971ff31a83c454f371f55c85be5', function(){
 
   Thank you for your subscription
 
-  Please update your payment information as soon as possible by logging in here:
+  You can update your information in the profile section of your account if necessary:
   https://app.login.webwright.io/login'
 
 
-));
-Flight::halt(200,"Successfull Payment");
-}
+  ));
 
-elseif (isset($event) && $event->type == "invoice.payment_failed") {
-$customer = \Stripe\Customer::retrieve($event->data->object->customer);
-$email = $customer->email;
-// Sending your customers the amount in pennies is weird, so convert to dollars
-$amount = sprintf('$%0.2f', $event->data->object->amount_due / 100.0);
+  Flight::halt(200,"Successfull Payment");
+  }
 
-$mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
-$domain = "login.webwright.io";
-$result = $mg->sendMessage($domain, array(
-// Be sure to replace the from address with the actual email address you're sending from
-'from'    => 'billing@login.webwright.io',
-'to'      => 'jkolnik@mac.com',
-'subject' => 'Your most recent invoice payment failed',
-  'text'    => 'Hi there,
+  elseif (isset($event) && $event->type == "invoice.payment_failed") {
+  $customer = \Stripe\Customer::retrieve($event->data->object->customer);
+  $email = $customer->email;
+  // Sending your customers the amount in pennies is weird, so convert to dollars
+  $amount = sprintf('$%0.2f', $event->data->object->amount_due / 100.0);
 
-  Unfortunately your most recent invoice payment for ' . $amount . ' was declined.
-  This could be due to a change in your card number or your card expiring, cancelation of your credit card,
-  or the bank not recognizing the payment and taking action to prevent it.
+  $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
+  $domain = "login.webwright.io";
+  $result = $mg->sendMessage($domain, array(
+  // Be sure to replace the from address with the actual email address you're sending from
+  'from'    => 'billing@login.webwright.io',
+  'to'      => 'jkolnik@mac.com',
+  'subject' => 'Your most recent invoice payment failed',
+    'text'    => 'Hi there,
 
-  Please update your payment information as soon as possible by logging in here:
-https://app.login.webwright.io/login'
-));
-Flight::halt(200,"Failed Payment");
+    Unfortunately your most recent invoice payment for ' . $amount . ' was declined.
+    This could be due to a change in your card number or your card expiring, cancelation of your credit card,
+    or the bank not recognizing the payment and taking action to prevent it.
 
-}
+    Please update your payment information as soon as possible by logging in here:
+  https://app.login.webwright.io/login'
+  ));
+  Flight::halt(200,"Failed Payment");
 
-elseif (isset($event) && $event->type == "charge.failed") {
-// Sending your customers the amount in pennies is weird, so convert to dollars
+  }
 
-$amount = sprintf('$%0.2f', $event->data->object->amount_due / 100.0);
-$email = $event->data->object->receipt_email;
-$mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
-$domain = "login.webwright.io";
-$result = $mg->sendMessage($domain, array(
-// Be sure to replace the from address with the actual email address you're sending from
-'from'    => 'billing@login.webwright.io',
-'to'      => 'jkolnik@mac.com',
-'subject' => 'Your Charge failed to go thru',
-  'text'    => 'Hi there,
+  elseif (isset($event) && $event->type == "charge.failed") {
+  // Sending your customers the amount in pennies is weird, so convert to dollars
 
-  Unfortunately your most recent invoice payment for ' . $amount . ' was declined.
-  This could be due to a change in your card number or your card expiring, cancelation of your credit card,
-  or the bank not recognizing the payment and taking action to prevent it.
-
-  Please update your payment information as soon as possible by trying to register with a different card here:
-https://app.login.webwright.io/login'
-));
-Flight::halt(200,"Failed Payment");
-
-}
-
-elseif (isset($event) && $event->type == "customer.subscription.deleted") {
-// Sending your customers the amount in pennies is weird, so convert to dollars
-$login_or_stripe = $event->request;
-if(is_null($login_or_stripe)){
+  $amount = sprintf('$%0.2f', $event->data->object->amount_due / 100.0);
   $email = $event->data->object->receipt_email;
   $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
   $domain = "login.webwright.io";
@@ -1770,181 +1810,204 @@ if(is_null($login_or_stripe)){
   'subject' => 'Your Charge failed to go thru',
     'text'    => 'Hi there,
 
-  It was fun while it lasted.
-  Sorry to see you go.
-  https://login.webwright.io'
+    Unfortunately your most recent invoice payment for ' . $amount . ' was declined.
+    This could be due to a change in your card number or your card expiring, cancelation of your credit card,
+    or the bank not recognizing the payment and taking action to prevent it.
+
+    Please update your payment information as soon as possible by trying to register with a different card here:
+  https://app.login.webwright.io/login'
   ));
-  Flight::halt(200,"Subscription Canceled by User");
-} else {
-$email = $event->data->object->receipt_email;
-$mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
-$domain = "login.webwright.io";
-$result = $mg->sendMessage($domain, array(
-// Be sure to replace the from address with the actual email address you're sending from
-'from'    => 'billing@login.webwright.io',
-'to'      => 'jkolnik@mac.com',
-'subject' => 'Your Subscription was Canceled',
-  'text'    => 'Hi there,
+  Flight::halt(200,"Failed Payment");
 
-Your subscription to Lōgïn was canceled after three attemts to charge your card.
-
-Consequently, your data was also deleted.
-https://login.webwright.io/'
-));
-}
-
-// ));
-
-Flight::halt(200,"Subscription Canceled after non payment");
-
-}
-
-else {
-  Flight::halt(500,"Nothing Worked");
-
-}
-
-});
-
-
-Flight::route('POST|GET /password-reset', function(){
-  global $jwt_key;
-	include "../inc/connection2.php";
-
-  if(isset($_GET['token'])){
-
-        try{
-            $jwt = $_GET['token'];
-            $validator = new \Gamegos\JWT\Validator();
-            $token = $validator->validate($jwt, $jwt_key);
-            $goodData = json_decode($token->getClaims()['sub']);
-            $email = $goodData->user_email;
-            }catch(Exception $e){
-                Flight::halt(401,"User not authorized - first");
-                }
-  Flight::render('password-reset', array('token' => $jwt));
   }
 
+  elseif (isset($event) && $event->type == "customer.subscription.deleted") {
+  // Sending your customers the amount in pennies is weird, so convert to dollars
+  $login_or_stripe = $event->request;
+  if(is_null($login_or_stripe)){
+    $email = $event->data->object->receipt_email;
+    $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
+    $domain = "login.webwright.io";
+    $result = $mg->sendMessage($domain, array(
+    // Be sure to replace the from address with the actual email address you're sending from
+    'from'    => 'billing@login.webwright.io',
+    'to'      => 'jkolnik@mac.com',
+    'subject' => 'Your Charge failed to go thru',
+      'text'    => 'Hi there,
 
-    else {
-            $entityBody = Flight::request()->getBody();
-          	include "../inc/connection2.php";
-          	$entityBody = json_decode($entityBody,true);
-            $user_email = $entityBody['user']['email'];
+    It was fun while it lasted.
+    Sorry to see you go.
+    https://login.webwright.io'
+    ));
+    Flight::halt(200,"Subscription Canceled by User");
+  } else {
+  $email = $event->data->object->receipt_email;
+  $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
+  $domain = "login.webwright.io";
+  $result = $mg->sendMessage($domain, array(
+  // Be sure to replace the from address with the actual email address you're sending from
+  'from'    => 'billing@login.webwright.io',
+  'to'      => 'jkolnik@mac.com',
+  'subject' => 'Your Subscription was Canceled',
+    'text'    => 'Hi there,
 
+  Your subscription to Lōgïn was canceled after three attemts to charge your card.
 
-            //Enter email for mail to be sent too
-                    if(empty($entityBody['user']['token'])){
-                        $sql = "SELECT user_security,user_status FROM registration WHERE user_email = ?";
-                        $stmt = $mysqli->prepare($sql);
-                        $stmt->bind_param('s',$user_email);
+  Consequently, your data was also deleted.
+  https://login.webwright.io/'
+  ));
+  }
 
-                            if(!$stmt->execute()){
-                              Flight::halt(500,$mysqli->error);
-                            }
-                        $result = $stmt->get_result();
-                        $resultArray = $result->fetch_assoc();
-                        $stmt->close();
-                        $user_status = $resultArray['user_status'];
-                        // Flight::stop(401,var_dump($result));
-            //if there is an email in the system
-                          if($result->num_rows>0 & $user_status == 1){
-                          $temp_hash = randomPassword();
-                          $temp_date = time();
-                          $sql = "INSERT INTO temp_table (temp_email,temp_hash,temp_date) VALUES (?,?,?)";
-                          $stmt = $mysqli->prepare($sql);
-                          $stmt->bind_param('ssi',$user_email,$temp_hash,$temp_date);
-                              if(!$stmt->execute()){
-                                Flight::halt(500,$mysqli->error);
-                              }
-                          $stmt->close();
-                          $user_security = $temp_hash;
-                          $payload = array('user_email'=>$user_email,'user_security'=>$user_security);
-                          $alg = "HS256";
-                          $token = new \Gamegos\JWT\Token();
-                          $token->setClaim('sub', json_encode($payload));
-                          $token->setClaim('exp', time()+60*60);
-                          $encoder = new \Gamegos\JWT\Encoder();
-                          $encoder->encode($token, $jwt_key, $alg);
-                          $token = $token->getJWT();
-                          $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
-                          $domain = "login.webwright.io";
-                          $link = "https://dev.webwright.io/service/password-reset?token=".$token;
-                          $result = $mg->sendMessage($domain, array(
-                          // Be sure to replace the from address with the actual email address you're sending from
-                          'from'    => 'support@login.webwright.io',
-                          'to'      => 'jkolnik@mac.com',
-                          'subject' => 'Resetting Password',
-                          'o:tag'   => array('Resetting Password'),
-                            // 'o:tracking-clicks' => 'htmlonly',
-                          'html'    => 'Resetting Password!</br>
+  Flight::halt(200,"Subscription Canceled after non payment");
 
-                          <a href="' .$link. '"><button>Reset Password</button></a></br>
-                          Click the link to reset your password'
-                          ));
+  }
 
-                          Flight::halt(200,"Successfully Sent Password Email");
-                        }
-                        elseif($user_status == 2) {
+      else {
+    Flight::halt(500,"Nothing Worked");
 
-                          Flight::halt(401,"You must have a verified email to perform a password reset");
-                        }
-                        else{
+  }
 
-                          Flight::halt(401,"That email is not in the system.");
-                          }
-                        } else {
-            $user_password = md5($entityBody['user']['password']);
-                try {
-                  $jwt = $entityBody['user']['token'];
-                  $validator = new \Gamegos\JWT\Validator();
-                  $token = $validator->validate($jwt, $jwt_key);
-                  $goodData = json_decode($token->getClaims()['sub']);
-                  $user_email = $goodData->user_email;
-                  $user_security = $goodData->user_security;
-                    } catch (Exception $e) {
-                      Flight::halt(401,"User not authorized - almost last");
-                    }
-            $sql = "SELECT temp_hash FROM temp_table WHERE temp_email = ?";
-  // Flight::stop(401,var_dump($sql));
+  });
 
-            $stmt = $mysqli->prepare($sql);
-            $stmt->bind_param('s',$user_email);
-                if(!$stmt->execute()){
-                  Flight::halt(500,$mysqli->error);
-                }
-            $result = $stmt->get_result();
-            $temp_hash = $result->fetch_assoc();
-            $stmt->close;
-            // Flight::stop(401,var_dump($user_security)-var_dump($temp_hash[temp_hash]));
-
-            if($temp_hash[temp_hash] == $user_security){
-
-            $sql2 = "UPDATE registration SET user_password = ? WHERE (user_email = ?)";
-            // Flight::stop(401,var_dump($sql));
-            $stmt = $mysqli->prepare($sql2);
-            $stmt->bind_param('ss',$user_password,$user_email);
-                      if(!$stmt->execute()){
-                        Flight::halt(500,$mysqli->error);
-                      }
+  Flight::route('POST|GET /password-reset', function(){
+    global $jwt_key;
+  	include "../inc/connection2.php";
+    if(isset($_GET['token'])){
+      try{
+          $jwt = $_GET['token'];
+          $validator = new \Gamegos\JWT\Validator();
+          $token = $validator->validate($jwt, $jwt_key);
+          $goodData = json_decode($token->getClaims()['sub']);
+          $email = $goodData->user_email;
+          }catch(Exception $e){
+      // Flight::redirect('https://dev.webwright.io', [401]) // Redirects to another URL.
+          Flight::halt(401,"User not authorized - first");
+          }
+          // Flight::redirect('../password-reset.php',301);
+          // Flight::render('service/password-reset');
+          Flight::render('password-reset', array('token' => $jwt));
+          // Flight::render('/password-reset',array('parameter' => 'test'));
+          } else {
+          $entityBody = Flight::request()->getBody();
+        	include "../inc/connection2.php";
+        	$entityBody = json_decode($entityBody,true);
+          $user_email = $entityBody['user']['email'];
+          if(empty($entityBody['user']['token'])){
+          $sql = "SELECT user_security FROM registration WHERE user_email = ?";
+          $stmt = $mysqli->prepare($sql);
+          $stmt->bind_param('s',$user_email);
+          if(!$stmt->execute()){
+            Flight::halt(500,$stmt->error);
+          }
+          $result = $stmt->get_result();
+          if($result->num_rows>0){
+      			// $user = $result->fetch_assoc();
             $stmt->close();
-            $sql3 = "DELETE FROM temp_table WHERE temp_email = '".$user_email."'";
-            // Flight::stop(401,var_dump($sql3));
-
-            if(!$mysqli->query($sql3)){
-              Flight::halt(500,$mysqli->error);
-            }
-
-              $mysqli->close();
-              Flight::halt(200,"Successfully Updated Password.  You will be redirected to login page shortly.");
-}
-
-
-            Flight::halt(401,"Security Issue");
-
-        }
+          }else{
+            $stmt->close();
+            Flight::halt(401,"That email is not in the system.");
+          }
   }
+                if(empty($entityBody['user']['password'])){
+                $sql = "SELECT user_security FROM registration WHERE user_email = ?";
+                $stmt = $mysqli->prepare($sql);
+                $stmt->bind_param('s',$user_email);
+                if(!$stmt->execute()){
+                  Flight::halt(500,$stmt->error);
+                }
+                $sql_array = array();
+                $result = $stmt->get_result();
+                $result = $result->fetch_assoc();
+                $stmt->close();
+                $user_security = $result['user_security'];
+                $payload = array('user_email'=>$user_email,'user_security'=>$user_security);
+                $alg = "HS256";
+                $token = new \Gamegos\JWT\Token();
+                $token->setClaim('sub', json_encode($payload));
+                $token->setClaim('exp', time()+60*60);
+                $encoder = new \Gamegos\JWT\Encoder();
+                $encoder->encode($token, $jwt_key, $alg);
+                $token = $token->getJWT();
+                $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
+                $domain = "login.webwright.io";
+                $link = "https://dev.webwright.io/service/password-reset?token=".$token;
+                $result = $mg->sendMessage($domain, array(
+                // Be sure to replace the from address with the actual email address you're sending from
+                'from'    => 'support@login.webwright.io',
+                'to'      => 'jkolnik@mac.com',
+                'subject' => 'Resetting Password',
+                'o:tag'   => array('Resetting Password'),
+                  // 'o:tracking-clicks' => 'htmlonly',
+                'html'    => 'Resetting Password!
+                ' .$link. '
+                Click the link to reset your password'
+                ));
+                Flight::halt(200,"Successfully Sent Password Email");
+              } elseif(!empty($entityBody['user']['token'])) {
+                      $user_password = md5($entityBody['user']['password']);
+                      try {
+                        $jwt = $entityBody['user']['token'];
+                        $validator = new \Gamegos\JWT\Validator();
+                        $token = $validator->validate($jwt, $jwt_key);
+                        $goodData = json_decode($token->getClaims()['sub']);
+                        $user_email = $goodData->user_email;
+                        $user_security = $goodData->user_security;
+                      } catch (Exception $e) {
+                        Flight::halt(401,"User not authorized - almost last");
+                      }
+                      $sql = "UPDATE registration SET user_password = ? WHERE (user_email = ? AND user_security = ?)";
+                      // var_dump($user_password);
+                      // var_dump($user_email);
+                      $stmt = $mysqli->prepare($sql);
+                      $stmt->bind_param('sss',$user_password,$user_email,$user_security);
+                      if(!$stmt->execute()){
+                        Flight::halt(500,$stmt->error);
+                      }
+                      $stmt->close();
+                      Flight::halt(200,"Successfully Updated Password.  You will be redirected to login page shortly.");
+                    } else {
+                      Flight::halt(401,"User not authorized - last");
+                    }
+  }
+  });
+
+
+Flight::route('POST /authy-verify/', function(){
+  $entityBody = Flight::request()->getBody();
+  include "../inc/connection2.php";
+  global $jwt_key;
+  $entityBody = str_replace('\\u0000', '', $entityBody);
+  $entityBody2 = json_decode($entityBody,true);
+  $jwt = substr($_SERVER['HTTP_AUTHORIZATION'],7);
+  $validator = new \Gamegos\JWT\Validator();
+  $token = $validator->validate($jwt, $jwt_key);
+  $goodData = json_decode($token->getClaims()['sub']);
+  $email = $goodData->user_email;
+  $security = $goodData->user_security;
+  $sql_security = "SELECT rt.authy_id FROM registration rt
+  where user_security = ?
+  AND user_email = ?";
+  $stmt = $mysqli->prepare($sql_security);
+  $stmt->bind_param('ss', $security, $email);
+  if(!$stmt->execute()){
+    Flight::halt(401,"User not authorized");
+  }
+  $sql_array = array();
+  $result = $stmt->get_result();
+  $result = $result->fetch_assoc();
+  $stmt->close();
+  Flight::stop(500,printf("shit"));
+  $authy_api = new Authy\AuthyApi('PXD03tc5vZbC78OJJbOM61WqDPgbldUB');
+  $verification = $authy_api->verifyToken($result['authy_id'],$entityBody2['authy']['code'] );
+  if($verification->ok()){
+    Flight::halt(200,"Successfully Verified");
+  } else {
+        foreach($verification->errors() as $field => $message) {
+        Flight::stop(500,printf("$field = $message"));
+        }
+}
 });
+
 
 Flight::start();
 

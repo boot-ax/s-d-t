@@ -4,8 +4,54 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "57a9535d22d3a430986cc0172558d79d",
+    "content-hash": "ee4c0145294215fe3456a258179c4c61",
     "packages": [
+        {
+            "name": "authy/php",
+            "version": "v2.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/authy/authy-php.git",
+                "reference": "20923450907a10c446bbc595d35dd4df9f059560"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/authy/authy-php/zipball/20923450907a10c446bbc595d35dd4df9f059560",
+                "reference": "20923450907a10c446bbc595d35dd4df9f059560",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0",
+                "resty/resty": "~0.6.0"
+            },
+            "require-dev": {
+                "eher/phpunit": ">= 1.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Authy": "lib"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "David Cuadrado",
+                    "email": "david@authy.com"
+                }
+            ],
+            "description": "PHP client for Authy",
+            "homepage": "https://github.com/authy/authy-php",
+            "keywords": [
+                "Authentication",
+                "api",
+                "two-factor"
+            ],
+            "time": "2014-08-15T15:08:21+00:00"
+        },
         {
             "name": "clue/stream-filter",
             "version": "v1.3.0",
@@ -312,16 +358,16 @@
         },
         {
             "name": "guzzlehttp/psr7",
-            "version": "1.4.1",
+            "version": "1.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "0d6c7ca039329247e4f0f8f8f6506810e8248855"
+                "reference": "f5b8a8512e2b58b0071a7280e39f14f72e05d87c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/0d6c7ca039329247e4f0f8f8f6506810e8248855",
-                "reference": "0d6c7ca039329247e4f0f8f8f6506810e8248855",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/f5b8a8512e2b58b0071a7280e39f14f72e05d87c",
+                "reference": "f5b8a8512e2b58b0071a7280e39f14f72e05d87c",
                 "shasum": ""
             },
             "require": {
@@ -373,7 +419,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2017-02-27T10:51:17+00:00"
+            "time": "2017-03-20T17:10:46+00:00"
         },
         {
             "name": "mailgun/mailgun-php",
@@ -917,17 +963,64 @@
             "time": "2016-08-06T14:39:51+00:00"
         },
         {
-            "name": "stripe/stripe-php",
-            "version": "v4.4.2",
+            "name": "resty/resty",
+            "version": "0.6.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/stripe/stripe-php.git",
-                "reference": "c9d4326bb99edd1a9849a6f22c0d8ea3351105de"
+                "url": "https://github.com/fictivekin/Resty.php.git",
+                "reference": "3ba18ec4b507b3b6fcbc49bba5a503baba051c0a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/c9d4326bb99edd1a9849a6f22c0d8ea3351105de",
-                "reference": "c9d4326bb99edd1a9849a6f22c0d8ea3351105de",
+                "url": "https://api.github.com/repos/fictivekin/Resty.php/zipball/3ba18ec4b507b3b6fcbc49bba5a503baba051c0a",
+                "reference": "3ba18ec4b507b3b6fcbc49bba5a503baba051c0a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "funkatron/funit": "dev-master"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Resty\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache 2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Ed Finkler",
+                    "email": "ed@fictivekin.com",
+                    "homepage": "http://fictivekin.com"
+                }
+            ],
+            "description": "A simple PHP library for doing RESTful HTTP stuff. Does not require the curl extension",
+            "homepage": "https://github.com/fictivekin/resty.php",
+            "keywords": [
+                "client",
+                "http",
+                "rest",
+                "restful"
+            ],
+            "time": "2014-02-13T16:19:46+00:00"
+        },
+        {
+            "name": "stripe/stripe-php",
+            "version": "v4.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/stripe/stripe-php.git",
+                "reference": "420d34ae71059700ea2a2e466670f66ddd97777d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/420d34ae71059700ea2a2e466670f66ddd97777d",
+                "reference": "420d34ae71059700ea2a2e466670f66ddd97777d",
                 "shasum": ""
             },
             "require": {
@@ -969,7 +1062,7 @@
                 "payment processing",
                 "stripe"
             ],
-            "time": "2017-02-27T15:48:36+00:00"
+            "time": "2017-03-22T17:51:32+00:00"
         }
     ],
     "packages-dev": [],

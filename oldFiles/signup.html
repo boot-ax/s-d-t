@@ -52,17 +52,36 @@
                    <input ng-required="access" type="text" ng-model="signUp.account_name" class="rowOffset2 flex" autocomplete="off">
                  </md-input-container>
               </div>
+             <div>
+                 <md-input-container layout="row" class="input-row layout-row rowOffset">
+                   <label class="loginLabel">Full Name</label>
+                   <md-icon class="md-icons iconOff">person</md-icon>
+                   <input ng-required="" type="text" ng-model="signUp.fullName" autocomplete="off">
+                 </md-input-container>
+             </div>
+             <div>
+                <md-input-container layout="row" class="input-row layout-row rowOffset">
+                  <label class="loginLabel">Phone Number</label>
+                  <md-icon class="md-icons iconOff">phone</md-icon>
+                  <input type="text" ng-model="signUp.phone" autocomplete="off">
+                </md-input-container>
+            </div>
 
+               <div class="md-errors-spacer"></div>
+               <div>
+                 <md-input-container layout="row" class="input-row layout-row rowOffset">
+                   <label class="loginLabel">Address</label>
+                   <md-icon class="md-icons iconOff">assignment_ind</md-icon>
+                   <textarea type="text" ng-model="signUp.address" autocomplete="off"></textarea>
+                 </md-input-container>
+               </div>
                <section style="margin-top:20px" layout="row" layout-align="center center">
                 <button disabled="disabled" ng-disabled="register.form.$invalid" class="stripe-button-el" stripe-checkout="sUpCtrl.register"
                          data-key="pk_test_DDqS4Ps7loF2JzJPH5JinfPW"
-                         data-email="{{signUp.email}}"
-                         data-zip-code="true"
+                         data-zip-code="false"
                          data-image="https://webwright.io/wp-content/uploads/2016/08/webwright_io-blue-wrench13-300x300.png"
-                         data-name="Lōg&iuml;n"
-                         data-description="Monthy Subscription"
                          >
-                   <span style="display: block; min-height: 30px;">Pay with Card $7.00</span>
+                   <span style="display: block; min-height: 30px;">Pay with Card 7/Mo</span>
              </button>
                </section>
          </div>

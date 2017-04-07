@@ -1,0 +1,33 @@
+
+<md-dialog aria-label="Dialog for Signup" style="max-width:380px">
+  <md-dialog-content>
+<div flex layout="column">
+      <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2>Two Factor Verification</h2>
+        <span flex></span>
+        <md-button class="md-icon-button" ng-click="authyCtrl.cancel()">
+          <md-icon class="material-icons" aria-label="Close dialog">close</md-icon>
+        </md-button>
+      </div>
+    </md-toolbar>
+       <form flex layout="row" name="authy.form" layout-padding>
+         <span flex ></span>
+           <div layout="column">
+             <h2>Enter the Code that was sent to the phone number you entered.</h2>
+             <div>
+                 <md-input-container flex layout="row" class="input-row layout-row rowOffset">
+                   <label class="loginLabel required">Code</label>
+                   <md-icon class="md-icons iconOff">security</md-icon>
+                   <input ng-required="true" type="security" ng-model="authy.code" autocomplete="off">
+                 </md-input-container>
+             </div>
+               <section style="margin-top:20px" layout="row" layout-align="center center">
+                 <md-button ng-disabled="authy.form.$invalid" class="md-raised md-primary" ng-click="authyVerify(authy)">Submit</md-button>
+               </section>
+         </div>
+       <span flex></span>
+     </form>
+</div>
+</md-dialog-content>
+</md-dialog>
