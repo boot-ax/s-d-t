@@ -61,11 +61,26 @@
                         <md-switch ng-model="profile.authy_id" layout-align="start" aria-label="active switch">
                                    Enable two factor identification
                              </md-switch>
-
+<div layout="row">
                <md-switch layout-align="start" ng-click="access = !access" aria-label="active switch">
                       Change Password
                 </md-switch>
-
+                <span flex 5></span>
+                <section layout="row" layout-align="right center">
+                 <button class="stripe-button-el" stripe-checkout="stripeChange"
+                          data-key="pk_test_DDqS4Ps7loF2JzJPH5JinfPW"
+                          data-email="{{profile.user_email}}"
+                          data-zip-code="true"
+                          data-image="https://webwright.io/wp-content/uploads/2016/08/webwright_io-blue-wrench13-300x300.png"
+                          data-name="Lōg&iuml;n"
+                          data-panel-label="Update Card Details"
+                          data-name="Update Card Details"
+                          data-allow-remember-me=false
+                          >
+                    <span style="display: block; min-height: 30px;">Update Card Details</span>
+              </button>
+                </section>
+</div>
                 <!-- <md-checkbox layout-align="start" ng-model="data.cb1" ng-click="access = !access" aria-label="Checkbox">
                      Change Password
                </md-checkbox> -->
@@ -91,6 +106,7 @@
                        <input ng-show="access" match-password="newPassword" type="password" name="confirmPassword" ng-model="profile.password2">
                      </md-input-container>
                </div>
+
                <section flex style="margin-top:20px" layout="row" layout-align="center center">
                 <md-button ng-disabled="register.form.$invalid" class="md-raised md-primary" ng-click="profileChange($event,profile)" type="button">Change Profile</md-button>
               </section>

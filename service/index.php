@@ -1869,7 +1869,7 @@ Flight::route('POST /stripe-991c8971ff31a83c454f371f55c85be5', function(){
 
   });
 
-  Flight::route('POST|GET /password-reset', function(){
+Flight::route('POST|GET /password-reset', function(){
     global $jwt_key;
   	include "../inc/connection2.php";
     if(isset($_GET['token'])){
@@ -1970,6 +1970,77 @@ Flight::route('POST /stripe-991c8971ff31a83c454f371f55c85be5', function(){
                     }
   }
   });
+
+Flight::route('POST /stripe-change/', function(){
+    $entityBody = Flight::request()->getBody();
+    include "../inc/connection2.php";
+    global $jwt_key;
+    $entityBody = str_replace('\\u0000', '', $entityBody);
+    $entityBody2 = json_decode($entityBody,true);
+    // Flight::stop(401,var_dump($entityBody2));
+    $jwt = substr($_SERVER['HTTP_AUTHORIZATION'],7);
+    $validator = new \Gamegos\JWT\Validator();
+    $token = $validator->validate($jwt, $jwt_key);
+    $goodData = json_decode($token->getClaims()['sub']);
+    $email = $goodData->user_email;
+    $security = $goodData->user_security;
+    $sql_security = "SELECT rt.account_ID,rt.user_stripe_token FROM registration rt
+    where user_security = ?
+    AND user_email = ?";
+    $stmt = $mysqli->prepare($sql_security);
+    $stmt->bind_param('ss', $security, $email);
+    if(!$stmt->execute()){
+      Flight::halt(401,"User not authorized");
+    }
+    $sql_array = array();
+    $result = $stmt->get_result();
+    $result = $result->fetch_assoc();
+    $stmt->close();
+
+    if(empty($result['user_stripe_token'])){
+          Flight::halt(401,"You are not the account originator");
+    }
+
+    $sql = "SELECT stripe_customer_ID FROM account
+    WHERE account_ID = ?";
+    $stmt2 = $mysqli->prepare($sql);
+    $stmt2->bind_param('s', $result['account_ID']);
+    if(!$stmt2->execute()){
+      Flight::halt(401,"User not authorized");
+    }
+    $result2 = $stmt2->get_result();
+    $result2 = $result2->fetch_assoc();
+    $stmt2->close();
+    $stripe = array(
+      "secret_key"      =>  "sk_test_tN4uGQsemjKrJ2tLpqg3VgIe",
+      "publishable_key" =>  "pk_test_DDqS4Ps7loF2JzJPH5JinfPW"
+    );
+
+  Stripe::setApiKey($stripe['secret_key']);
+
+  // Flight::stop(401,var_dump($entityBody2['$token']['id']));
+  $token = $entityBody2['$token']['id'];
+  try {
+    $cu = \Stripe\Customer::retrieve($result2['stripe_customer_ID']); // stored in your application
+    $cu->source = $token; // obtained with Checkout
+    $cu->save();
+    $success = "Your card details have been updated!";
+    Flight::halt(200,$success);
+  }
+  catch(\Stripe\Error\Card $e) {
+    // Use the variable $error to save any errors
+    // To be displayed to the customer later in the page
+    $body = $e->getJsonBody();
+    $err  = $body['error'];
+    $error = $err['message'];
+    Flight::halt(500,$body.$err.$error);
+  }
+  // Add additional error handling here as needed
+
+
+
+  });
+
 
 
 Flight::route('POST /authy-verify/', function(){
