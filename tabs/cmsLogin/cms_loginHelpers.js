@@ -8,7 +8,7 @@ angular.module('SE_App').factory('$cms_login', ['$resource', function ($resource
 
 //===========================================================
 
-angular.module('SE_App').controller('addCMSController', ['$mdDialog', '$cms_login', '$scope' , '$http', '$q', '$mdToast',function ($mdDialog, $cms_login, $scope, $http, $q, $mdToast) {
+angular.module('SE_App').controller('addCMSController', ['$mdDialog', '$cms_login', '$scope' , '$http', '$q', 'ngToast',function ($mdDialog, $cms_login, $scope, $http, $q, ngToast) {
   'use strict';
 
 
@@ -24,22 +24,23 @@ $scope.getDomainsFunc = function(){
   this.cancel = $mdDialog.cancel;
 
   function success(cms_login_table) {
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent('New Content Added')
-          .hideDelay(3000)
-      );
+    ngToast.create({
+      className: 'success',
+      content: 'New Content Added',
+      dismissButton: 'true'
+      });
     $mdDialog.hide(cms_login_table);
   }
 
 
-    function fedup(data){
+    function fedup(response){
   	//console.log('FAILED!',data);
-	$mdToast.show(
-      $mdToast.simple()
-        .textContent(data.data)
-        .hideDelay(3000)
-    );
+    ngToast.create({
+      className: 'danger toasthome',
+      content: response.data,
+      dismissButton: 'true',
+      timeout: 9000
+      });
   }
 
   this.addItem = function () {
@@ -54,7 +55,7 @@ $scope.getDomainsFunc = function(){
 
 // =======================================================
 
-angular.module('SE_App').controller('deleteCMSController', ['$authorize', 'cms_login_tables', '$mdDialog', '$cms_login', '$scope', '$q', '$mdToast',function ($authorize, cms_login_tables, $mdDialog, $cms_login, $scope, $q, $mdToast) {
+angular.module('SE_App').controller('deleteCMSController', ['$authorize', 'cms_login_tables', '$mdDialog', '$cms_login', '$scope', '$q', 'ngToast',function ($authorize, cms_login_tables, $mdDialog, $cms_login, $scope, $q, ngToast) {
   'use strict';
 
   this.cancel = $mdDialog.cancel;
@@ -75,19 +76,20 @@ angular.module('SE_App').controller('deleteCMSController', ['$authorize', 'cms_l
   }
 
   function success() {
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent('Successfully Deleted')
-          .hideDelay(3000)
-      );
+    ngToast.create({
+      className: 'success',
+      content: 'Successfully Deleted',
+      dismissButton: 'true'
+      });
     }
 
   function error(response) {
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent(response.data)
-          .hideDelay(3000)
-      );
+    ngToast.create({
+      className: 'danger toasthome',
+      content: response.data,
+      dismissButton: 'true',
+      timeout: 9000
+      });
     }
     this.authorizeUser = function () {
       $q.all(cms_login_tables.forEach(deleteDessert)).then(onComplete);

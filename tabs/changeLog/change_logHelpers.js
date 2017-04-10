@@ -8,7 +8,7 @@ angular.module('SE_App').factory('$change_log', ['$resource', function ($resourc
 
 //===========================================================
 
-angular.module('SE_App').controller('addChange_logController', ['$mdDialog', '$change_log', '$scope' , '$http', '$q','$mdToast', function ($mdDialog, $change_log, $scope, $http, $q, $mdToast) {
+angular.module('SE_App').controller('addChange_logController', ['$mdDialog', '$change_log', '$scope' , '$http', '$q','ngToast', function ($mdDialog, $change_log, $scope, $http, $q, ngToast) {
   'use strict';
 
 
@@ -24,21 +24,22 @@ $scope.getOwnersFunc = function(){
   this.cancel = $mdDialog.cancel;
 
   function success(change_log_table) {
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent('New Content Added')
-          .hideDelay(3000)
-      );
+    ngToast.create({
+      className: 'success',
+      content: 'New Content Added',
+      dismissButton: 'true'
+      });
     $mdDialog.hide(change_log_table);
   }
 
-    function fedup(data){
+    function fedup(response){
   	//console.log('FAILED!',data);
-	$mdToast.show(
-      $mdToast.simple()
-        .textContent(data.data)
-        .hideDelay(3000)
-    );
+    ngToast.create({
+      className: 'danger toasthome',
+      content: response.data,
+      dismissButton: 'true',
+      timeout: 9000
+      });
   }
 
 
@@ -60,7 +61,7 @@ $scope.getOwnersFunc = function(){
 
 // =======================================================
 
-angular.module('SE_App').controller('deleteChange_logController', ['$authorize', 'change_log_tables', '$mdDialog', '$change_log', '$scope', '$q', '$mdToast',function ($authorize, change_log_tables, $mdDialog, $change_log, $scope, $q,$mdToast) {
+angular.module('SE_App').controller('deleteChange_logController', ['$authorize', 'change_log_tables', '$mdDialog', '$change_log', '$scope', '$q', 'ngToast',function ($authorize, change_log_tables, $mdDialog, $change_log, $scope, $q,ngToast) {
   'use strict';
 
   this.cancel = $mdDialog.cancel;
@@ -81,19 +82,20 @@ angular.module('SE_App').controller('deleteChange_logController', ['$authorize',
   }
 
   function success() {
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent('Successfully Deleted')
-          .hideDelay(3000)
-      );
+    ngToast.create({
+      className: 'success',
+      content: 'New Content Added',
+      dismissButton: 'true'
+      });
     }
 
   function error(response) {
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent(response.data)
-          .hideDelay(3000)
-      );
+    ngToast.create({
+      className: 'danger toasthome',
+      content: response.data,
+      dismissButton: 'true',
+      timeout: 9000
+      });
     }
     this.authorizeUser = function () {
       $q.all(change_log_tables.forEach(deleteDessert)).then(onComplete);
@@ -103,27 +105,28 @@ angular.module('SE_App').controller('deleteChange_logController', ['$authorize',
 
 // =======================================================
 
-angular.module('SE_App').controller('bulkUploadController', ['$mdDialog', '$change_log', '$scope' , '$http', '$q','$mdToast', function ($mdDialog, $change_log, $scope, $http, $q, $mdToast) {
+angular.module('SE_App').controller('bulkUploadController', ['$mdDialog', '$change_log', '$scope' , '$http', '$q','ngToast', function ($mdDialog, $change_log, $scope, $http, $q, ngToast) {
   'use strict';
 
   this.cancel = $mdDialog.cancel;
 
   function success(change_log_table) {
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent('New Content Added')
-          .hideDelay(3000)
-      );
+    ngToast.create({
+      className: 'success',
+      content: 'Successfully Deleted',
+      dismissButton: 'true'
+      });
     $mdDialog.hide(change_log_table);
   }
 
-    function fedup(data){
+    function fedup(response){
   	//console.log('FAILED!',data);
-	$mdToast.show(
-      $mdToast.simple()
-        .textContent(data.data)
-        .hideDelay(3000)
-    );
+    ngToast.create({
+      className: 'danger toasthome',
+      content: response.data,
+      dismissButton: 'true',
+      timeout: 9000
+      });
   }
 
 

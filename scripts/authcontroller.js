@@ -1,7 +1,7 @@
 
-angular.module('SE_App').controller('loginController', ['$mdDialog','$scope', '$mdEditDialog', '$http','$mdToast',
+angular.module('SE_App').controller('loginController', ['$mdDialog','$scope', '$mdEditDialog', '$http','ngToast',
 '$q','$auth','$state',
-    function ($mdDialog,$scope, $mdEditDialog, $http,$mdToast,$q,$auth,$state) {
+    function ($mdDialog,$scope, $mdEditDialog, $http,ngToast,$q,$auth,$state) {
   'use strict';
 
   $scope.login = function($uuser){
@@ -23,17 +23,39 @@ angular.module('SE_App').controller('loginController', ['$mdDialog','$scope', '$
                              }
                           })
                     } else {
-        $mdToast.show(
-            $mdToast.simple()
-              .textContent('Successfully Loged In')
-              .hideDelay(3000)
-          );
+        // $mdToast.show(
+        //     $mdToast.simple()
+        //       .textContent('Successfully Loged In')
+        //       .hideDelay(3000)
+        //       .position('top center')
+        //       .toastClass('toastclass')
+        //   );
+          ngToast.create({
+            className: 'success',
+            content: 'Successfully Loged In',
+            dismissButton: 'true'
+            });
         }
 				$state.go('home.domains');
 			})
 			.catch(function(response) {
 				$scope.busy = false;
-				$mdToast.show($mdToast.simple().textContent(response.data).hideDelay(6000));
+        // $mdToast.show({
+        // hideDelay   : 9000,
+        // position    : 'top center',
+        // controller  : 'ToastCtrl',
+        // templateUrl : '/partials/toast-template.html',
+        // resolve: {
+        //      $response: function () {
+        //        return response;
+        //      }
+        //    }
+        // });
+        ngToast.create({
+          className: 'warning toasthome',
+          content: response.data,
+          dismissButton: 'true',
+          });
 			});
     }
     $scope.forgotPassword = function (event) {
@@ -61,9 +83,9 @@ angular.module('SE_App').controller('loginController', ['$mdDialog','$scope', '$
     };
 }]);
 
-angular.module('SE_App').controller('signupController', ['$mdDialog','$scope', '$mdEditDialog', '$http','$mdToast',
+angular.module('SE_App').controller('signupController', ['$mdDialog','$scope', '$mdEditDialog', '$http','ngToast',
 '$q',
-    function ($mdDialog,$scope, $mdEditDialog, $http,$mdToast,$q) {
+    function ($mdDialog,$scope, $mdEditDialog, $http,$q,ngToast) {
   'use strict';
 
   function stripeResponse(response) {
@@ -91,31 +113,46 @@ angular.module('SE_App').controller('signupController', ['$mdDialog','$scope', '
 
         stripeResponse(response);
     })
-
       .catch(function(response) {
-
-        $mdToast.show($mdToast.simple().textContent(response.data).hideDelay(6000));
+        // $mdToast.show({
+        // hideDelay   : 9000,
+        // position    : 'top left',
+        // controller  : 'ToastCtrl',
+        // templateUrl : '/partials/toast-template.html',
+        // resolve: {
+        //      $response: function () {
+        //        return response;
+        //      }
+        //    }
+        // });
+        ngToast.create({
+          className: 'warning toasthome',
+          content: response.data,
+          dismissButton: 'true',
+          timeout: 9000
+          });
       });
 
     }
   }
 
     function success(signUp) {
-      $mdToast.show(
-          $mdToast.simple()
-            .textContent('New Content Added')
-            .hideDelay(3000)
-        );
+      ngToast.create({
+        className: 'success',
+        content: 'New Content Added',
+        dismissButton: 'true'
+        });
       $mdDialog.hide(software_keys_table);
     }
 
-      function fedup(data){
+      function fedup(response){
     	//console.log('FAILED!',data);
-  	$mdToast.show(
-        $mdToast.simple()
-          .textContent(data.data)
-          .hideDelay(3000)
-      );
+      ngToast.create({
+        className: 'danger toasthome',
+        content: response.data,
+        dismissButton: 'true',
+        timeout: 9000
+        });
     }
 
     $scope.hide = function() {
@@ -133,24 +170,19 @@ angular.module('SE_App').controller('signupController', ['$mdDialog','$scope', '
 }]);
 
 
-angular.module('SE_App').controller('deleteAccountController', ['$mdDialog','$scope', '$mdEditDialog', '$http','$mdToast',
+angular.module('SE_App').controller('deleteAccountController', ['$mdDialog','$scope', '$mdEditDialog', '$http','ngToast',
 '$q',
-    function ($mdDialog, $scope, $mdEditDialog, $http,$mdToast,$q) {
+    function ($mdDialog, $scope, $mdEditDialog, $http,ngToast,$q) {
   'use strict';
 
   this.cancelAccount = function(){
     $http.post('/service/delete-account/').then(function(response){
-      $mdToast.show({
-        hideDelay   : 9000,
-        position    : 'bottom left',
-        controller  : 'ToastCtrl',
-        templateUrl : '/partials/toast-template.html',
-        resolve: {
-             $response: function () {
-               return response;
-           }
-         }
-      });
+      ngToast.create({
+        className: 'danger toasthome',
+        content: response.data,
+        dismissButton: 'true',
+        timeout: 9000
+        });
         $mdDialog.hide();
   });
   }
@@ -161,22 +193,27 @@ angular.module('SE_App').controller('deleteAccountController', ['$mdDialog','$sc
 
 
 
-  angular.module('SE_App').controller('forgotPasswordController', ['$mdDialog','$scope', '$mdEditDialog', '$http','$mdToast',
-  function ($mdDialog, $scope, $mdEditDialog, $http,$mdToast) {
+  angular.module('SE_App').controller('forgotPasswordController', ['$mdDialog','$scope', '$mdEditDialog', '$http','ngToast',
+  function ($mdDialog, $scope, $mdEditDialog, $http,ngToast) {
     'use strict';
 
     $scope.resetPassword = function($user){
       $scope.forgotPassword.form.$setSubmitted();
       $http.post('/service/password-reset/',{user: $user}).then(function(response){
-        $mdToast.show(
-            $mdToast.simple()
-              .textContent(response.data)
-              .hideDelay(3000)
-          );
+        ngToast.create({
+          className: 'success',
+          content: response.data,
+          dismissButton: 'true',
+          });
           $mdDialog.hide();
     }).catch(function(response) {
       $scope.busy = false;
-      $mdToast.show($mdToast.simple().textContent(response.data).hideDelay(6000));
+      ngToast.create({
+        className: 'danger toasthome',
+        content: response.data,
+        dismissButton: 'true',
+        timeout: 9000
+        });
     });
     }
 
@@ -187,9 +224,9 @@ angular.module('SE_App').controller('deleteAccountController', ['$mdDialog','$sc
 
   }]);
 
-  angular.module('SE_App').controller('profileChangeController', ['$mdDialog','$scope', '$mdEditDialog', '$http','$mdToast',
+  angular.module('SE_App').controller('profileChangeController', ['$mdDialog','$scope', '$mdEditDialog', '$http','ngToast',
   '$q', '$profile',
-      function ($mdDialog, $scope, $mdEditDialog, $http,$mdToast,$q,$profile) {
+      function ($mdDialog, $scope, $mdEditDialog, $http,ngToast,$q,$profile) {
         'use strict';
         this.profileChange2 = function(){
           $http.post('/service/newprofileinfo/',{newProfile: $profile})
@@ -215,11 +252,11 @@ angular.module('SE_App').controller('deleteAccountController', ['$mdDialog','$sc
                         templateUrl: 'partials/authy.html',
                         })
                   } else {
-        $mdToast.show(
-            $mdToast.simple()
-              .textContent(response.data)
-              .hideDelay(3000)
-          );
+                    ngToast.create({
+                      className: 'success',
+                      content: response.data,
+                      dismissButton: 'true',
+                      });
         }
           $mdDialog.hide();
     };
@@ -240,9 +277,9 @@ angular.module('SE_App').controller('deleteAccountController', ['$mdDialog','$sc
               };
     }]);
 
-    angular.module('SE_App').controller('stripeResponseController', ['$mdDialog', '$scope', '$mdEditDialog', '$http','$mdToast',
+    angular.module('SE_App').controller('stripeResponseController', ['$mdDialog', '$scope', '$mdEditDialog', '$http','ngToast',
     '$q', '$response',
-    function ($mdDialog, $scope, $mdEditDialog, $http,$mdToast,$q,$response) {
+    function ($mdDialog, $scope, $mdEditDialog, $http,ngToast,$q,$response) {
       'use strict';
 
       $scope.response = $response.data;
@@ -259,8 +296,8 @@ angular.module('SE_App').controller('deleteAccountController', ['$mdDialog','$sc
 
 
 
-    angular.module('SE_App').controller('authy', ['$mdDialog','$scope', '$mdEditDialog', '$http','$mdToast',
-    function ($mdDialog, $scope, $mdEditDialog, $http,$mdToast) {
+    angular.module('SE_App').controller('authy', ['$mdDialog','$scope', '$mdEditDialog', '$http','ngToast',
+    function ($mdDialog, $scope, $mdEditDialog, $http,ngToast) {
       'use strict';
 
       this.cancel = function() {

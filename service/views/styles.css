@@ -137,7 +137,8 @@ h2 {
 
 .loginLabel{
 	/*margin-right:15px;*/
-	margin-left:12%;
+
+	font-size: 1.1em;
 }
 
 .rowOffset{
@@ -174,3 +175,16 @@ md-input-container.md-default-theme label,
  md-input-container.md-default-theme .md-placeholder{
     color:red !important;
 }
+
+@media screen and (max-width: 959px) {
+.toasthome {
+		 margin-top: 50%;
+		 position: static;
+		 /*transform: translate3d(-50%, 0, 0);*/
+}
+}
+
+.required:after {
+	color:red;
+	content:" *";
+ }

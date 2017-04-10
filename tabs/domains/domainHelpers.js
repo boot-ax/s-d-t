@@ -8,7 +8,7 @@ angular.module('SE_App').factory('$domains', ['$resource', function ($resource) 
 
 //===========================================================
 
-angular.module('SE_App').controller('addDomainController', ['$mdDialog', '$domains', '$scope' , '$http', '$q','$mdToast',function ($mdDialog, $domains, $scope, $http, $q,$mdToast) {
+angular.module('SE_App').controller('addDomainController', ['$mdDialog', '$domains', '$scope' , '$http', '$q','ngToast',function ($mdDialog, $domains, $scope, $http, $q,ngToast) {
   'use strict';
 $scope.myDate = new Date();
 
@@ -30,22 +30,21 @@ $scope.getRegistrarsFunc = function(){
   this.cancel = $mdDialog.cancel;
 
   function success(domains_table) {
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent('New Content Added')
-          .hideDelay(3000)
-      );
+    ngToast.create({
+      className: 'success',
+      content: 'New Content Added',
+      dismissButton: 'true'
+      });
     $mdDialog.hide(domains_table);
   }
 
-    function fedup(data){
-  	//console.log('FAILED!',data);
-    console.log(data.data);
-	$mdToast.show(
-      $mdToast.simple()
-        .textContent(data.data)
-        .hideDelay(3000)
-    );
+    function fedup(response){
+      ngToast.create({
+        className: 'danger toasthome',
+        content: response.data,
+        dismissButton: 'true',
+        timeout: 9000
+        });
   }
 
   this.addItem = function () {
@@ -69,7 +68,7 @@ $scope.getRegistrarsFunc = function(){
 
 // =======================================================
 
-angular.module('SE_App').controller('deleteDomainController', ['$authorize', 'domains_tables', '$mdDialog', '$domains', '$scope', '$q', '$mdToast',function ($authorize, domains_tables, $mdDialog, $domains, $scope, $q,$mdToast) {
+angular.module('SE_App').controller('deleteDomainController', ['$authorize', 'domains_tables', '$mdDialog', '$domains', '$scope', '$q', 'ngToast',function ($authorize, domains_tables, $mdDialog, $domains, $scope, $q,ngToast) {
   'use strict';
 
   this.cancel = $mdDialog.cancel;
@@ -89,19 +88,20 @@ angular.module('SE_App').controller('deleteDomainController', ['$authorize', 'do
   }
 
 function success() {
-  $mdToast.show(
-      $mdToast.simple()
-        .textContent('Successfully Deleted')
-        .hideDelay(3000)
-    );
+  ngToast.create({
+    className: 'success',
+    content: 'Successfully Deleted',
+    dismissButton: 'true'
+    });
   }
 
 function error(response) {
-  $mdToast.show(
-      $mdToast.simple()
-        .textContent(response.data)
-        .hideDelay(3000)
-    );
+  ngToast.create({
+    className: 'danger toasthome',
+    content: response.data,
+    dismissButton: 'true',
+    timeout: 9000
+    });
   }
   this.authorizeUser = function () {
     $q.all(domains_tables.forEach(deleteDessert)).then(onComplete);

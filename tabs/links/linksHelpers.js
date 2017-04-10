@@ -8,7 +8,7 @@ angular.module('SE_App').factory('$links', ['$resource', function ($resource) {
 
 //===========================================================
 
-angular.module('SE_App').controller('addLinksController', ['$mdDialog', '$links', '$scope' , '$http', '$q','$mdToast',function ($mdDialog, $links, $scope, $http, $q, $mdToast) {
+angular.module('SE_App').controller('addLinksController', ['$mdDialog', '$links', '$scope' , '$http', '$q','ngToast',function ($mdDialog, $links, $scope, $http, $q, ngToast) {
   'use strict';
 
 $scope.myDate = new Date();
@@ -23,21 +23,22 @@ $scope.getLinksFunc = function(){
   this.cancel = $mdDialog.cancel;
 
   function success(links_table) {
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent('New Content Added')
-          .hideDelay(3000)
-      );
+    ngToast.create({
+      className: 'success',
+      content: 'New Content Added',
+      dismissButton: 'true'
+      });
     $mdDialog.hide(links_table);
   }
 
-    function fedup(data){
+    function fedup(response){
   	//console.log('FAILED!',data);
-	$mdToast.show(
-      $mdToast.simple()
-        .textContent(data.data)
-        .hideDelay(3000)
-    );
+    ngToast.create({
+      className: 'danger toasthome',
+      content: response.data,
+      dismissButton: 'true',
+      timeout: 9000
+      });
   }
 
 
@@ -59,7 +60,7 @@ $scope.getLinksFunc = function(){
 
 // =======================================================
 
-angular.module('SE_App').controller('deleteLinksController', ['$authorize', 'links_tables', '$mdDialog', '$links', '$scope', '$q', '$mdToast',function ($authorize, links_tables, $mdDialog, $links, $scope, $q,$mdToast) {
+angular.module('SE_App').controller('deleteLinksController', ['$authorize', 'links_tables', '$mdDialog', '$links', '$scope', '$q', 'ngToast',function ($authorize, links_tables, $mdDialog, $links, $scope, $q,ngToast) {
   'use strict';
 
   this.cancel = $mdDialog.cancel;
@@ -80,19 +81,20 @@ angular.module('SE_App').controller('deleteLinksController', ['$authorize', 'lin
   }
 
   function success() {
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent('Successfully Deleted')
-          .hideDelay(3000)
-      );
+    ngToast.create({
+      className: 'success',
+      content: 'Successfully Deleted',
+      dismissButton: 'true'
+      });
     }
 
   function error(response) {
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent(response.data)
-          .hideDelay(3000)
-      );
+    ngToast.create({
+      className: 'danger toasthome',
+      content: response.data,
+      dismissButton: 'true',
+      timeout: 9000
+      });
     }
     this.authorizeUser = function () {
       $q.all(links_tables.forEach(deleteDessert)).then(onComplete);

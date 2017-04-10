@@ -8,7 +8,7 @@ angular.module('SE_App').factory('$resource_login', ['$resource', function ($res
 
 //===========================================================
 
-angular.module('SE_App').controller('addResource_loginController', ['$mdDialog', '$resource_login', '$scope' , '$http', '$mdToast',function ($mdDialog, $resource_login, $scope, $http,$mdToast) {
+angular.module('SE_App').controller('addResource_loginController', ['$mdDialog', '$resource_login', '$scope' , '$http', 'ngToast',function ($mdDialog, $resource_login, $scope, $http,ngToast) {
   'use strict';
 $scope.myDate = new Date();
 
@@ -22,21 +22,22 @@ $scope.getOwnersFunc = function(){
   this.cancel = $mdDialog.cancel;
 
   function success(resource_login_table) {
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent('New Content Added')
-          .hideDelay(3000)
-      );
+    ngToast.create({
+      className: 'success',
+      content: 'New Content Added',
+      dismissButton: 'true'
+      });
     $mdDialog.hide(resource_login_table);
   }
 
-    function fedup(data){
+    function fedup(response){
   	//console.log('FAILED!',data);
-	$mdToast.show(
-      $mdToast.simple()
-        .textContent(data.data)
-        .hideDelay(3000)
-    );
+    ngToast.create({
+      className: 'danger toasthome',
+      content: response.data,
+      dismissButton: 'true',
+      timeout: 9000
+      });
   }
 
   this.addItem = function () {
@@ -51,7 +52,7 @@ $scope.getOwnersFunc = function(){
 
 // =======================================================
 
-angular.module('SE_App').controller('deleteResource_loginController', ['$authorize', 'resource_login_tables', '$mdDialog', '$resource_login', '$scope', '$q', '$mdToast',function ($authorize, resource_login_tables, $mdDialog, $resource_login, $scope, $q,$mdToast) {
+angular.module('SE_App').controller('deleteResource_loginController', ['$authorize', 'resource_login_tables', '$mdDialog', '$resource_login', '$scope', '$q', 'ngToast',function ($authorize, resource_login_tables, $mdDialog, $resource_login, $scope, $q,ngToast) {
   'use strict';
 
   this.cancel = $mdDialog.cancel;
@@ -72,19 +73,20 @@ angular.module('SE_App').controller('deleteResource_loginController', ['$authori
   }
 
   function success() {
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent('Successfully Deleted')
-          .hideDelay(3000)
-      );
+    ngToast.create({
+      className: 'success',
+      content: 'Successfully Deleted',
+      dismissButton: 'true'
+      });
     }
 
   function error(response) {
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent(response.data)
-          .hideDelay(3000)
-      );
+    ngToast.create({
+      className: 'danger toasthome',
+      content: response.data,
+      dismissButton: 'true',
+      timeout: 9000
+      });
     }
     this.authorizeUser = function () {
       $q.all(resource_login_tables.forEach(deleteDessert)).then(onComplete);

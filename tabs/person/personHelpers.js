@@ -8,7 +8,7 @@ angular.module('SE_App').factory('$person', ['$resource', function ($resource) {
 
 //===========================================================
 
-angular.module('SE_App').controller('addPersonController', ['$mdDialog', '$person', '$scope' , '$http', '$mdToast',function ($mdDialog, $person, $scope, $http,$mdToast) {
+angular.module('SE_App').controller('addPersonController', ['$mdDialog', '$person', '$scope' , '$http', 'ngToast',function ($mdDialog, $person, $scope, $http,ngToast) {
   'use strict';
 $scope.myDate = new Date();
 
@@ -22,21 +22,21 @@ $scope.getPersonsFunc = function(){
   this.cancel = $mdDialog.cancel;
 
   function success(person_table) {
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent('New Content Added')
-          .hideDelay(3000)
-      );
+    ngToast.create({
+      className: 'success',
+      content: 'New Content Added',
+      dismissButton: 'true'
+      });
     $mdDialog.hide(person_table);
   }
 
-    function fedup(data){
-  	//console.log('FAILED!',data);
-	$mdToast.show(
-      $mdToast.simple()
-        .textContent(data.data)
-        .hideDelay(3000)
-    );
+    function fedup(response){
+      ngToast.create({
+        className: 'danger toasthome',
+        content: response.data,
+        dismissButton: 'true',
+        timeout: 9000
+        });
   }
 
   this.addItem = function () {
@@ -51,7 +51,7 @@ $scope.getPersonsFunc = function(){
 
 // =======================================================
 
-angular.module('SE_App').controller('deletePersonController', ['$authorize', 'person_tables', '$mdDialog', '$person', '$scope', '$q', '$mdToast',function ($authorize, person_tables, $mdDialog, $person, $scope, $q,$mdToast) {
+angular.module('SE_App').controller('deletePersonController', ['$authorize', 'person_tables', '$mdDialog', '$person', '$scope', '$q', 'ngToast',function ($authorize, person_tables, $mdDialog, $person, $scope, $q,ngToast) {
   'use strict';
 
   this.cancel = $mdDialog.cancel;
@@ -72,19 +72,20 @@ angular.module('SE_App').controller('deletePersonController', ['$authorize', 'pe
   }
 
   function success() {
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent('Successfully Deleted')
-          .hideDelay(3000)
-      );
+    ngToast.create({
+      className: 'success',
+      content: 'Successfully Deleted',
+      dismissButton: 'true'
+      });
     }
 
   function error(response) {
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent(response.data)
-          .hideDelay(3000)
-      );
+    ngToast.create({
+      className: 'danger toasthome',
+      content: response.data,
+      dismissButton: 'true',
+      timeout: 9000
+      });
     }
     this.authorizeUser = function () {
       $q.all(person_tables.forEach(deleteDessert)).then(onComplete);
@@ -94,7 +95,7 @@ angular.module('SE_App').controller('deletePersonController', ['$authorize', 'pe
 
 // =======================================================
 
-angular.module('SE_App').controller('getPwrdController', ['$mdDialog', '$person', '$scope','changeCellServices','$object','$http','$q','$mdToast', function ($mdDialog, $person, $scope,changeCellServices,$object,$http,$q,$mdToast) {
+angular.module('SE_App').controller('getPwrdController', ['$mdDialog', '$person', '$scope','changeCellServices','$object','$http','$q','ngToast', function ($mdDialog, $person, $scope,changeCellServices,$object,$http,$q,ngToast) {
   'use strict';
 $scope.$email = $object.email;
 console.log($object.value);
@@ -115,20 +116,27 @@ $scope.isHidden = $object.value;
 
   function changeDropdown(){
                   var success  = function(data){
-                      $mdToast.show(
-                          $mdToast.simple()
+                      ngToast.show(
+                          ngToast.simple()
                             .textContent(data.data)
                             .hideDelay(3000)
+                            .position('top left')
                         );
                         $mdDialog.hide();
                     };
 
-                    var failure  = function(data){
-                      $mdToast.show(
-                          $mdToast.simple()
-                            .textContent(data.data)
-                            .hideDelay(3000)
-                        );
+                    var failure  = function(response){
+                      ngToast.show({
+                      hideDelay   : 9000,
+                      position    : 'top left',
+                      controller  : 'ToastCtrl',
+                      templateUrl : '/partials/toast-template.html',
+                      resolve: {
+                           $response: function () {
+                             return response;
+                           }
+                         }
+                      });
                     };
 
                   var deferred = $q.defer();

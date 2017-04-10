@@ -7,6 +7,9 @@
 	<meta name="description" content="WebWright's Data Collection Software">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<title>WebWright Data Management</title>
+	<link rel="stylesheet" href="views/bootstrap.css">
+	<link rel="stylesheet" href="views/ngToast.min.css">
+	<link rel="stylesheet" href="views/ngToast-animations.min.css">
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	<link href="views/angular-material.min.css" rel="stylesheet" type="text/css"/>
 	<link href="views/loading-bar.min.css" rel="stylesheet" type="text/css"/>
@@ -15,6 +18,7 @@
 
 </head>
 <body ng-controller="password-resetController">
+	<toast></toast>
 <div class="box" layout="row" layout-align="center center">
 	<!-- <md-card layout="column" ng-show="busy" layout-align="center center">
 		<md-progress-circular md-mode="indeterminate"></md-progress-circular>
@@ -69,6 +73,7 @@
 <script type="text/javascript" src="views/app.js"></script>
 <script type="text/javascript" src="views/angular-password.min.js"></script>
 <script type="text/javascript" src="views/loading-bar.min.js"></script>
+<script type="text/javascript" src="views/ngToast.min.js"></script>
 
 </body>
 </html>

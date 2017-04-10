@@ -19,14 +19,14 @@ $body ='<div class="box" layout="row" layout-align="center center">
 		           <div layout="column">
 		             <div>
 		               <md-input-container layout="row" class="input-row layout-row rowOffset">
-		                   <label class="loginLabel">Password&#42;</label>
+		                   <label class="loginLabel required">Password</label>
 		                   <md-icon class="material-icons iconOff">lock</md-icon>
 		                   <input name="newPassword" type="password" ng-model="reset.password">
 		                 </md-input-container>
 		               </div>
 		               <div>
 		                 <md-input-container class="input-row layout-row rowOffset">
-		                     <label class="loginLabel">Confirm Password&#42;</label>
+		                     <label class="loginLabel required">Confirm Password</label>
 		                     <md-icon class="material-icons iconOff">lock_outline</md-icon>
 		                     <input match-password="newPassword" type="password" name="confirmPassword" ng-model="reset.password2">
 		                   </md-input-container>

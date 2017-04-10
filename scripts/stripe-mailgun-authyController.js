@@ -1,6 +1,6 @@
 
-angular.module('SE_App').controller('authyVerify', ['$mdDialog','$scope', '$http','$mdToast','$user','$auth','$state',
-function ($mdDialog, $scope, $http,$mdToast,$user,$auth,$state) {
+angular.module('SE_App').controller('authyVerify', ['$mdDialog','$scope', '$http','$user','$auth','$state','ngToast',
+function ($mdDialog, $scope, $http,$user,$auth,$state,ngToast) {
   'use strict';
   $scope.authyVerify = function($authy){
     $user['authy'] = $authy.code;
@@ -8,16 +8,20 @@ function ($mdDialog, $scope, $http,$mdToast,$user,$auth,$state) {
     $scope.authy.form.$setSubmitted();
 
     $auth.login($user).then(function(response){
-      $mdToast.show(
-          $mdToast.simple()
-            .textContent("Successfully Verifed and Logged In")
-            .hideDelay(3000)
-        );
+        ngToast.create({
+          className: 'success',
+          content: 'Successfully Verifed and Logged In',
+          dismissButton: 'true'
+          });
         $mdDialog.hide();
         $state.go('home.domains');
   }).catch(function(response) {
     $scope.busy = false;
-    $mdToast.show($mdToast.simple().textContent(response.data).hideDelay(6000));
+      ngToast.create({
+        className: 'warning toasthome',
+        content: response.data,
+        dismissButton: 'true',
+        });
   });
   }
   this.cancel = function() {
@@ -27,9 +31,9 @@ function ($mdDialog, $scope, $http,$mdToast,$user,$auth,$state) {
 }]);
 
 
-angular.module('SE_App').controller('profileController', ['$mdDialog','$scope', '$mdEditDialog', '$http','$mdToast',
+angular.module('SE_App').controller('profileController', ['$mdDialog','$scope', '$mdEditDialog', '$http','ngToast',
 '$q','$location','$auth',
-function ($mdDialog,$scope, $mdEditDialog, $http,$mdToast,$q,$location,$auth) {
+function ($mdDialog,$scope, $mdEditDialog, $http,ngToast,$q,$location,$auth) {
   'use strict';
 
 function currentProfile(){
@@ -70,19 +74,21 @@ $scope.stripeChange = function(token){
           success(response);
   })
     .catch(function(response) {
-      $mdToast.show($mdToast.simple()
-      .textContent(response.data)
-      .hideDelay(6000));
+      ngToast.create({
+        className: 'danger toasthome',
+        content: response.data,
+        dismissButton: 'true',
+        });
     });
 
   }
 
   function success(response) {
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent(response.data)
-          .hideDelay(3000)
-      );
+    ngToast.create({
+      className: 'success toasthome',
+      content: response.data,
+      dismissButton: 'true',
+      });
     $mdDialog.hide();
   }
 

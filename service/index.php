@@ -1536,7 +1536,7 @@ Flight::route('POST /newprofileinfo/', function(){
     $goodData = json_decode($token->getClaims()['sub']);
     $email = $goodData->user_email;
     $security = $goodData->user_security;
-    $sql = "SELECT rt.account_ID,at.stripe_subscription_ID,at.good_til_date FROM registration rt
+    $sql = "SELECT rt.account_ID,rt.user_stripe_token,at.stripe_subscription_ID,at.good_til_date FROM registration rt
     LEFT JOIN `account` at ON rt.account_ID = at.account_ID
     where user_security = ?
     AND user_email = ?";
@@ -1552,6 +1552,10 @@ Flight::route('POST /newprofileinfo/', function(){
     $result = $stmt->get_result();
     $result = $result->fetch_assoc();
     $stmt->close();
+
+    if(empty($result['user_stripe_token'])){
+      Flight::halt(200,'Only the account originator can delete the account');
+    }
 
   $sql = "UPDATE account SET flag_delete_date = ?
           WHERE account_ID = ?";
@@ -1674,7 +1678,7 @@ Flight::route('POST /signup/', function(){
     $result = $mg->sendMessage($domain, array(
     // Be sure to replace the from address with the actual email address you're sending from
     'from'    => 'support@login.webwright.io',
-    'to'      => 'jkolnik@mac.com',
+    'to'      => $user_email,
     'subject' => 'Email Verification',
     'o:tag'   => array('Email Verification'),
       // 'o:tracking-clicks' => 'htmlonly',
@@ -1730,11 +1734,39 @@ Flight::route('POST /stripe-991c8971ff31a83c454f371f55c85be5', function(){
   $event_json = json_decode($stripe_event);
   $event = \Stripe\Event::retrieve($event_json->id);
 
-  if (isset($event) && $event->type == "customer.subscription.created") {
-  $customer = \Stripe\Customer::retrieve($event->data->object->customer);
+  $sql1 = "SELECT id FROM temp_table WHERE temp_stripe_event = ?";
+  $stmt1 = $mysqli->prepare($sql1);
+  $stmt1->bind_param('s',$event->id);
+  if(!$stmt1->execute()){
+    Flight::halt(500,$mysqli->error);
+  }
+  $result = $stmt1->get_result();
+  $stmt1->close();
+  if($result->num_rows != 0) {
+     Flight::halt(200,"Already processed This Event");
+   } else {
+     $sql3 = "INSERT INTO temp_table (temp_stripe_event,temp_date)
+             VALUES (?,?)";
+     $temp_date = time()+60*60*24*4;
+     $stmt3 = $mysqli->prepare($sql3);
+     $stmt3->bind_param('si', $event->id,$temp_date);
+     if(!$stmt3->execute()){
+               Flight::halt(500,$mysqli->error);
+             }
+     $stmt3->close();
+  }
+  try {
+    $customer = \Stripe\Customer::retrieve($event->data->object->customer);
+  } catch (Exception $e) {
+    Flight::halt(500,var_dump($e));
+  }
+
   $subscription = $event->data->object->id;
   $email = $customer->email;
   $cusID = $customer->id;
+
+  // Flight::halt(200,$event->id);
+  if (isset($event) && $event->type == "customer.subscription.created") {
   $sql = "UPDATE account SET stripe_subscription_ID = ? WHERE (stripe_customer_ID = ?)";
   // var_dump($sql);
   // var_dump($subscription);
@@ -1754,14 +1786,15 @@ Flight::route('POST /stripe-991c8971ff31a83c454f371f55c85be5', function(){
   $result = $mg->sendMessage($domain, array(
   // Be sure to replace the from address with the actual email address you're sending from
   'from'    => 'billing@login.webwright.io',
-  'to'      => 'jkolnik@mac.com',
+  'to'      => $email,
   'subject' => 'Thank you for your subscription',
     'html'    => '
 
 
   Thank you for your subscription
-
+</br>
   You can update your information in the profile section of your account if necessary:
+</br>
   https://app.login.webwright.io/login'
 
 
@@ -1771,8 +1804,6 @@ Flight::route('POST /stripe-991c8971ff31a83c454f371f55c85be5', function(){
   }
 
   elseif (isset($event) && $event->type == "invoice.payment_failed") {
-  $customer = \Stripe\Customer::retrieve($event->data->object->customer);
-  $email = $customer->email;
   // Sending your customers the amount in pennies is weird, so convert to dollars
   $amount = sprintf('$%0.2f', $event->data->object->amount_due / 100.0);
 
@@ -1781,7 +1812,7 @@ Flight::route('POST /stripe-991c8971ff31a83c454f371f55c85be5', function(){
   $result = $mg->sendMessage($domain, array(
   // Be sure to replace the from address with the actual email address you're sending from
   'from'    => 'billing@login.webwright.io',
-  'to'      => 'jkolnik@mac.com',
+  'to'      => $email,
   'subject' => 'Your most recent invoice payment failed',
     'text'    => 'Hi there,
 
@@ -1800,21 +1831,20 @@ Flight::route('POST /stripe-991c8971ff31a83c454f371f55c85be5', function(){
   // Sending your customers the amount in pennies is weird, so convert to dollars
 
   $amount = sprintf('$%0.2f', $event->data->object->amount_due / 100.0);
-  $email = $event->data->object->receipt_email;
   $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
   $domain = "login.webwright.io";
   $result = $mg->sendMessage($domain, array(
   // Be sure to replace the from address with the actual email address you're sending from
   'from'    => 'billing@login.webwright.io',
-  'to'      => 'jkolnik@mac.com',
+  'to'      => $email,
   'subject' => 'Your Charge failed to go thru',
     'text'    => 'Hi there,
 
-    Unfortunately your most recent invoice payment for ' . $amount . ' was declined.
+    Unfortunately your most recent invoice payment for ' . $amount . ' was declined.</br>
     This could be due to a change in your card number or your card expiring, cancelation of your credit card,
     or the bank not recognizing the payment and taking action to prevent it.
 
-    Please update your payment information as soon as possible by trying to register with a different card here:
+    Please update your payment information as soon as possible by trying to register with a different card here:</br>
   https://app.login.webwright.io/login'
   ));
   Flight::halt(200,"Failed Payment");
@@ -1825,35 +1855,36 @@ Flight::route('POST /stripe-991c8971ff31a83c454f371f55c85be5', function(){
   // Sending your customers the amount in pennies is weird, so convert to dollars
   $login_or_stripe = $event->request;
   if(is_null($login_or_stripe)){
-    $email = $event->data->object->receipt_email;
     $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
     $domain = "login.webwright.io";
     $result = $mg->sendMessage($domain, array(
     // Be sure to replace the from address with the actual email address you're sending from
     'from'    => 'billing@login.webwright.io',
-    'to'      => 'jkolnik@mac.com',
+    'to'      => $email,
     'subject' => 'Your Charge failed to go thru',
       'text'    => 'Hi there,
-
+</br>
     It was fun while it lasted.
+    </br>
     Sorry to see you go.
+    </br>
     https://login.webwright.io'
     ));
     Flight::halt(200,"Subscription Canceled by User");
   } else {
-  $email = $event->data->object->receipt_email;
   $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
   $domain = "login.webwright.io";
   $result = $mg->sendMessage($domain, array(
   // Be sure to replace the from address with the actual email address you're sending from
   'from'    => 'billing@login.webwright.io',
-  'to'      => 'jkolnik@mac.com',
+  'to'      => $email,
   'subject' => 'Your Subscription was Canceled',
     'text'    => 'Hi there,
-
+</br>
   Your subscription to Lōgïn was canceled after three attemts to charge your card.
-
+</br>
   Consequently, your data was also deleted.
+  </br>
   https://login.webwright.io/'
   ));
   }
@@ -1863,7 +1894,7 @@ Flight::route('POST /stripe-991c8971ff31a83c454f371f55c85be5', function(){
   }
 
       else {
-    Flight::halt(500,"Nothing Worked");
+    Flight::halt(200,"There wasn't a hook for this event");
 
   }
 
@@ -1934,12 +1965,12 @@ Flight::route('POST|GET /password-reset', function(){
                 $result = $mg->sendMessage($domain, array(
                 // Be sure to replace the from address with the actual email address you're sending from
                 'from'    => 'support@login.webwright.io',
-                'to'      => 'jkolnik@mac.com',
+                'to'      => $user_email,
                 'subject' => 'Resetting Password',
                 'o:tag'   => array('Resetting Password'),
                   // 'o:tracking-clicks' => 'htmlonly',
                 'html'    => 'Resetting Password!
-                ' .$link. '
+                <a href="' .$link. '"><button>Reset Your Password</button></a></br><br>
                 Click the link to reset your password'
                 ));
                 Flight::halt(200,"Successfully Sent Password Email");

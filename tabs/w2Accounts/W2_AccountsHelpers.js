@@ -8,7 +8,7 @@ angular.module('SE_App').factory('$W2_accounts', ['$resource', function ($resour
 
 //===========================================================
 
-angular.module('SE_App').controller('addW2_AccountsController', ['$mdDialog', '$W2_accounts', '$scope' , '$http','$mdToast',function ($mdDialog, $W2_accounts, $scope, $http,$mdToast) {
+angular.module('SE_App').controller('addW2_AccountsController', ['$mdDialog', '$W2_accounts', '$scope' , '$http','ngToast',function ($mdDialog, $W2_accounts, $scope, $http,ngToast) {
   'use strict';
 $scope.myDate = new Date();
 
@@ -22,21 +22,26 @@ $scope.getOwnersFunc = function(){
   this.cancel = $mdDialog.cancel;
 
   function success(W2_accounts_table) {
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent('New Content Added')
-          .hideDelay(3000)
-      );
+    ngToast.create({
+      className: 'success',
+      content: 'New Content Added',
+      dismissButton: 'true'
+      });
     $mdDialog.hide(W2_accounts_table);
   }
 
-    function fedup(data){
-  	//console.log('FAILED!',data);
-	$mdToast.show(
-      $mdToast.simple()
-        .textContent(data.data)
-        .hideDelay(3000)
-    );
+    function fedup(response){
+      ngToast.show({
+      hideDelay   : 9000,
+      position    : 'top left',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      resolve: {
+           $response: function () {
+             return response;
+           }
+         }
+      });
   }
 
   this.addItem = function () {
@@ -51,7 +56,7 @@ $scope.getOwnersFunc = function(){
 
 // =======================================================
 
-angular.module('SE_App').controller('deleteW2_AccountsController', ['W2_accounts_tables', '$mdDialog', '$W2_accounts', '$scope', '$q', '$mdToast',function (W2_accounts_tables, $mdDialog, $W2_accounts, $scope, $q,$mdToast) {
+angular.module('SE_App').controller('deleteW2_AccountsController', ['W2_accounts_tables', '$mdDialog', '$W2_accounts', '$scope', '$q', 'ngToast',function (W2_accounts_tables, $mdDialog, $W2_accounts, $scope, $q,ngToast) {
   'use strict';
 
   this.cancel = $mdDialog.cancel;
@@ -71,19 +76,20 @@ angular.module('SE_App').controller('deleteW2_AccountsController', ['W2_accounts
   }
 
   function success() {
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent('Successfully Deleted')
-          .hideDelay(3000)
-      );
+    ngToast.create({
+      className: 'success',
+      content: 'Successfully Deleted',
+      dismissButton: 'true'
+      });
     }
 
   function error(response) {
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent(response.data)
-          .hideDelay(3000)
-      );
+    ngToast.create({
+      className: 'danger toasthome',
+      content: response.data,
+      dismissButton: 'true',
+      timeout: 9000
+      });
     }
     this.authorizeUser = function () {
       $q.all(W2_accounts_tables.forEach(deleteDessert)).then(onComplete);

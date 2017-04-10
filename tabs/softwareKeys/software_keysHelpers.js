@@ -8,7 +8,7 @@ angular.module('SE_App').factory('$software_keys', ['$resource', function ($reso
 
 //===========================================================
 
-angular.module('SE_App').controller('addSoftware_keysController', ['$mdDialog', '$software_keys', '$scope' , '$http', '$mdToast',function ($mdDialog, $software_keys, $scope, $http,$mdToast) {
+angular.module('SE_App').controller('addSoftware_keysController', ['$mdDialog', '$software_keys', '$scope' , '$http', 'ngToast',function ($mdDialog, $software_keys, $scope, $http,ngToast) {
   'use strict';
 $scope.myDate = new Date();
 
@@ -22,21 +22,21 @@ $scope.getOwnersFunc = function(){
   this.cancel = $mdDialog.cancel;
 
   function success(software_keys_table) {
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent('New Content Added')
-          .hideDelay(3000)
-      );
+    ngToast.create({
+      className: 'success',
+      content: 'New Content Added',
+      dismissButton: 'true'
+      });
     $mdDialog.hide(software_keys_table);
   }
 
-    function fedup(data){
-  	//console.log('FAILED!',data);
-	$mdToast.show(
-      $mdToast.simple()
-        .textContent(data.data)
-        .hideDelay(3000)
-    );
+    function fedup(response){
+      ngToast.create({
+        className: 'danger toasthome',
+        content: response.data,
+        dismissButton: 'true',
+        timeout: 9000
+        });
   }
 
   this.addItem = function () {
@@ -51,7 +51,7 @@ $scope.getOwnersFunc = function(){
 
 // =======================================================
 
-angular.module('SE_App').controller('deleteSoftware_keysController', ['$authorize', 'software_keys_tables', '$mdDialog', '$software_keys', '$scope', '$q', '$mdToast',function ($authorize, software_keys_tables, $mdDialog, $software_keys, $scope, $q,$mdToast) {
+angular.module('SE_App').controller('deleteSoftware_keysController', ['$authorize', 'software_keys_tables', '$mdDialog', '$software_keys', '$scope', '$q', 'ngToast',function ($authorize, software_keys_tables, $mdDialog, $software_keys, $scope, $q,ngToast) {
   'use strict';
 
   this.cancel = $mdDialog.cancel;
@@ -72,19 +72,20 @@ angular.module('SE_App').controller('deleteSoftware_keysController', ['$authoriz
   }
 
   function success() {
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent('Successfully Deleted')
-          .hideDelay(3000)
-      );
+    ngToast.create({
+      className: 'success',
+      content: 'Successfully Deleted',
+      dismissButton: 'true'
+      });
     }
 
   function error(response) {
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent(response.data)
-          .hideDelay(3000)
-      );
+    ngToast.create({
+      className: 'danger toasthome',
+      content: response.data,
+      dismissButton: 'true',
+      timeout: 9000
+      });
     }
     this.authorizeUser = function () {
       $q.all(software_keys_tables.forEach(deleteDessert)).then(onComplete);

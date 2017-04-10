@@ -8,28 +8,29 @@ angular.module('SE_App').factory('$hosting', ['$resource', function ($resource) 
 
 //===========================================================
 
-angular.module('SE_App').controller('addHostingController', ['$mdDialog', '$hosting', '$scope' , '$http', '$mdToast',function ($mdDialog, $hosting, $scope, $http, $mdToast) {
+angular.module('SE_App').controller('addHostingController', ['$mdDialog', '$hosting', '$scope' , '$http', 'ngToast',function ($mdDialog, $hosting, $scope, $http, ngToast) {
   'use strict';
 $scope.myDate = new Date();
 
   this.cancel = $mdDialog.cancel;
 
   function success(hosting_table) {
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent('New Content Added')
-          .hideDelay(3000)
-      );
+    ngToast.create({
+      className: 'success',
+      content: 'New Content Added',
+      dismissButton: 'true'
+      });
     $mdDialog.hide(hosting_table);
   }
 
-    function fedup(data){
+    function fedup(response){
   	//console.log('FAILED!',data);
-	$mdToast.show(
-      $mdToast.simple()
-        .textContent(data.data)
-        .hideDelay(3000)
-    );
+    ngToast.create({
+      className: 'danger toasthome',
+      content: response.data,
+      dismissButton: 'true',
+      timeout: 9000
+      });
   }
 
 
@@ -54,7 +55,7 @@ this.addItem = function () {
 
 // =======================================================
 
-angular.module('SE_App').controller('deleteHostingController', ['$authorize', 'hosting_tables', '$mdDialog', '$hosting', '$scope', '$q', '$mdToast',function ($authorize, hosting_tables, $mdDialog, $hosting, $scope, $q, $mdToast) {
+angular.module('SE_App').controller('deleteHostingController', ['$authorize', 'hosting_tables', '$mdDialog', '$hosting', '$scope', '$q', 'ngToast',function ($authorize, hosting_tables, $mdDialog, $hosting, $scope, $q, ngToast) {
   'use strict';
 
   this.cancel = $mdDialog.cancel;
@@ -74,19 +75,20 @@ angular.module('SE_App').controller('deleteHostingController', ['$authorize', 'h
   }
 
   function success() {
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent('Successfully Deleted')
-          .hideDelay(3000)
-      );
+    ngToast.create({
+      className: 'success',
+      content: 'Successfully Deleted',
+      dismissButton: 'true'
+      });
     }
 
   function error(response) {
-    $mdToast.show(
-        $mdToast.simple()
-          .textContent(response.data)
-          .hideDelay(3000)
-      );
+    ngToast.create({
+      className: 'danger toasthome',
+      content: response.data,
+      dismissButton: 'true',
+      timeout: 9000
+      });
     }
     this.authorizeUser = function () {
       $q.all(hosting_tables.forEach(deleteDessert)).then(onComplete);
