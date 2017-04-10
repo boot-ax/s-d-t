@@ -1,14 +1,8 @@
-angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute','ngclipboard','ngSanitize', 'ngCsv','satellizer','ui.router','angular-loading-bar','stripe.checkout','ngPassword','ngToast'])
-  .config(['$compileProvider', '$mdThemingProvider','$mdAriaProvider','$stateProvider', '$locationProvider','$urlRouterProvider','$authProvider','cfpLoadingBarProvider', 'ngToastProvider',function ($compileProvider, $mdThemingProvider,$mdAriaProvider, $stateProvider, $locationProvider,$urlRouterProvider,$authProvider,cfpLoadingBarProvider,ngToast) {
+angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute','ngclipboard','ngSanitize', 'ngCsv','satellizer','ui.router','angular-loading-bar','stripe.checkout','ngPassword'])
+  .config(['$compileProvider', '$mdThemingProvider','$mdAriaProvider','$stateProvider', '$locationProvider','$urlRouterProvider','$authProvider','cfpLoadingBarProvider', function ($compileProvider, $mdThemingProvider,$mdAriaProvider, $stateProvider, $locationProvider,$urlRouterProvider,$authProvider,cfpLoadingBarProvider) {
     'use strict';
     // cfpLoadingBarProvider.parentSelector = '#loading-bar-container';
     // cfpLoadingBarProvider.spinnerTemplate = '<div><span class="fa fa-spinner">Custom Loading Message...</div>';
-
-    ngToast.configure({
-  horizontalPosition: 'center',
-  animation: 'fade',
-              combineDuplications: true,
-});
 
     $mdAriaProvider.disableWarnings();
     $compileProvider.debugInfoEnabled(false);
@@ -150,7 +144,7 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
     $locationProvider.html5Mode(true);
   }])
 
-.service('upDownloadService',function($q,$http,ngToast,$mdDialog){
+.service('upDownloadService',function($q,$http,$mdToast,$mdDialog){
 
   this.bulkDownload = function (event,$current_data,$file_name,$header,$location) {
     $mdDialog.show({
@@ -178,37 +172,39 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
   };
 })
 
-  .service('changeCellServices',function($mdEditDialog,$q,$http,$mdDialog,ngToast){
+  .service('changeCellServices',function($mdEditDialog,$q,$http,$mdToast,$mdDialog){
 
     this.changeCellText = function (event, $table, $column,db_table,db_ID,$length) {
         event.stopPropagation();
 
         var success  = function(response){
-          ngToast.create({
-            className: 'success toasthome',
-            content: response.data,
-            dismissButton: 'true'
-            });
+          $mdToast.show({
+          hideDelay   : 4000,
+          position    : 'top center',
+          controller  : 'ToastCtrl',
+          templateUrl : '/partials/toast-template.html',
+          toastClass  : 'toastSuccess',
+          resolve: {
+               $response: function () {
+                 return response.data;
+               }
+             }
+          });
         };
 
         var failure  = function(response){
-          // $mdToast.show({
-          // hideDelay   : 9000,
-          // position    : 'top left',
-          // controller  : 'ToastCtrl',
-          // templateUrl : '/partials/toast-template.html',
-          // resolve: {
-          //      $response: function () {
-          //        return response;
-          //      }
-          //    }
-          // });
-          ngToast.create({
-            className: 'danger toasthome',
-            content: response.data,
-            dismissButton: 'true',
-            timeout: 9000
-            });
+          $mdToast.show({
+          hideDelay   : 9000,
+          position    : 'top center',
+          controller  : 'ToastCtrl',
+          templateUrl : '/partials/toast-template.html',
+          toastClass  : 'toastDanger',
+          resolve: {
+               $response: function () {
+                 return response.data;
+               }
+             }
+          });
         };
 
         var promise = $mdEditDialog.large({
@@ -251,20 +247,33 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
 
       this.changeDate = function($column, $table,db_table,db_ID){
         var success  = function(response){
-          ngToast.create({
-            className: 'success toasthome',
-            content: response.data,
-            dismissButton: 'true'
-            });
+          $mdToast.show({
+          hideDelay   : 4000,
+          position    : 'top center',
+          controller  : 'ToastCtrl',
+          templateUrl : '/partials/toast-template.html',
+          toastClass  : 'toastSuccess',
+          resolve: {
+               $response: function () {
+                 return response.data;
+               }
+             }
+          });
         };
 
         var failure  = function(response){
-          ngToast.create({
-            className: 'danger toasthome',
-            content: response.data,
-            dismissButton: 'true',
-            timeout: 9000
-            });
+          $mdToast.show({
+          hideDelay   : 9000,
+          position    : 'top center',
+          controller  : 'ToastCtrl',
+          templateUrl : '/partials/toast-template.html',
+          toastClass  : 'toastDanger',
+          resolve: {
+               $response: function () {
+                 return response.data;
+               }
+             }
+          });
         };
 
           var deferred = $q.defer();
@@ -298,20 +307,33 @@ this.changeDropdown = function($column, $value, $table,db_table,db_ID){
               $obj.id = $table[db_ID];
 
               var success  = function(response){
-                ngToast.create({
-                  className: 'success toasthome',
-                  content: response.data,
-                  dismissButton: 'true'
-                  });
+                $mdToast.show({
+                hideDelay   : 4000,
+                position    : 'top center',
+                controller  : 'ToastCtrl',
+                templateUrl : '/partials/toast-template.html',
+                toastClass  : 'toastSuccess',
+                resolve: {
+                     $response: function () {
+                       return response.data;
+                     }
+                   }
+                });
                 };
 
                 var failure  = function(response){
-                  ngToast.create({
-                    className: 'danger toasthome',
-                    content: response.data,
-                    dismissButton: 'true',
-                    timeout: 9000
-                    });
+                  $mdToast.show({
+                  hideDelay   : 9000,
+                  position    : 'top center',
+                  controller  : 'ToastCtrl',
+                  templateUrl : '/partials/toast-template.html',
+                  toastClass  : 'toastDanger',
+                  resolve: {
+                       $response: function () {
+                         return response.data;
+                       }
+                     }
+                  });
                 };
 
               var deferred = $q.defer();
@@ -329,20 +351,33 @@ this.changeDropdown = function($column, $value, $table,db_table,db_ID){
 
             this.changeSwitchValue = function($column, $table,db_table,db_ID){
               var success  = function(response){
-                ngToast.create({
-                  className: 'success toasthome',
-                  content: response.data,
-                  dismissButton: 'true'
-                  });
+                $mdToast.show({
+                hideDelay   : 4000,
+                position    : 'top center',
+                controller  : 'ToastCtrl',
+                templateUrl : '/partials/toast-template.html',
+                toastClass  : 'toastSuccess',
+                resolve: {
+                     $response: function () {
+                       return response.data;
+                     }
+                   }
+                });
               };
 
               var failure  = function(response){
-                ngToast.create({
-                  className: 'danger toasthome',
-                  content: response.data,
-                  dismissButton: 'true',
-                  timeout: 9000
-                  });
+                $mdToast.show({
+                hideDelay   : 9000,
+                position    : 'top center',
+                controller  : 'ToastCtrl',
+                templateUrl : '/partials/toast-template.html',
+                toastClass  : 'toastDanger',
+                resolve: {
+                     $response: function () {
+                       return response.data;
+                     }
+                   }
+                });
               };
 
                var deferred = $q.defer();
@@ -429,7 +464,7 @@ $location.path('/profile');
 
 }]);
 
-angular.module('SE_App').controller('bulkDownloadController', ['$mdDialog','$scope' , '$http', '$q','ngToast','tableData','file_name','header','location',function ($mdDialog, $scope, $http, $q, ngToast,tableData,file_name,header,location) {
+angular.module('SE_App').controller('bulkDownloadController', ['$mdDialog','$scope' , '$http', '$q','$mdToast','tableData','file_name','header','location',function ($mdDialog, $scope, $http, $q, $mdToast,tableData,file_name,header,location) {
   'use strict';
 
 this.$file = file_name;
@@ -448,12 +483,18 @@ this.tableNew = function(){
   this.bulkDownload = function () {
 
     var failure  = function(response){
-      ngToast.create({
-        className: 'danger toasthome',
-        content: response.data,
-        dismissButton: 'true',
-        timeout: 9000
-        });
+      $mdToast.show({
+      hideDelay   : 9000,
+      position    : 'top center',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      toastClass  : 'toastDanger',
+      resolve: {
+           $response: function () {
+             return response.data;
+           }
+         }
+      });
     };
 
     var $query = {

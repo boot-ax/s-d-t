@@ -8,24 +8,31 @@ angular.module('SE_App').factory('$hosting', ['$resource', function ($resource) 
 
 //===========================================================
 
-angular.module('SE_App').controller('addHostingController', ['$mdDialog', '$hosting', '$scope' , '$http', 'ngToast',function ($mdDialog, $hosting, $scope, $http, ngToast) {
+angular.module('SE_App').controller('addHostingController', ['$mdDialog', '$hosting', '$scope' , '$http', '$mdToast',function ($mdDialog, $hosting, $scope, $http, $mdToast) {
   'use strict';
 $scope.myDate = new Date();
 
   this.cancel = $mdDialog.cancel;
 
   function success(hosting_table) {
-    ngToast.create({
-      className: 'success',
-      content: 'New Content Added',
-      dismissButton: 'true'
+    $mdToast.show({
+      hideDelay   : 4000,
+      position    : 'top center',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      toastClass  : 'toastSuccess',
+      resolve: {
+           $response: function () {
+             return 'New Content Added';
+           }
+         }
       });
     $mdDialog.hide(hosting_table);
   }
 
     function fedup(response){
   	//console.log('FAILED!',data);
-    ngToast.create({
+    $mdToast.create({
       className: 'danger toasthome',
       content: response.data,
       dismissButton: 'true',
@@ -55,7 +62,7 @@ this.addItem = function () {
 
 // =======================================================
 
-angular.module('SE_App').controller('deleteHostingController', ['$authorize', 'hosting_tables', '$mdDialog', '$hosting', '$scope', '$q', 'ngToast',function ($authorize, hosting_tables, $mdDialog, $hosting, $scope, $q, ngToast) {
+angular.module('SE_App').controller('deleteHostingController', ['$authorize', 'hosting_tables', '$mdDialog', '$hosting', '$scope', '$q', '$mdToast',function ($authorize, hosting_tables, $mdDialog, $hosting, $scope, $q, $mdToast) {
   'use strict';
 
   this.cancel = $mdDialog.cancel;
@@ -75,19 +82,32 @@ angular.module('SE_App').controller('deleteHostingController', ['$authorize', 'h
   }
 
   function success() {
-    ngToast.create({
-      className: 'success',
-      content: 'Successfully Deleted',
-      dismissButton: 'true'
+    $mdToast.show({
+      hideDelay   : 4000,
+      position    : 'top center',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      toastClass  : 'toastSuccess',
+      resolve: {
+           $response: function () {
+             return 'Successfully Deleted';
+           }
+         }
       });
     }
 
   function error(response) {
-    ngToast.create({
-      className: 'danger toasthome',
-      content: response.data,
-      dismissButton: 'true',
-      timeout: 9000
+    $mdToast.show({
+      hideDelay   : 9000,
+      position    : 'top center',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      toastClass  : 'toastDanger',
+      resolve: {
+           $response: function () {
+             return response.data;
+           }
+         }
       });
     }
     this.authorizeUser = function () {

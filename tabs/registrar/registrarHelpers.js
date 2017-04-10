@@ -8,7 +8,7 @@ angular.module('SE_App').factory('$registrar', ['$resource', function ($resource
 
 //===========================================================
 
-angular.module('SE_App').controller('addRegistrarController', ['$mdDialog', '$registrar', '$scope' , '$http', 'ngToast',function ($mdDialog, $registrar, $scope, $http, ngToast) {
+angular.module('SE_App').controller('addRegistrarController', ['$mdDialog', '$registrar', '$scope' , '$http', '$mdToast',function ($mdDialog, $registrar, $scope, $http, $mdToast) {
   'use strict';
 $scope.myDate = new Date();
 
@@ -22,16 +22,23 @@ $scope.getOwnersFunc = function(){
   this.cancel = $mdDialog.cancel;
 
   function success(registrar_table) {
-    ngToast.create({
-      className: 'success',
-      content: 'New Content Added',
-      dismissButton: 'true'
+    $mdToast.show({
+      hideDelay   : 4000,
+      position    : 'top center',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      toastClass  : 'toastSuccess',
+      resolve: {
+           $response: function () {
+             return 'New Content Added';
+           }
+         }
       });
     $mdDialog.hide(registrar_table);
   }
 
   function fedup(response){
-    ngToast.create({
+    $mdToast.create({
       className: 'danger toasthome',
       content: response.data,
       dismissButton: 'true',
@@ -51,7 +58,7 @@ $scope.getOwnersFunc = function(){
 
 // =======================================================
 
-angular.module('SE_App').controller('deleteRegistrarController', ['$authorize', 'registrar_tables', '$mdDialog', '$registrar', '$scope', '$q', 'ngToast',function ($authorize, registrar_tables, $mdDialog, $registrar, $scope, $q,ngToast) {
+angular.module('SE_App').controller('deleteRegistrarController', ['$authorize', 'registrar_tables', '$mdDialog', '$registrar', '$scope', '$q', '$mdToast',function ($authorize, registrar_tables, $mdDialog, $registrar, $scope, $q,$mdToast) {
   'use strict';
 
   this.cancel = $mdDialog.cancel;
@@ -72,19 +79,32 @@ angular.module('SE_App').controller('deleteRegistrarController', ['$authorize', 
   }
 
   function success() {
-    ngToast.create({
-      className: 'success',
-      content: 'Successfully Deleted',
-      dismissButton: 'true'
+    $mdToast.show({
+      hideDelay   : 4000,
+      position    : 'top center',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      toastClass  : 'toastSuccess',
+      resolve: {
+           $response: function () {
+             return 'Successfully Deleted';
+           }
+         }
       });
     }
 
   function error(response) {
-    ngToast.create({
-      className: 'danger toasthome',
-      content: response.data,
-      dismissButton: 'true',
-      timeout: 9000
+    $mdToast.show({
+      hideDelay   : 9000,
+      position    : 'top center',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      toastClass  : 'toastDanger',
+      resolve: {
+           $response: function () {
+             return response.data;
+           }
+         }
       });
     }
     this.authorizeUser = function () {

@@ -64,4 +64,4 @@ $scope.cancel = function() {
   $window.location.href = '/index.html';
 }
 
-  }]);
+}]);

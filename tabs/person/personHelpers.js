@@ -8,7 +8,7 @@ angular.module('SE_App').factory('$person', ['$resource', function ($resource) {
 
 //===========================================================
 
-angular.module('SE_App').controller('addPersonController', ['$mdDialog', '$person', '$scope' , '$http', 'ngToast',function ($mdDialog, $person, $scope, $http,ngToast) {
+angular.module('SE_App').controller('addPersonController', ['$mdDialog', '$person', '$scope' , '$http', '$mdToast',function ($mdDialog, $person, $scope, $http,$mdToast) {
   'use strict';
 $scope.myDate = new Date();
 
@@ -22,16 +22,23 @@ $scope.getPersonsFunc = function(){
   this.cancel = $mdDialog.cancel;
 
   function success(person_table) {
-    ngToast.create({
-      className: 'success',
-      content: 'New Content Added',
-      dismissButton: 'true'
+    $mdToast.show({
+      hideDelay   : 4000,
+      position    : 'top center',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      toastClass  : 'toastSuccess',
+      resolve: {
+           $response: function () {
+             return 'New Content Added';
+           }
+         }
       });
     $mdDialog.hide(person_table);
   }
 
     function fedup(response){
-      ngToast.create({
+      $mdToast.create({
         className: 'danger toasthome',
         content: response.data,
         dismissButton: 'true',
@@ -51,7 +58,7 @@ $scope.getPersonsFunc = function(){
 
 // =======================================================
 
-angular.module('SE_App').controller('deletePersonController', ['$authorize', 'person_tables', '$mdDialog', '$person', '$scope', '$q', 'ngToast',function ($authorize, person_tables, $mdDialog, $person, $scope, $q,ngToast) {
+angular.module('SE_App').controller('deletePersonController', ['$authorize', 'person_tables', '$mdDialog', '$person', '$scope', '$q', '$mdToast',function ($authorize, person_tables, $mdDialog, $person, $scope, $q,$mdToast) {
   'use strict';
 
   this.cancel = $mdDialog.cancel;
@@ -72,19 +79,32 @@ angular.module('SE_App').controller('deletePersonController', ['$authorize', 'pe
   }
 
   function success() {
-    ngToast.create({
-      className: 'success',
-      content: 'Successfully Deleted',
-      dismissButton: 'true'
+    $mdToast.show({
+      hideDelay   : 4000,
+      position    : 'top center',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      toastClass  : 'toastSuccess',
+      resolve: {
+           $response: function () {
+             return 'Successfully Deleted';
+           }
+         }
       });
     }
 
   function error(response) {
-    ngToast.create({
-      className: 'danger toasthome',
-      content: response.data,
-      dismissButton: 'true',
-      timeout: 9000
+    $mdToast.show({
+      hideDelay   : 9000,
+      position    : 'top center',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      toastClass  : 'toastDanger',
+      resolve: {
+           $response: function () {
+             return response.data;
+           }
+         }
       });
     }
     this.authorizeUser = function () {
@@ -95,7 +115,7 @@ angular.module('SE_App').controller('deletePersonController', ['$authorize', 'pe
 
 // =======================================================
 
-angular.module('SE_App').controller('getPwrdController', ['$mdDialog', '$person', '$scope','changeCellServices','$object','$http','$q','ngToast', function ($mdDialog, $person, $scope,changeCellServices,$object,$http,$q,ngToast) {
+angular.module('SE_App').controller('getPwrdController', ['$mdDialog', '$person', '$scope','changeCellServices','$object','$http','$q','$mdToast', function ($mdDialog, $person, $scope,changeCellServices,$object,$http,$q,$mdToast) {
   'use strict';
 $scope.$email = $object.email;
 console.log($object.value);
@@ -115,28 +135,35 @@ $scope.isHidden = $object.value;
   };
 
   function changeDropdown(){
-                  var success  = function(data){
-                      ngToast.show(
-                          ngToast.simple()
-                            .textContent(data.data)
-                            .hideDelay(3000)
-                            .position('top left')
-                        );
+                  var success  = function(response){
+                    $mdToast.show({
+                      hideDelay   : 4000,
+                      position    : 'top center',
+                      controller  : 'ToastCtrl',
+                      templateUrl : '/partials/toast-template.html',
+                      toastClass  : 'toastSuccess',
+                      resolve: {
+                           $response: function () {
+                             return response.data;
+                           }
+                         }
+                      });
                         $mdDialog.hide();
                     };
 
                     var failure  = function(response){
-                      ngToast.show({
-                      hideDelay   : 9000,
-                      position    : 'top left',
-                      controller  : 'ToastCtrl',
-                      templateUrl : '/partials/toast-template.html',
-                      resolve: {
-                           $response: function () {
-                             return response;
+                      $mdToast.show({
+                        hideDelay   : 9000,
+                        position    : 'top center',
+                        controller  : 'ToastCtrl',
+                        templateUrl : '/partials/toast-template.html',
+                        toastClass  : 'toastDanger',
+                        resolve: {
+                             $response: function () {
+                               return response.data;
+                             }
                            }
-                         }
-                      });
+                        });
                     };
 
                   var deferred = $q.defer();

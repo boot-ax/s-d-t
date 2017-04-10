@@ -8,7 +8,7 @@ angular.module('SE_App').factory('$cms_login', ['$resource', function ($resource
 
 //===========================================================
 
-angular.module('SE_App').controller('addCMSController', ['$mdDialog', '$cms_login', '$scope' , '$http', '$q', 'ngToast',function ($mdDialog, $cms_login, $scope, $http, $q, ngToast) {
+angular.module('SE_App').controller('addCMSController', ['$mdDialog', '$cms_login', '$scope' , '$http', '$q', '$mdToast',function ($mdDialog, $cms_login, $scope, $http, $q, $mdToast) {
   'use strict';
 
 
@@ -24,10 +24,17 @@ $scope.getDomainsFunc = function(){
   this.cancel = $mdDialog.cancel;
 
   function success(cms_login_table) {
-    ngToast.create({
-      className: 'success',
-      content: 'New Content Added',
-      dismissButton: 'true'
+    $mdToast.show({
+      hideDelay   : 4000,
+      position    : 'top center',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      toastClass  : 'toastSuccess',
+      resolve: {
+           $response: function () {
+             return 'New Content Added';
+           }
+         }
       });
     $mdDialog.hide(cms_login_table);
   }
@@ -35,7 +42,7 @@ $scope.getDomainsFunc = function(){
 
     function fedup(response){
   	//console.log('FAILED!',data);
-    ngToast.create({
+    $mdToast.create({
       className: 'danger toasthome',
       content: response.data,
       dismissButton: 'true',
@@ -55,7 +62,7 @@ $scope.getDomainsFunc = function(){
 
 // =======================================================
 
-angular.module('SE_App').controller('deleteCMSController', ['$authorize', 'cms_login_tables', '$mdDialog', '$cms_login', '$scope', '$q', 'ngToast',function ($authorize, cms_login_tables, $mdDialog, $cms_login, $scope, $q, ngToast) {
+angular.module('SE_App').controller('deleteCMSController', ['$authorize', 'cms_login_tables', '$mdDialog', '$cms_login', '$scope', '$q', '$mdToast',function ($authorize, cms_login_tables, $mdDialog, $cms_login, $scope, $q, $mdToast) {
   'use strict';
 
   this.cancel = $mdDialog.cancel;
@@ -76,19 +83,32 @@ angular.module('SE_App').controller('deleteCMSController', ['$authorize', 'cms_l
   }
 
   function success() {
-    ngToast.create({
-      className: 'success',
-      content: 'Successfully Deleted',
-      dismissButton: 'true'
+    $mdToast.show({
+      hideDelay   : 4000,
+      position    : 'top center',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      toastClass  : 'toastSuccess',
+      resolve: {
+           $response: function () {
+             return 'Successfully Deleted';
+           }
+         }
       });
     }
 
   function error(response) {
-    ngToast.create({
-      className: 'danger toasthome',
-      content: response.data,
-      dismissButton: 'true',
-      timeout: 9000
+    $mdToast.show({
+      hideDelay   : 9000,
+      position    : 'top center',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      toastClass  : 'toastDanger',
+      resolve: {
+           $response: function () {
+             return response.data;
+           }
+         }
       });
     }
     this.authorizeUser = function () {

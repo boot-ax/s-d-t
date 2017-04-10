@@ -145,7 +145,7 @@ Flight::before('start', function(&$params, &$output){
 				// var_dump($request->data->user);
 				// die();
       }catch(Exception $e){
-        // Flight::redirect('https://dev.webwright.io', [401]) // Redirects to another URL.
+        // Flight::redirect('https://app.login.webwright.io', [401]) // Redirects to another URL.
         Flight::halt(401,"User not authorized");
       }
     }
@@ -297,8 +297,8 @@ Flight::route('POST /url_data', function(){
   $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
   $domain = "login.webwright.io";
   $token ="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ7XCJ1c2VyX2VtYWlsXCI6XCJhbm90aGVyRHZAbWFjLmNvbVwiLFwiZW1haWxfdmVyaWZpY2F0aW9uXCI6XCIxMDNmMmYzNDk4MDk5OGQwZjJkZmMzMDE0NjhjOTEyNlwifSIsImV4cCI6MTQ5MTM0MTY0Mn0.1dEz4FrCcB4xA9dIbAdJtBmMONT8_waTvEeEeihtt4c";
-  // $link = "https://dev.webwright.io/service/mailgun-0f5ac2ac043c5665bf3e2f00638dbdce?token=";
-  $link = "https://dev.webwright.io/service/mailgun-0f5ac2ac043c5665bf3e2f00638dbdce?token=".$token;
+  // $link = "https://app.login.webwright.io/service/mailgun-0f5ac2ac043c5665bf3e2f00638dbdce?token=";
+  $link = "https://app.login.webwright.io/service/mailgun-0f5ac2ac043c5665bf3e2f00638dbdce?token=".$token;
 
   $result = $mg->sendMessage($domain, array(
   // Be sure to replace the from address with the actual email address you're sending from
@@ -1610,6 +1610,19 @@ Flight::route('POST /signup/', function(){
   $email_verification = randomPassword();
   $payload = array('user_email' => $user_email,'email_verification' => $email_verification);
 
+  $sql4 = "SELECT user_ID FROM registration WHERE user_email = ?";
+  $stmt4 = $mysqli->prepare($sql4);
+  $stmt4->bind_param('s', $user_email);
+  if(!$result = $stmt4->execute()){
+            Flight::halt(500,$mysqli->error);
+          }
+  $result = $stmt4->get_result();
+  if($result->num_rows != 0) {
+     Flight::halt(401,"This user email already exists");
+   }
+  $stmt4->close();
+
+
   $stripe = array(
     "secret_key"      =>  "sk_test_tN4uGQsemjKrJ2tLpqg3VgIe",
     "publishable_key" =>  "pk_test_DDqS4Ps7loF2JzJPH5JinfPW"
@@ -1674,7 +1687,7 @@ Flight::route('POST /signup/', function(){
 
     $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
     $domain = "login.webwright.io";
-    $link = "https://dev.webwright.io/service/mailgun-0f5ac2ac043c5665bf3e2f00638dbdce?token=".$token;
+    $link = "https://app.login.webwright.io/service/mailgun-0f5ac2ac043c5665bf3e2f00638dbdce?token=".$token;
     $result = $mg->sendMessage($domain, array(
     // Be sure to replace the from address with the actual email address you're sending from
     'from'    => 'support@login.webwright.io',
@@ -1705,7 +1718,7 @@ Flight::route('GET /mailgun-0f5ac2ac043c5665bf3e2f00638dbdce', function(){
       $token = $validator->validate($jwt, $jwt_key);
       $goodData = json_decode($token->getClaims()['sub']);
       }catch(Exception $e){
-  // Flight::redirect('https://dev.webwright.io', [401]) // Redirects to another URL.
+  // Flight::redirect('https://app.login.webwright.io', [401]) // Redirects to another URL.
       Flight::halt(401,"User not authorized");
 }
 
@@ -1853,6 +1866,15 @@ Flight::route('POST /stripe-991c8971ff31a83c454f371f55c85be5', function(){
 
   elseif (isset($event) && $event->type == "customer.subscription.deleted") {
   // Sending your customers the amount in pennies is weird, so convert to dollars
+
+  $sql = "DELETE FROM account WHERE stripe_customer_ID = ?";
+  $stmt = $mysqli->prepare($sql);
+  $stmt->bind_param('s',$cusID);
+  if(!$stmt->execute()){
+    Flight::halt(500,$stmt->error);
+  }
+    $stmt->close();
+
   $login_or_stripe = $event->request;
   if(is_null($login_or_stripe)){
     $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
@@ -1911,7 +1933,7 @@ Flight::route('POST|GET /password-reset', function(){
           $goodData = json_decode($token->getClaims()['sub']);
           $email = $goodData->user_email;
           }catch(Exception $e){
-      // Flight::redirect('https://dev.webwright.io', [401]) // Redirects to another URL.
+      // Flight::redirect('https://app.login.webwright.io', [401]) // Redirects to another URL.
           Flight::halt(401,"User not authorized - first");
           }
           // Flight::redirect('../password-reset.php',301);
@@ -1961,7 +1983,7 @@ Flight::route('POST|GET /password-reset', function(){
                 $token = $token->getJWT();
                 $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
                 $domain = "login.webwright.io";
-                $link = "https://dev.webwright.io/service/password-reset?token=".$token;
+                $link = "https://app.login.webwright.io/service/password-reset?token=".$token;
                 $result = $mg->sendMessage($domain, array(
                 // Be sure to replace the from address with the actual email address you're sending from
                 'from'    => 'support@login.webwright.io',

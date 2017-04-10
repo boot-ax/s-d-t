@@ -137,7 +137,8 @@ h2 {
 
 .loginLabel{
 	/*margin-right:15px;*/
-	margin-left:8%;
+	margin-left:12%;
+	font-size: 1.1em;
 }
 
 .rowOffset{
@@ -175,8 +176,34 @@ md-input-container.md-default-theme label,
 
  md-toast.md-top {
    left: 50%;
+	 top: 2%;
    transform: translate3d(-50%, 0, 0);
 	 position: fixed;
+ }
+
+ md-toast.toastSuccess .md-toast-content{
+	 background-color: #DFF0D8;
+	 border-radius: 5px;
+	 color: #3C763D;
+ }
+ md-toast.toastInfo .md-toast-content{
+	background-color: #D9EDF7;
+	border-radius: 5px;
+	color: #31708F;
+ }
+ md-toast.toastWarning .md-toast-content{
+	background-color: #FCF8E3;
+	border-radius: 5px;
+	color: #8A6D3B;
+ }
+ md-toast.toastDanger .md-toast-content{
+ background-color: #F2DEDE;
+ border-radius: 5px;
+ color: #A94442;
+ }
+
+ .md-toast-text{
+	 margin-right: 5px;
  }
 
  @media screen and (max-width: 959px) {
@@ -186,17 +213,10 @@ md-input-container.md-default-theme label,
 				width: 95%;
 				max-width: 95%;
 				min-width: 0;
-				border-radius: 0;
 				top: 10%;
 				padding: 0;
 			 	position: fixed;
 	 }
- }
-
- @media screen and (max-width: 959px) {
-	.toastclass {
-			 top: 0%;
-	}
  }
 
  @media screen and (max-width: 959px) {
