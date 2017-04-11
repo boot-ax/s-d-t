@@ -66,7 +66,7 @@
       </md-input-container>
     </div>
 
-    <h3 class="md-subhead">Foreign Keys</h3>
+    <h3 class="md-subhead">Connected To</h3>
     <div layout="row" class="input-row layout-row">
       <md-input-container class="flex" flex="">
         <md-select class="flex" required md-on-open="getRegistrarsFunc()" ng-model="domains_table.registrar_ID" placeholder="Registrar&#42;" flex="">
@@ -97,7 +97,7 @@
 
           <div layout="column" flex style="font-size:.8em; color:grey">
             <label>Date Purchased&#42;</label>
-            <md-datepicker ng-init="domains_table.date_purchased = myDate" ng-model="domains_table.date_purchased" name="datePurchasedField" required></md-datepicker>
+            <md-datepicker md-option-empty ng-init="domains_table.date_purchased = myDate" ng-model="domains_table.date_purchased" name="datePurchasedField" required></md-datepicker>
           </div>
 
 

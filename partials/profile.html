@@ -18,7 +18,7 @@
                  <md-input-container flex layout="row" class="input-row layout-row rowOffset">
                    <label class="loginLabel">Full Name</label>
                    <md-icon class="md-icons iconOff">person</md-icon>
-                   <input type="text" ng-model="profile.user_name" autofocus="autofocus" autocomplete="off">
+                   <input type="text" ng-model="profile.user_name" autocomplete="off">
                  </md-input-container>
              </div>
              <div>
@@ -39,6 +39,7 @@
 
 
                       <div layout="row">
+                        <div>
                                     <md-input-container flex layout="row" class="input-row layout-row rowOffset">
                                       <md-icon class="md-icons iconOff">phone</md-icon>
                                       <label ng-class="{'required':profile.authy_id}">Country Code</label>
@@ -49,8 +50,8 @@
                                           </md-select>
 
                                     </md-input-container>
-<span flex="5"></span>
-<div>
+                                  </div>
+                                  <div>
                                     <md-input-container flex layout="row" class="input-row layout-row" style="margin-left:10px">
                                       <label ng-class="{'required':profile.authy_id}">Phone Number</label>
                                       <input flex type="phone" ng-required="profile.authy_id" ng-model="profile.user_phone" class="rowOffset2 flex" autocomplete="off">
@@ -69,7 +70,7 @@
                 <section layout="row" layout-align="right center">
                  <button class="stripe-button-el" stripe-checkout="stripeChange"
                           data-key="pk_test_DDqS4Ps7loF2JzJPH5JinfPW"
-                          data-email="{{profile.user_email}}"
+
                           data-zip-code="true"
                           data-image="https://webwright.io/wp-content/uploads/2016/08/webwright_io-blue-wrench13-300x300.png"
                           data-name="Lōg&iuml;n"
@@ -77,6 +78,7 @@
                           data-name="Update Card Details"
                           data-allow-remember-me=false
                           >
+                          <!-- data-email="{{profile.user_email}}" -->
                     <span style="display: block; min-height: 30px;">Update Card Details</span>
               </button>
                 </section>

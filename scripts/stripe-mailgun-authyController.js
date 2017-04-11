@@ -57,6 +57,7 @@ function currentProfile(){
     $scope.profile.user_address = response.data.profile[0].user_address;
     $scope.profile.user_country_code = response.data.profile[0].user_country_code;
     $scope.profile.authy_id = response.data.profile[0].authy_id;
+    $scope.profile.user_name = response.data.profile[0].user_name;
     // console.log($scope.profile);
     });
 };

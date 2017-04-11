@@ -52,17 +52,17 @@
                    <input ng-required="access" type="text" ng-model="signUp.account_name" class="rowOffset2 flex" autocomplete="off">
                  </md-input-container>
               </div>
-
+<!-- data-email="{{signUp.email}}" -->
                <section style="margin-top:20px" layout="row" layout-align="center center">
                 <button disabled="disabled" ng-disabled="register.form.$invalid" class="stripe-button-el" stripe-checkout="sUpCtrl.register"
-                         data-key="pk_test_DDqS4Ps7loF2JzJPH5JinfPW"
-                         data-email="{{signUp.email}}"
+                         data-key="pk_live_KPauG3GQX0bjrbCgvdbRJP9A"
+
                          data-zip-code="true"
                          data-image="https://webwright.io/wp-content/uploads/2016/08/webwright_io-blue-wrench13-300x300.png"
                          data-name="Lōg&iuml;n"
                          data-description="Monthy Subscription"
                          >
-                   <span style="display: block; min-height: 30px;">Pay with Card $7.00</span>
+                   <span style="display: block; min-height: 30px;">Pay with Card $13.00</span>
              </button>
                </section>
          </div>

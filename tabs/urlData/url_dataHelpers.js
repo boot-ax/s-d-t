@@ -39,11 +39,17 @@ $scope.getPersonsFunc = function(){
   }
 
     function fedup(response){
-      $mdToast.create({
-        className: 'danger toasthome',
-        content: response.data,
-        dismissButton: 'true',
-        timeout: 9000
+      $mdToast.show({
+        hideDelay   : 9000,
+        position    : 'top center',
+        controller  : 'ToastCtrl',
+        templateUrl : '/partials/toast-template.html',
+        toastClass  : 'toastDanger',
+        resolve: {
+             $response: function () {
+               return response.data;
+             }
+           }
         });
   }
 

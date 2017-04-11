@@ -42,8 +42,8 @@
     <h3 class="md-subhead">Other Information</h3>
 
 
-    <div layout="row" class="input-row layout-row">
-
+    <div layout="row" class="input-row layout-row" laoyout="start end">
+      <div>
 <md-input-container class="flex" flex="">
         <md-select md-on-open="getOwnersFunc()" ng-model="registrar_table.user_ID" placeholder="Owner" class="flex" flex="">
           <md-option ng-value="variable.user_ID" ng-repeat="variable in getOwners.data"><span class="firstSpan">{{variable.user_name}}</span></br><span class="secondSpan">{{variable.user_email}}</span></md-option>
@@ -52,12 +52,15 @@
       <div class="addButtonInModl">+ Owner</div>
     </button>
       </md-input-container>
-
+</div>
+<div>
+   <div class="md-errors-spacer"></div>
       <md-input-container class="flex" flex="">
         <label>Credit Card Last Four&#42;</label>
         <input style="" name="credit_card_last_4" ng-model="registrar_table.credit_card_last_4" required="true">
         <div class="md-errors-spacer"></div>
       </md-input-container>
+      </div>
     </div>
   </form>
 

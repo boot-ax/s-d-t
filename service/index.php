@@ -161,7 +161,7 @@ Flight::route('POST /auth/login', function(){
   $authy = $entityBody2['authy'];
 
   if(!empty($authy)){
-    $sql  = "SELECT user_name,user_email,user_security,user_status,user_type,authy_id FROM registration
+    $sql  = "SELECT user_email,user_security,user_status,user_type,authy_id FROM registration
     WHERE (`user_email` = ?)
     AND (`user_password` = md5(?))
     AND (`user_type` != 'no_access');";
@@ -1567,8 +1567,8 @@ Flight::route('POST /newprofileinfo/', function(){
   // var_dump($result['account_ID']);
 
   $stripe = array(
-    "secret_key"      =>  "sk_test_tN4uGQsemjKrJ2tLpqg3VgIe",
-    "publishable_key" =>  "pk_test_DDqS4Ps7loF2JzJPH5JinfPW"
+    "secret_key"      =>  "sk_live_WdUJFAEbeteYdBX6Pf0Ht3AA",
+    "publishable_key" =>  "pk_live_KPauG3GQX0bjrbCgvdbRJP9A"
   );
 
   try {
@@ -1624,8 +1624,8 @@ Flight::route('POST /signup/', function(){
 
 
   $stripe = array(
-    "secret_key"      =>  "sk_test_tN4uGQsemjKrJ2tLpqg3VgIe",
-    "publishable_key" =>  "pk_test_DDqS4Ps7loF2JzJPH5JinfPW"
+    "secret_key"      =>  "sk_live_WdUJFAEbeteYdBX6Pf0Ht3AA",
+    "publishable_key" =>  "pk_live_KPauG3GQX0bjrbCgvdbRJP9A"
   );
 
   Stripe::setApiKey($stripe['secret_key']);
@@ -1633,7 +1633,7 @@ Flight::route('POST /signup/', function(){
     $customer = \Stripe\Customer::create(array(
       'email' =>  $user_email,
       'source'    =>  $user_stripe_token,
-      'plan'  =>'HhQ88aKJ4qDKccsYsq62c'
+      'plan'  =>'oK6TraUtB6x724nwXwBeT'
     ));
 
   } catch (Exception $e) {
@@ -1703,7 +1703,7 @@ Flight::route('POST /signup/', function(){
 
   ));
 
-  Flight::halt(200,"Successfully Signed Up and charged $7.00!");
+  Flight::halt(200,"Successfully Signed Up and charged $13.00!");
 
 });
 
@@ -1739,8 +1739,8 @@ Flight::route('GET /mailgun-0f5ac2ac043c5665bf3e2f00638dbdce', function(){
 Flight::route('POST /stripe-991c8971ff31a83c454f371f55c85be5', function(){
   include "../inc/connection2.php";
   $stripe = array(
-    "secret_key"      =>  "sk_test_tN4uGQsemjKrJ2tLpqg3VgIe",
-    "publishable_key" =>  "pk_test_DDqS4Ps7loF2JzJPH5JinfPW"
+    "secret_key"      =>  "sk_live_WdUJFAEbeteYdBX6Pf0Ht3AA",
+    "publishable_key" =>  "pk_live_KPauG3GQX0bjrbCgvdbRJP9A"
   );
   Stripe::setApiKey($stripe['secret_key']);
   $stripe_event = Flight::request()->getBody();
@@ -2065,8 +2065,8 @@ Flight::route('POST /stripe-change/', function(){
     $result2 = $result2->fetch_assoc();
     $stmt2->close();
     $stripe = array(
-      "secret_key"      =>  "sk_test_tN4uGQsemjKrJ2tLpqg3VgIe",
-      "publishable_key" =>  "pk_test_DDqS4Ps7loF2JzJPH5JinfPW"
+      "secret_key"      =>  "sk_live_WdUJFAEbeteYdBX6Pf0Ht3AA",
+      "publishable_key" =>  "pk_live_KPauG3GQX0bjrbCgvdbRJP9A"
     );
 
   Stripe::setApiKey($stripe['secret_key']);
