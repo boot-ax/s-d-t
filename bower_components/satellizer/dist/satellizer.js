@@ -1,7 +1,7 @@
 /**
  * Satellizer 0.15.5
- * (c) 2016 Sahat Yalkabov 
- * License: MIT 
+ * (c) 2016 Sahat Yalkabov
+ * License: MIT
  */
 
 (function (global, factory) {
@@ -163,7 +163,7 @@
         });
         return Config;
     }());
-    ;
+    
 
     var AuthProvider = (function () {
         function AuthProvider(SatellizerConfig) {

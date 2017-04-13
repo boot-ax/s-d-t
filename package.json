@@ -1,13 +1,23 @@
 {
-  "name": "public",
+  "name": "login",
   "version": "1.0.0",
   "description": "npm runner",
   "main": "plugin.js",
   "dependencies": {
+    "angular-messages": "^1.6.4",
     "angular-stripe": "^4.2.12",
-    "bower": "^1.8.0"
+    "angular-stripe-checkout": "^5.1.0",
+    "bower": "^1.8.0",
+    "minimatch": "^3.0.3",
+    "ngclipboard": "^1.1.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-minify": "0.0.15",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^2.1.2"
+  },
   "scripts": {
     "test": "sure"
   },
