@@ -58,12 +58,13 @@ Flight::map('basicSecurity', function(){
   $stmt = $mysqli->prepare($sql_security);
   $stmt->bind_param('ss', $security, $email);
   if(!$stmt->execute()){
-    Flight::halt(401,"User not authorized");
+    Flight::halt(401,"Token is expired or user not authorized");
   }
   $sql_array = array();
   $result = $stmt->get_result();
   $result = $result->fetch_assoc();
   $stmt->close();
+  $sql_array['email'] = $email;
   $sql_array['entityBody2'] = $entityBody2;
   $sql_array['account_ID'] = $result['account_ID'];
   return $sql_array;
@@ -84,7 +85,7 @@ Flight::map('getStart', function(){
   $stmt = $mysqli->prepare($sql_security);
   $stmt->bind_param('ss', $security, $email);
   if(!$stmt->execute()){
-    Flight::halt(401,"User not authorized");
+    Flight::halt(401,"Token is expired or user not authorized");
   }
   $result = $stmt->get_result();
   $result = $result->fetch_assoc();
@@ -146,7 +147,7 @@ Flight::before('start', function(&$params, &$output){
 				// die();
       }catch(Exception $e){
         // Flight::redirect('https://app.login.webwright.io', [401]) // Redirects to another URL.
-        Flight::halt(401,"User not authorized");
+        Flight::halt(401,"Token is expired or user not authorized");
       }
     }
 });
@@ -161,7 +162,7 @@ Flight::route('POST /auth/login', function(){
   $authy = $entityBody2['authy'];
 
   if(!empty($authy)){
-    $sql  = "SELECT user_email,user_security,user_status,user_type,authy_id FROM registration
+    $sql  = "SELECT user_email,user_security,user_status,user_type,authy_id,user_stripe_token FROM registration
     WHERE (`user_email` = ?)
     AND (`user_password` = md5(?))
     AND (`user_type` != 'no_access');";
@@ -169,13 +170,19 @@ Flight::route('POST /auth/login', function(){
     $stmt = $mysqli->prepare($sql);
     $stmt->bind_param('ss', $entityBody2['email'], $entityBody2['password']);
     if(!$stmt->execute()){
-      Flight::halt(401,"User not authorized");
+      Flight::halt(401,"Token is expired or user not authorized");
     }
     $sql_array = array();
     $result = $stmt->get_result();
-    // var_dump($result->num_rows);
     $user = $result->fetch_assoc();
     $stmt->close();
+    if(!empty($user['user_stripe_token'])){
+      $user['account_owner'] = 'yes';
+    } else {
+      $user['account_owner'] = 'no';
+    };
+    unset($user['user_stripe_token']);
+    // var_dump($result->num_rows);
         $authy_api = new Authy\AuthyApi('PXD03tc5vZbC78OJJbOM61WqDPgbldUB');
         $verification = $authy_api->verifyToken($user['authy_id'], $authy, array("force" => "true"));
 
@@ -199,7 +206,7 @@ Flight::route('POST /auth/login', function(){
   // FLight::stop(401,var_dump($authy));
 
   else{
-          $sql  = "SELECT user_name,user_email,user_security,user_status,user_type,authy_id FROM registration
+          $sql  = "SELECT user_name,user_email,user_security,user_status,user_type,authy_id,user_stripe_token FROM registration
       		WHERE (`user_email` = ?)
       		AND (`user_password` = md5(?))
           AND (`user_type` != 'no_access');";
@@ -207,13 +214,19 @@ Flight::route('POST /auth/login', function(){
           $stmt = $mysqli->prepare($sql);
           $stmt->bind_param('ss', $entityBody2['email'], $entityBody2['password']);
           if(!$stmt->execute()){
-            Flight::halt(401,"User not authorized");
+            Flight::halt(401,"Token is expired or user not authorized");
           }
           $sql_array = array();
           $result = $stmt->get_result();
           // var_dump($result->num_rows);
           $user = $result->fetch_assoc();
           $stmt->close();
+          if(!empty($user['user_stripe_token'])){
+            $user['account_owner'] = 'yes';
+          } else {
+            $user['account_owner'] = 'no';
+          };
+          unset($user['user_stripe_token']);
 
           if($result->num_rows>0 & empty($user['authy_id'])){
             $alg = "HS256";
@@ -1361,8 +1374,24 @@ Flight::route('/updateItem', function(){
   $value = $mysqli->real_escape_string($value);
   $body3[$key] = $value;
   }
-
-
+  // Flight::stop(500,var_dump($body3));
+    if($body3['table'] == 'registration'){
+      $sql = "SELECT user_stripe_token,user_email FROM registration WHERE user_ID = ?";
+      $stmt = $mysqli->prepare($sql);
+      $stmt->bind_param('s', $body3['id']);
+      if(!$stmt->execute()){
+        Flight::halt(500,$mysqli->error);
+      }
+      $result = $stmt->get_result();
+      $result = $result->fetch_assoc();
+      $stmt->close();
+        // Flight::stop(401,var_dump($sqlArray));
+        if(!empty($result['user_stripe_token'])) {
+         Flight::halt(401,"Change account originator thru profile");
+       } elseif($sqlArray['email'] == $result['user_email']){
+         Flight::halt(401,"Change yourself thru profile");
+       }
+    }
 
     if($body3['table'] == 'change_log' || $body3['table'] == 'url_data'){
      $sql  = "UPDATE " . $body3['table'] . " SET " . $body3['column'] . "=\"" . $body3['value'] . "\"";
@@ -1422,13 +1451,13 @@ Flight::route('POST /profileinfo/', function(){
   $email = $goodData->user_email;
   $security = $goodData->user_security;
 
-  $sql = "SELECT rt.user_phone,rt.user_address,rt.user_name,rt.user_country_code,rt.authy_id FROM registration rt
+  $sql = "SELECT rt.user_phone,rt.user_address,rt.user_name,rt.user_country_code,rt.authy_id,rt.user_status FROM registration rt
   where user_security = ?
   AND user_email = ?";
   $stmt = $mysqli->prepare($sql);
   $stmt->bind_param('ss', $security, $email);
   if(!$stmt->execute()){
-    Flight::halt(401,"User not authorized");
+    Flight::halt(401,"Token is expired or user not authorized");
   }
   $result = $stmt->get_result();
   while ($row = $result->fetch_assoc()) {
@@ -1463,7 +1492,7 @@ Flight::route('POST /newprofileinfo/', function(){
   $stmt = $mysqli->prepare($sql_security);
   $stmt->bind_param('ss', $security, $email);
   if(!$stmt->execute()){
-    Flight::halt(401,"User not authorized");
+    Flight::halt(401,"Token is expired or user not authorized");
   }
   $sql_array = array();
   $result = $stmt->get_result();
@@ -1589,6 +1618,149 @@ Flight::route('POST /newprofileinfo/', function(){
 
   });
 
+Flight::route('POST /newprofileinfo/', function(){
+    $entityBody = Flight::request()->getBody();
+    include "../inc/connection2.php";
+    global $jwt_key;
+    $entityBody = str_replace('\\u0000', '', $entityBody);
+    $entityBody2 = json_decode($entityBody,true);
+    $jwt = substr($_SERVER['HTTP_AUTHORIZATION'],7);
+    $validator = new \Gamegos\JWT\Validator();
+    $token = $validator->validate($jwt, $jwt_key);
+    $goodData = json_decode($token->getClaims()['sub']);
+    $email = $goodData->user_email;
+    $security = $goodData->user_security;
+    $sql_security = "SELECT rt.account_ID,rt.user_password,rt.authy_id FROM registration rt
+    where user_security = ?
+    AND user_email = ?";
+    $stmt = $mysqli->prepare($sql_security);
+    $stmt->bind_param('ss', $security, $email);
+    if(!$stmt->execute()){
+      Flight::halt(401,"Token is expired or user not authorized");
+    }
+    $sql_array = array();
+    $result = $stmt->get_result();
+    $result = $result->fetch_assoc();
+    $authy_id = $result['authy_id'];
+    $stmt->close();
+
+    if (!empty($entityBody2['newProfile']['password'])) {
+      $entityBody2['newProfile']['password'] = md5($entityBody2['newProfile']['password']);
+    } else {
+      $entityBody2['newProfile']['password'] = $result['user_password'];
+    }
+
+    $sql = "UPDATE registration SET user_name = ?, user_email = ?, user_password = ?, user_phone = ?, user_address = ?, user_country_code = ? WHERE (user_email = ? AND user_security = ?)";
+
+    $stmt = $mysqli->prepare($sql);
+    $stmt->bind_param('ssssssss',$entityBody2['newProfile']['user_name'],$entityBody2['newProfile']['user_email'],$entityBody2['newProfile']['password'],$entityBody2['newProfile']['user_phone'],$entityBody2['newProfile']['user_address'],$entityBody2['newProfile']['user_country_code'],$email,$security);
+
+    if(!$stmt->execute()){
+      Flight::halt(500,$mysqli->error);
+      $stmt->close();
+    }
+      $stmt->close();
+
+      if($entityBody2['newProfile']['authy_id'] & empty($authy_id)){
+        $user_phone = $entityBody2['newProfile']['user_phone'];
+        $user_country_code = filter_var($entityBody2['newProfile']['user_country_code'],FILTER_SANITIZE_NUMBER_INT);
+
+        $authy_api = new Authy\AuthyApi('PXD03tc5vZbC78OJJbOM61WqDPgbldUB');
+        $user = $authy_api->registerUser($email, $user_phone, $user_country_code); //email, cellphone, country_code
+        if($user->ok()){
+          $sql3 = "UPDATE registration SET authy_id = ? WHERE (user_email = ? AND user_security = ?)";
+          $stmt3 = $mysqli->prepare($sql3);
+          $stmt3->bind_param('sss',$user->id(),$email,$security);
+          if(!$stmt3->execute()){
+            Flight::stop(500,$mysqli->error);
+          }
+          $stmt3->close();
+            } else
+              foreach($user->errors() as $field => $message) {
+              Flight::stop(500,printf("$field = $message"));
+              }
+        Flight::halt(200,"Verification");
+      } elseif(!$entityBody2['newProfile']['authy_id'] & !empty($authy_id)){
+        $sql4 = "UPDATE registration SET authy_id = NULL WHERE (user_email = ? AND user_security = ?)";
+        $stmt4 = $mysqli->prepare($sql4);
+        $stmt4->bind_param('ss',$email,$security);
+        if(!$stmt4->execute()){
+          Flight::stop(500,$mysqli->error);
+        }
+        $stmt4->close();
+        Flight::halt(200,"Profile Updated And User Removed From Two Factor Auth");
+      } else {
+       Flight::halt(200,"Profile Updated");
+     }
+
+
+    });
+
+
+Flight::route('POST /verify-email/', function(){
+      include "../inc/connection2.php";
+      global $jwt_key;
+      $entityBody = Flight::request()->getBody();
+      $entityBody = str_replace('\\u0000', '', $entityBody);
+      $entityBody2 = json_decode($entityBody,true);
+      try{
+          $jwt = substr($_SERVER['HTTP_AUTHORIZATION'],7);
+          $validator = new \Gamegos\JWT\Validator();
+          $token = $validator->validate($jwt, $jwt_key);
+          $goodData = json_decode($token->getClaims()['sub']);
+          }catch(Exception $e){
+          Flight::halt(401,"Token is expired or user not authorized");
+    }
+      $email_verification = randomPassword();
+      $user_email = $entityBody2['$profile']['user_email'];
+      $payload = array('user_email' => $user_email,'email_verification' => $email_verification);
+      // Flight::stop(401,var_dump($user_email));
+
+      // Flight::stop(401,var_dump($entityBody));
+
+      $sql3 = "UPDATE registration SET email_verification = ?
+              WHERE user_email = ?";
+
+      $stmt3 = $mysqli->prepare($sql3);
+      $stmt3->bind_param('ss', $email_verification,$user_email);
+
+      if(!$stmt3->execute()){
+        Flight::halt(500,$mysqli->error);
+      }
+      $stmt3->close();
+
+        $alg = "HS256";
+        $token = new \Gamegos\JWT\Token();
+        $token->setClaim('sub', json_encode($payload));
+        $token->setClaim('exp', time()+60*60*24*7);
+        $encoder = new \Gamegos\JWT\Encoder();
+        $encoder->encode($token, $jwt_key, $alg);
+        $token = $token->getJWT();
+
+      // Flight::stop(500,var_dump($user_email));
+      $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
+      $domain = "login.webwright.io";
+      $link = "https://app.login.webwright.io/service/mailgun-0f5ac2ac043c5665bf3e2f00638dbdce?token=".$token;
+      $result = $mg->sendMessage($domain, array(
+      // Be sure to replace the from address with the actual email address you're sending from
+      'from'    => 'support@login.webwright.io',
+      'to'      => $user_email,
+      'subject' => 'Email Verification',
+      'o:tag'   => array('Email Verification'),
+        // 'o:tracking-clicks' => 'htmlonly',
+      'html'    => 'Click the link below to verify your email.</br></br>
+      <a href="' .$link. '"></br><button>Verify Email</button></a></br><br>
+      Thanks from the loginners-</br>
+      https://app.login.webwright.io/login'
+
+
+
+       ));
+       Flight::halt(200,"A verificaion email was sent to you");
+    });
+
+
+
 Flight::route('POST /signup/', function(){
   global $jwt_key;
   $entityBody = Flight::request()->getBody();
@@ -1696,7 +1868,7 @@ Flight::route('POST /signup/', function(){
     'o:tag'   => array('Email Verification'),
       // 'o:tracking-clicks' => 'htmlonly',
     'html'    => 'Click the link below to verify your email.</br></br>
-    <a href="' .$link. '"><button>Verify Email</button></a></br><br>
+    <a href="' .$link. '"></br><button>Verify Email</button></a></br><br>
     Thanks from the loginners-</br>
     https://app.login.webwright.io/login'
 
@@ -1713,17 +1885,17 @@ Flight::route('GET /mailgun-0f5ac2ac043c5665bf3e2f00638dbdce', function(){
 
   try{
       $jwt = $_GET['token'];
-      var_dump($jwt);
       $validator = new \Gamegos\JWT\Validator();
       $token = $validator->validate($jwt, $jwt_key);
       $goodData = json_decode($token->getClaims()['sub']);
       }catch(Exception $e){
   // Flight::redirect('https://app.login.webwright.io', [401]) // Redirects to another URL.
-      Flight::halt(401,"User not authorized");
-}
+      Flight::halt(401,"Token is expired or user not authorized");
+    }
 
   $email = $goodData->user_email;
   $email_verification = $goodData->email_verification;
+  // Flight::stop(401,var_dump($email_verification));
   $sql = "UPDATE registration SET user_status = 1 WHERE (email_verification = ? AND user_email = ?)";
 
   $stmt = $mysqli->prepare($sql);
@@ -1805,78 +1977,45 @@ Flight::route('POST /stripe-991c8971ff31a83c454f371f55c85be5', function(){
 
 
   Thank you for your subscription
-</br>
-  You can update your information in the profile section of your account if necessary:
-</br>
-  https://app.login.webwright.io/login'
+  </br>
+    You can update your information in the profile section of your account if necessary:
+  </br>
+    https://app.login.webwright.io/login'
 
 
-  ));
+    ));
 
-  Flight::halt(200,"Successfull Payment");
-  }
+    Flight::halt(200,"Successfull Payment");
+    }
 
-  elseif (isset($event) && $event->type == "invoice.payment_failed") {
-  // Sending your customers the amount in pennies is weird, so convert to dollars
-  $amount = sprintf('$%0.2f', $event->data->object->amount_due / 100.0);
+    elseif (isset($event) && $event->type == "invoice.payment_failed") {
+    // Sending your customers the amount in pennies is weird, so convert to dollars
+    $amount = sprintf('$%0.2f', $event->data->object->amount_due / 100.0);
 
-  $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
-  $domain = "login.webwright.io";
-  $result = $mg->sendMessage($domain, array(
-  // Be sure to replace the from address with the actual email address you're sending from
-  'from'    => 'billing@login.webwright.io',
-  'to'      => $email,
-  'subject' => 'Your most recent invoice payment failed',
-    'text'    => 'Hi there,
+    $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
+    $domain = "login.webwright.io";
+    $result = $mg->sendMessage($domain, array(
+    // Be sure to replace the from address with the actual email address you're sending from
+    'from'    => 'billing@login.webwright.io',
+    'to'      => $email,
+    'subject' => 'Your most recent invoice payment failed',
+      'text'    => 'Hi there,
 
-    Unfortunately your most recent invoice payment for ' . $amount . ' was declined.
-    This could be due to a change in your card number or your card expiring, cancelation of your credit card,
-    or the bank not recognizing the payment and taking action to prevent it.
+      Unfortunately your most recent invoice payment for ' . $amount . ' was declined.
+      This could be due to a change in your card number or your card expiring, cancelation of your credit card,
+      or the bank not recognizing the payment and taking action to prevent it.
 
-    Please update your payment information as soon as possible by logging in here:
-  https://app.login.webwright.io/login'
-  ));
-  Flight::halt(200,"Failed Payment");
+      Please update your payment information as soon as possible by logging in here:
+    https://app.login.webwright.io/login'
+    ));
+    Flight::halt(200,"Failed Payment");
 
-  }
+    }
 
-  elseif (isset($event) && $event->type == "charge.failed") {
-  // Sending your customers the amount in pennies is weird, so convert to dollars
+    elseif (isset($event) && $event->type == "charge.failed") {
+    // Sending your customers the amount in pennies is weird, so convert to dollars
 
-  $amount = sprintf('$%0.2f', $event->data->object->amount_due / 100.0);
-  $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
-  $domain = "login.webwright.io";
-  $result = $mg->sendMessage($domain, array(
-  // Be sure to replace the from address with the actual email address you're sending from
-  'from'    => 'billing@login.webwright.io',
-  'to'      => $email,
-  'subject' => 'Your Charge failed to go thru',
-    'text'    => 'Hi there,
-
-    Unfortunately your most recent invoice payment for ' . $amount . ' was declined.</br>
-    This could be due to a change in your card number or your card expiring, cancelation of your credit card,
-    or the bank not recognizing the payment and taking action to prevent it.
-
-    Please update your payment information as soon as possible by trying to register with a different card here:</br>
-  https://app.login.webwright.io/login'
-  ));
-  Flight::halt(200,"Failed Payment");
-
-  }
-
-  elseif (isset($event) && $event->type == "customer.subscription.deleted") {
-  // Sending your customers the amount in pennies is weird, so convert to dollars
-
-  $sql = "DELETE FROM account WHERE stripe_customer_ID = ?";
-  $stmt = $mysqli->prepare($sql);
-  $stmt->bind_param('s',$cusID);
-  if(!$stmt->execute()){
-    Flight::halt(500,$stmt->error);
-  }
-    $stmt->close();
-
-  $login_or_stripe = $event->request;
-  if(is_null($login_or_stripe)){
+    $amount = sprintf('$%0.2f', $event->data->object->amount_due / 100.0);
     $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
     $domain = "login.webwright.io";
     $result = $mg->sendMessage($domain, array(
@@ -1885,42 +2024,75 @@ Flight::route('POST /stripe-991c8971ff31a83c454f371f55c85be5', function(){
     'to'      => $email,
     'subject' => 'Your Charge failed to go thru',
       'text'    => 'Hi there,
-</br>
-    It was fun while it lasted.
-    </br>
-    Sorry to see you go.
-    </br>
-    https://login.webwright.io'
+
+      Unfortunately your most recent invoice payment for ' . $amount . ' was declined.</br>
+      This could be due to a change in your card number or your card expiring, cancelation of your credit card,
+      or the bank not recognizing the payment and taking action to prevent it.
+
+      Please update your payment information as soon as possible by trying to register with a different card here:</br>
+    https://app.login.webwright.io/login'
     ));
-    Flight::halt(200,"Subscription Canceled by User");
-  } else {
-  $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
-  $domain = "login.webwright.io";
-  $result = $mg->sendMessage($domain, array(
-  // Be sure to replace the from address with the actual email address you're sending from
-  'from'    => 'billing@login.webwright.io',
-  'to'      => $email,
-  'subject' => 'Your Subscription was Canceled',
-    'text'    => 'Hi there,
-</br>
-  Your subscription to Lōgïn was canceled after three attemts to charge your card.
-</br>
-  Consequently, your data was also deleted.
+    Flight::halt(200,"Failed Payment");
+
+    }
+
+    elseif (isset($event) && $event->type == "customer.subscription.deleted") {
+    // Sending your customers the amount in pennies is weird, so convert to dollars
+
+    $sql = "DELETE FROM account WHERE stripe_customer_ID = ?";
+    $stmt = $mysqli->prepare($sql);
+    $stmt->bind_param('s',$cusID);
+    if(!$stmt->execute()){
+      Flight::halt(500,$stmt->error);
+    }
+      $stmt->close();
+
+    $login_or_stripe = $event->request;
+    if(is_null($login_or_stripe)){
+      $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
+      $domain = "login.webwright.io";
+      $result = $mg->sendMessage($domain, array(
+      // Be sure to replace the from address with the actual email address you're sending from
+      'from'    => 'billing@login.webwright.io',
+      'to'      => $email,
+      'subject' => 'Your Charge failed to go thru',
+        'text'    => 'Hi there,
   </br>
-  https://login.webwright.io/'
-  ));
-  }
+      It was fun while it lasted.
+      </br>
+      Sorry to see you go.
+      </br>
+      https://login.webwright.io'
+      ));
+      Flight::halt(200,"Subscription Canceled by User");
+    } else {
+    $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
+    $domain = "login.webwright.io";
+    $result = $mg->sendMessage($domain, array(
+    // Be sure to replace the from address with the actual email address you're sending from
+    'from'    => 'billing@login.webwright.io',
+    'to'      => $email,
+    'subject' => 'Your Subscription was Canceled',
+      'text'    => 'Hi there,
+  </br>
+    Your subscription to Lōgïn was canceled after three attemts to charge your card.
+  </br>
+    Consequently, your data was also deleted.
+    </br>
+    https://login.webwright.io/'
+    ));
+    }
 
-  Flight::halt(200,"Subscription Canceled after non payment");
+    Flight::halt(200,"Subscription Canceled after non payment");
 
-  }
+    }
 
-      else {
-    Flight::halt(200,"There wasn't a hook for this event");
+        else {
+      Flight::halt(200,"There wasn't a hook for this event");
 
-  }
+    }
 
-  });
+    });
 
 Flight::route('POST|GET /password-reset', function(){
     global $jwt_key;
@@ -1934,7 +2106,7 @@ Flight::route('POST|GET /password-reset', function(){
           $email = $goodData->user_email;
           }catch(Exception $e){
       // Flight::redirect('https://app.login.webwright.io', [401]) // Redirects to another URL.
-          Flight::halt(401,"User not authorized - first");
+          Flight::halt(401,"Token is expired or user not authorized - first");
           }
           // Flight::redirect('../password-reset.php',301);
           // Flight::render('service/password-reset');
@@ -2006,7 +2178,7 @@ Flight::route('POST|GET /password-reset', function(){
                         $user_email = $goodData->user_email;
                         $user_security = $goodData->user_security;
                       } catch (Exception $e) {
-                        Flight::halt(401,"User not authorized - almost last");
+                        Flight::halt(401,"Token is expired or user not authorized - almost last");
                       }
                       $sql = "UPDATE registration SET user_password = ? WHERE (user_email = ? AND user_security = ?)";
                       // var_dump($user_password);
@@ -2019,7 +2191,7 @@ Flight::route('POST|GET /password-reset', function(){
                       $stmt->close();
                       Flight::halt(200,"Successfully Updated Password.  You will be redirected to login page shortly.");
                     } else {
-                      Flight::halt(401,"User not authorized - last");
+                      Flight::halt(401,"Token is expired or user not authorized - last");
                     }
   }
   });
@@ -2043,7 +2215,7 @@ Flight::route('POST /stripe-change/', function(){
     $stmt = $mysqli->prepare($sql_security);
     $stmt->bind_param('ss', $security, $email);
     if(!$stmt->execute()){
-      Flight::halt(401,"User not authorized");
+      Flight::halt(401,"Token is expired or user not authorized");
     }
     $sql_array = array();
     $result = $stmt->get_result();
@@ -2059,7 +2231,7 @@ Flight::route('POST /stripe-change/', function(){
     $stmt2 = $mysqli->prepare($sql);
     $stmt2->bind_param('s', $result['account_ID']);
     if(!$stmt2->execute()){
-      Flight::halt(401,"User not authorized");
+      Flight::halt(401,"Token is expired or user not authorized");
     }
     $result2 = $stmt2->get_result();
     $result2 = $result2->fetch_assoc();
@@ -2114,7 +2286,7 @@ Flight::route('POST /authy-verify/', function(){
   $stmt = $mysqli->prepare($sql_security);
   $stmt->bind_param('ss', $security, $email);
   if(!$stmt->execute()){
-    Flight::halt(401,"User not authorized");
+    Flight::halt(401,"Token is expired or user not authorized");
   }
   $sql_array = array();
   $result = $stmt->get_result();

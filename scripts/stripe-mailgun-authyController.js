@@ -1,4 +1,3 @@
-
 angular.module('SE_App').controller('authyVerify', ['$mdDialog','$scope', '$http','$user','$auth','$state','$mdToast',
 function ($mdDialog, $scope, $http,$user,$auth,$state,$mdToast) {
   'use strict';
@@ -50,6 +49,39 @@ angular.module('SE_App').controller('profileController', ['$mdDialog','$scope', 
 function ($mdDialog,$scope, $mdEditDialog, $http,$mdToast,$q,$location,$auth) {
   'use strict';
 
+$scope.sendVerifyEmail = function (event,profile){
+$http.post('/service/verify-email/',{$profile: profile}).then(function(response){
+  $mdToast.show({
+  hideDelay   : 4000,
+  position    : 'top center',
+  controller  : 'ToastCtrl',
+  templateUrl : '/partials/toast-template.html',
+  toastClass  : 'toastSuccess',
+  resolve: {
+       $response: function () {
+         return response.data;
+       }
+     }
+  });
+  $mdDialog.hide();
+  $scope.needVerify = false;
+})
+.catch(function(response) {
+$mdToast.show({
+hideDelay   : 9000,
+position    : 'top center',
+controller  : 'ToastCtrl',
+templateUrl : '/partials/toast-template.html',
+toastClass  : 'toastWarning',
+resolve: {
+   $response: function () {
+     return response.data;
+   }
+ }
+});
+});
+};
+
 function currentProfile(){
     $scope.profile = JSON.parse($auth.getPayload().sub);
     $http.post('/service/profileinfo/').then(function(response){
@@ -58,9 +90,21 @@ function currentProfile(){
     $scope.profile.user_country_code = response.data.profile[0].user_country_code;
     $scope.profile.authy_id = response.data.profile[0].authy_id;
     $scope.profile.user_name = response.data.profile[0].user_name;
+    $scope.profile.user_status = response.data.profile[0].user_status;
     // console.log($scope.profile);
-    });
+  }).then(function(){
+    status();
+  });
 };
+
+function status(){
+  if($scope.profile.user_status == 2){
+   $scope.needVerify = true;
+  } else {
+   $scope.needVerify = false;
+  }
+};
+
 currentProfile();
 
 $scope.profileChange = function (event,profile) {

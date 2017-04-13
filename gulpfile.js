@@ -9,8 +9,12 @@ var gulp = require('gulp'),
 
 gulp.task("concatScripts", function(){
   gulp.src([
+  "node_modules/moment/moment.js",
+  // "node_modules/angular-material/angular-material.js",
+  "node_modules/ng-csv/build/ng-csv.js",
+  "node_modules/angular-sanitize/angular-sanitize.js",
+  "bower_components/jquery/dist/jquery.js",
     "node_modules/ngclipboard/dist/ngclipboard.js",
-    // "node_modules/angular-messages/angular-messages.js",
     "bower_components/satellizer/dist/satellizer.js",
     "bower_components/angular-ui-router/release/angular-ui-router.js",
     "bower_components/angular-loading-bar/build/loading-bar.js",
