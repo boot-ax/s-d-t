@@ -1,19 +1,19 @@
 
-<md-dialog aria-label="Dialog for Signup" style="max-width:380px">
+<md-dialog aria-label="Dialog for Signup" style="min-width:380px;max-width:480px">
   <md-dialog-content>
 <div flex layout="column">
       <md-toolbar>
       <div class="md-toolbar-tools">
         <h2>Register / Pay</h2>
-        <span flex></span>
+       <span flex></span>
         <md-button class="md-icon-button" ng-click="cancel()">
           <md-icon class="material-icons" aria-label="Close dialog">close</md-icon>
         </md-button>
       </div>
     </md-toolbar>
        <form flex layout="row" name="register.form" layout-padding>
-         <span flex ></span>
-           <div layout="column" style="margin-top:25px">
+         <span flex="2"></span>
+           <div flex layout="column" style="margin-top:25px">
              <div>
                  <md-input-container flex layout="row" class="input-row layout-row rowOffset">
                    <label class="loginLabel">Email&#42;</label>
@@ -77,7 +77,7 @@
              </button>
                </section>
          </div>
-       <span flex></span>
+       <span flex="2"></span>
      </form>
 </div>
 </md-dialog-content>
