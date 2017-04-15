@@ -11,6 +11,10 @@ use Authy\AuthyApi;
 //date_default_timezone_set('UTC');
 
 $jwt_key = "joelikeshisinflatablebal$22A2Ux7qcu3jXFdcczEc77c";
+$stripe = array(
+  "secret_key"      =>  "sk_test_tN4uGQsemjKrJ2tLpqg3VgIe",
+  "publishable_key" =>  "pk_test_DDqS4Ps7loF2JzJPH5JinfPW"
+);
 
 // Map your method
 Flight::map('basicDelete', function(){
@@ -135,7 +139,7 @@ Flight::before('start', function(&$params, &$output){
 
     $request = Flight::request();
     $url = $request->url;
-    if($url !== '/auth/login' & $url !== '/signup/' & $url !== '/stripe-991c8971ff31a83c454f371f55c85be5' & strpos($url, '/mailgun-0f5ac2ac043c5665bf3e2f00638dbdce') === false & strpos($url, '/password-reset') === false){
+    if($url !== '/auth/login' & $url !== '/signup/' & $url !== '/stripe-991c8971ff31a83c454f371f55c85be5' & strpos($url, '/mailgun-0f5ac2ac043c5665bf3e2f00638dbdce') === false & strpos($url, '/password-reset') === false  & strpos($url, '/verify-out-email') === false){
       $jwt = substr($_SERVER['HTTP_AUTHORIZATION'],7);
       try{
 				$validator = new \Gamegos\JWT\Validator();
@@ -1557,6 +1561,7 @@ Flight::route('POST /newprofileinfo/', function(){
     $entityBody = Flight::request()->getBody();
     include "../inc/connection2.php";
     global $jwt_key;
+    global $stripe;
     $entityBody = str_replace('\\u0000', '', $entityBody);
     $entityBody2 = json_decode($entityBody,true);
     $jwt = substr($_SERVER['HTTP_AUTHORIZATION'],7);
@@ -1594,11 +1599,6 @@ Flight::route('POST /newprofileinfo/', function(){
 
   // var_dump($result['good_til_date']);
   // var_dump($result['account_ID']);
-
-  $stripe = array(
-    "secret_key"      =>  "sk_live_WdUJFAEbeteYdBX6Pf0Ht3AA",
-    "publishable_key" =>  "pk_live_KPauG3GQX0bjrbCgvdbRJP9A"
-  );
 
   try {
     Stripe::setApiKey($stripe['secret_key']);
@@ -1749,7 +1749,8 @@ Flight::route('POST /verify-email/', function(){
       'o:tag'   => array('Email Verification'),
         // 'o:tracking-clicks' => 'htmlonly',
       'html'    => 'Click the link below to verify your email.</br></br>
-      <a href="' .$link. '"></br><button>Verify Email</button></a></br><br>
+      <a href="' .$link. '"></br></br>
+      <button>Verify Email</button></a></br><br>
       Thanks from the loginners-</br>
       https://app.login.webwright.io/login'
 
@@ -1759,16 +1760,95 @@ Flight::route('POST /verify-email/', function(){
        Flight::halt(200,"A verificaion email was sent to you");
     });
 
+    Flight::route('POST /verify-out-email', function(){
+          include "../inc/connection2.php";
+          global $jwt_key;
+          $entityBody = Flight::request()->getBody();
+          $entityBody = str_replace('\\u0000', '', $entityBody);
+          $entityBody2 = json_decode($entityBody,true);
+          $email_verification = randomPassword();
+          $user_email = $entityBody2['$profile']['user_email'];
+          // Flight::stop(401,var_dump($user_email));
+
+          $payload = array('user_email' => $user_email,'email_verification' => $email_verification);
+          // Flight::stop(401,var_dump($user_email));
+
+          // Flight::stop(401,var_dump($entityBody));
+
+          $sql3 = "UPDATE registration SET email_verification = ?
+                  WHERE user_email = ?";
+
+          $stmt3 = $mysqli->prepare($sql3);
+          $stmt3->bind_param('ss', $email_verification,$user_email);
+
+          if(!$stmt3->execute()){
+            Flight::halt(500,$mysqli->error);
+          }
+          $stmt3->close();
+
+            $alg = "HS256";
+            $token = new \Gamegos\JWT\Token();
+            $token->setClaim('sub', json_encode($payload));
+            $token->setClaim('exp', time()+60*60*24*7);
+            $encoder = new \Gamegos\JWT\Encoder();
+            $encoder->encode($token, $jwt_key, $alg);
+            $token = $token->getJWT();
+
+          // Flight::stop(500,var_dump($user_email));
+          $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
+          $domain = "login.webwright.io";
+          $link = "https://app.login.webwright.io/service/mailgun-0f5ac2ac043c5665bf3e2f00638dbdce?token=".$token;
+          $result = $mg->sendMessage($domain, array(
+          // Be sure to replace the from address with the actual email address you're sending from
+          'from'    => 'support@login.webwright.io',
+          'to'      => $user_email,
+          'subject' => 'Email Verification',
+          'o:tag'   => array('Email Verification'),
+            // 'o:tracking-clicks' => 'htmlonly',
+          'html'    => 'Click the link below to verify your email.</br></br>
+          <a href="' .$link. '"></br></br>
+          <button>Verify Email</button></a></br><br>
+          Thanks from the loginners-</br>
+          https://app.login.webwright.io/login'
+
+
+
+           ));
+           Flight::halt(200,"A verificaion email was sent to you");
+        });
 
 
 Flight::route('POST /signup/', function(){
   global $jwt_key;
+  global $stripe;
   $entityBody = Flight::request()->getBody();
 	include "../inc/connection2.php";
 	$entityBody = json_decode($entityBody,true);
   $accountName = $entityBody['signUp']['accountName'];
   $user_email = $entityBody['signUp']['email'];
   $account_name = $entityBody['signUp']['account_name'];
+  $coupon = $entityBody['signUp']['coupon'];
+
+  Stripe::setApiKey($stripe['secret_key']);
+
+  if(!empty($coupon)){
+    try {
+      $stripe_coupon = \Stripe\Coupon::retrieve($coupon);
+      $dallor_off = sprintf($stripe_coupon->amount_off / 100.0);
+      // Flight::stop(401,var_dump($dollor_off));
+    } catch (Exception $e) {
+      Flight::halt(401,"Unable to retrieve coupon:" . $coupon.
+        "  , error:  " . $e->getMessage()
+      );
+    }
+
+
+
+  }
+
+
+
+
   if($accountName == 'Individual'){
     $account_name = $user_email."-account";
   }
@@ -1795,17 +1875,11 @@ Flight::route('POST /signup/', function(){
   $stmt4->close();
 
 
-  $stripe = array(
-    "secret_key"      =>  "sk_live_WdUJFAEbeteYdBX6Pf0Ht3AA",
-    "publishable_key" =>  "pk_live_KPauG3GQX0bjrbCgvdbRJP9A"
-  );
-
-  Stripe::setApiKey($stripe['secret_key']);
   try {
     $customer = \Stripe\Customer::create(array(
       'email' =>  $user_email,
       'source'    =>  $user_stripe_token,
-      'plan'  =>'oK6TraUtB6x724nwXwBeT'
+      'plan'  =>'LhQ88aKJ4tDKccsYsq68c'
     ));
 
   } catch (Exception $e) {
@@ -1868,14 +1942,17 @@ Flight::route('POST /signup/', function(){
     'o:tag'   => array('Email Verification'),
       // 'o:tracking-clicks' => 'htmlonly',
     'html'    => 'Click the link below to verify your email.</br></br>
-    <a href="' .$link. '"></br><button>Verify Email</button></a></br><br>
+    <a href="' .$link. '"></br></br>
+    <button>Verify Email</button></a></br><br>
     Thanks from the loginners-</br>
     https://app.login.webwright.io/login'
 
 
   ));
 
-  Flight::halt(200,"Successfully Signed Up and charged $13.00!");
+  $cost = 13 - $dallor_off;
+
+  Flight::halt(200,"Successfully Signed Up and charged $".$cost.".00!");
 
 });
 
@@ -1910,10 +1987,7 @@ Flight::route('GET /mailgun-0f5ac2ac043c5665bf3e2f00638dbdce', function(){
 
 Flight::route('POST /stripe-991c8971ff31a83c454f371f55c85be5', function(){
   include "../inc/connection2.php";
-  $stripe = array(
-    "secret_key"      =>  "sk_live_WdUJFAEbeteYdBX6Pf0Ht3AA",
-    "publishable_key" =>  "pk_live_KPauG3GQX0bjrbCgvdbRJP9A"
-  );
+  global $stripe;
   Stripe::setApiKey($stripe['secret_key']);
   $stripe_event = Flight::request()->getBody();
   $event_json = json_decode($stripe_event);
@@ -2106,7 +2180,7 @@ Flight::route('POST|GET /password-reset', function(){
           $email = $goodData->user_email;
           }catch(Exception $e){
       // Flight::redirect('https://app.login.webwright.io', [401]) // Redirects to another URL.
-          Flight::halt(401,"Token is expired or user not authorized - first");
+          Flight::halt(401,"Token is expired or user not authorized");
           }
           // Flight::redirect('../password-reset.php',301);
           // Flight::render('service/password-reset');
@@ -2118,15 +2192,19 @@ Flight::route('POST|GET /password-reset', function(){
         	$entityBody = json_decode($entityBody,true);
           $user_email = $entityBody['user']['email'];
           if(empty($entityBody['user']['token'])){
-          $sql = "SELECT user_security FROM registration WHERE user_email = ?";
+          $sql = "SELECT user_security,user_status FROM registration WHERE user_email = ?";
           $stmt = $mysqli->prepare($sql);
           $stmt->bind_param('s',$user_email);
           if(!$stmt->execute()){
             Flight::halt(500,$stmt->error);
           }
           $result = $stmt->get_result();
-          if($result->num_rows>0){
-      			// $user = $result->fetch_assoc();
+          $result_array = $result->fetch_assoc();
+          // Flight::stop(401,var_dump($result_array['user_status']));
+          if($result->num_rows>0 & $result_array['user_status']==2){
+            $stmt->close();
+            Flight::halt(401,$user_email);
+          }elseif($result->num_rows>0){
             $stmt->close();
           }else{
             $stmt->close();
@@ -2164,7 +2242,8 @@ Flight::route('POST|GET /password-reset', function(){
                 'o:tag'   => array('Resetting Password'),
                   // 'o:tracking-clicks' => 'htmlonly',
                 'html'    => 'Resetting Password!
-                <a href="' .$link. '"><button>Reset Your Password</button></a></br><br>
+                <a href="' .$link. '"></br></br>
+                <button>Reset Your Password</button></a></br><br>
                 Click the link to reset your password'
                 ));
                 Flight::halt(200,"Successfully Sent Password Email");
@@ -2200,6 +2279,7 @@ Flight::route('POST /stripe-change/', function(){
     $entityBody = Flight::request()->getBody();
     include "../inc/connection2.php";
     global $jwt_key;
+    global $stripe;
     $entityBody = str_replace('\\u0000', '', $entityBody);
     $entityBody2 = json_decode($entityBody,true);
     // Flight::stop(401,var_dump($entityBody2));
@@ -2236,10 +2316,6 @@ Flight::route('POST /stripe-change/', function(){
     $result2 = $stmt2->get_result();
     $result2 = $result2->fetch_assoc();
     $stmt2->close();
-    $stripe = array(
-      "secret_key"      =>  "sk_live_WdUJFAEbeteYdBX6Pf0Ht3AA",
-      "publishable_key" =>  "pk_live_KPauG3GQX0bjrbCgvdbRJP9A"
-    );
 
   Stripe::setApiKey($stripe['secret_key']);
 
