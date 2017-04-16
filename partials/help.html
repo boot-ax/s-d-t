@@ -1,1 +1,88 @@
-Need some content
+<md-toolbar class="md-hue-2">
+  <div class="md-toolbar-tools">
+    <span><h2 flex style="margin-left:10px">Lōgïn</h2></span>
+
+<div flex style="padding-right:20px"></div>
+<span flex></span>
+<span class="flex-child long-and-truncated">{{payload.user_email}}</span>
+    <div class="md-menu-demo" ng-cloak>
+      <div>
+        <md-menu>
+          <md-button class="md-icon-button" aria-label="More" ng-click="$mdOpenMenu()">
+            <md-icon>more_vert</md-icon>
+          </md-button>
+          <md-menu-content width="4">
+            <md-menu-item>
+              <md-button ng-click="homePage()">
+                <i style="color:#0BB9F1" class="material-icons">home</i>
+                Home
+              </md-button>
+            </md-menu-item>
+            <md-menu-divider></md-menu-divider>
+            <md-menu-item>
+              <md-button ng-click="userSettings()">
+                <i style="color:#6100A0" class="material-icons">settings</i>
+                Profile Settings
+              </md-button>
+            </md-menu-item>
+            <md-menu-divider></md-menu-divider>
+
+
+            <md-menu-item>
+              <md-button ng-click="logout()">
+                <i style="color:green" class="material-icons">&#xE8AC;</i>
+                Logout
+              </md-button>
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
+      </div>
+    </div>
+  </div>
+
+    <!-- <div flex></div>
+    {{payload.user_email}}
+    <md-button class="md-icon-button" aria-label="More" ng-click="logout()">
+      <md-icon>more_vert</md-icon>
+    </md-button>
+  </div> -->
+
+
+
+
+
+
+</md-toolbar>
+
+
+<div flex layout="row">
+<div layout="column" flex>
+  <!-- <md-tabs md-swipe-content="true" md-selected="data.selectedIndex">
+    <md-tab md-on-select="tabClicked()" label="Domains"></md-tab>
+    <md-tab md-on-select="tabClicked()" label="Hosting"></md-tab>
+    <md-tab md-on-select="tabClicked()" label="Registrar"></md-tab>
+    <md-tab md-on-select="tabClicked()" label="Web 2.0"></md-tab>
+    <md-tab data-ng-if="showTab" md-on-select="tabClicked()" label="People"></md-tab>
+    <md-tab md-on-select="tabClicked()" label="CMS Login"></md-tab>
+    <md-tab md-on-select="tabClicked()" label="Resource Login"></md-tab>
+    <md-tab md-on-select="tabClicked()" label="Links"></md-tab>
+    <md-tab md-on-select="tabClicked()" label="Software Keys"></md-tab>
+    <md-tab md-on-select="tabClicked()" label="URL Data"></md-tab>
+    <md-tab md-on-select="tabClicked()" label="Change Log"></md-tab>
+  </md-tabs> -->
+  <!-- <md-sidenav class="md-sidenav-left" md-component-id="left" md-whiteframe="4">
+    <md-toolbar class="md-hue-2">
+      <h1 class="md-toolbar-tools">Choose Wisely</h1>
+    </md-toolbar>
+    <md-content layout-margin>
+      <p class="md-accent">
+        <a href="/jordan.php">Jordan's Method</a>
+      </p>
+    </md-content>
+  </md-sidenav> -->
+  <md-card>
+    Testing
+    <!-- <md-card-content ui-view /> -->
+  </md-card>
+</div>
+</div>

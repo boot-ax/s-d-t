@@ -47,7 +47,8 @@ gulp.task("concatScripts", function(){
     "tabs/urlData/url_dataHelpers.js",
     "tabs/urlData/url_dataController.js",
     "scripts/authorizeResource.js",
-    "scripts/profile.js"
+    "scripts/profile.js",
+    "scripts/help.js"
   ])
   .pipe(concat('app.js'))
   .pipe (gulp.dest('dist/js'));

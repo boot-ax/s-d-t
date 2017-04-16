@@ -1366,18 +1366,18 @@ Flight::route('/updateItem', function(){
   $alpha = "= '".$alpha."'";
   }
   $entityBody2 = $sqlArray['entityBody2'];
-
-
-  $body3['id'] = filter_var($body3['id'],FILTER_SANITIZE_NUMBER_INT);
-  $body3['identifier'] = filter_var($body3['identifier'],FILTER_SANITIZE_STRING);
-
-
   $body3 = array();
   foreach ($entityBody2 as $key => $value) {
   $key = $mysqli->real_escape_string($key);
   $value = $mysqli->real_escape_string($value);
   $body3[$key] = $value;
   }
+
+  $body3['id'] = filter_var($body3['id'],FILTER_SANITIZE_NUMBER_INT);
+  $body3['identifier'] = filter_var($body3['identifier'],FILTER_SANITIZE_STRING);
+
+
+
   // Flight::stop(500,var_dump($body3));
     if($body3['table'] == 'registration'){
       $sql = "SELECT user_stripe_token,user_email FROM registration WHERE user_ID = ?";
@@ -1490,7 +1490,7 @@ Flight::route('POST /newprofileinfo/', function(){
   $goodData = json_decode($token->getClaims()['sub']);
   $email = $goodData->user_email;
   $security = $goodData->user_security;
-  $sql_security = "SELECT rt.account_ID,rt.user_password,rt.authy_id FROM registration rt
+  $sql_security = "SELECT rt.account_ID,rt.user_password,rt.authy_id,rt.user_name FROM registration rt
   where user_security = ?
   AND user_email = ?";
   $stmt = $mysqli->prepare($sql_security);
@@ -1508,18 +1508,22 @@ $user_name = $entityBody2['newProfile']['user_name'];
 
 $user_email = $entityBody2['newProfile']['user_email'];
 
-  if(!empty($user_name)){
-    $mgClientfour = new Mailgun("key-ec9388937d006572057b2b518dab3159");
-    $listAddress = 'list_one@login.webwright.io';
-    $resultfive = $mgClientfour->post("lists/".$listAddress."/members", array(
-    'address'     => $user_email,
-    'name'        => $user_name,
-    'description' => 'lōgïn user',
-    'subscribed'  => true,
-    'vars'        => '{"lōgïn": "yes"}',
-    'upsert'      => 'yes'
-));
+  if(!empty($user_name) & $user_name != $result['user_name']){
 
+    try {
+      $mgClientfour = new Mailgun("key-ec9388937d006572057b2b518dab3159");
+      $listAddress = 'list_one@login.webwright.io';
+      $resultfive = $mgClientfour->post("lists/".$listAddress."/members", array(
+      'address'     => $user_email,
+      'name'        => $user_name,
+      'description' => 'lōgïn user',
+      'subscribed'  => true,
+      'vars'        => '{"lōgïn": "yes"}',
+      'upsert'      => 'yes'
+  ));
+    } catch (Exception $e) {
+      Flight::halt(500,$e->error);
+    }
           // $mgClientfour = new Mailgun("key-ec9388937d006572057b2b518dab3159");
           // $listAddress = 'list_one@login.webwright.io';
           // $memberAddress = $user_email;
@@ -1650,84 +1654,6 @@ $user_email = $entityBody2['newProfile']['user_email'];
      Flight::halt(200,"Your account will be deleted ".gmdate("m-d-Y", $result['good_til_date']));
 
   });
-
-Flight::route('POST /newprofileinfo/', function(){
-    $entityBody = Flight::request()->getBody();
-    include "../inc/connection2.php";
-    global $jwt_key;
-    $entityBody = str_replace('\\u0000', '', $entityBody);
-    $entityBody2 = json_decode($entityBody,true);
-    $jwt = substr($_SERVER['HTTP_AUTHORIZATION'],7);
-    $validator = new \Gamegos\JWT\Validator();
-    $token = $validator->validate($jwt, $jwt_key);
-    $goodData = json_decode($token->getClaims()['sub']);
-    $email = $goodData->user_email;
-    $security = $goodData->user_security;
-    $sql_security = "SELECT rt.account_ID,rt.user_password,rt.authy_id FROM registration rt
-    where user_security = ?
-    AND user_email = ?";
-    $stmt = $mysqli->prepare($sql_security);
-    $stmt->bind_param('ss', $security, $email);
-    if(!$stmt->execute()){
-      Flight::halt(401,"Token is expired or user not authorized");
-    }
-    $sql_array = array();
-    $result = $stmt->get_result();
-    $result = $result->fetch_assoc();
-    $authy_id = $result['authy_id'];
-    $stmt->close();
-
-    if (!empty($entityBody2['newProfile']['password'])) {
-      $entityBody2['newProfile']['password'] = md5($entityBody2['newProfile']['password']);
-    } else {
-      $entityBody2['newProfile']['password'] = $result['user_password'];
-    }
-
-    $sql = "UPDATE registration SET user_name = ?, user_email = ?, user_password = ?, user_phone = ?, user_address = ?, user_country_code = ? WHERE (user_email = ? AND user_security = ?)";
-
-    $stmt = $mysqli->prepare($sql);
-    $stmt->bind_param('ssssssss',$entityBody2['newProfile']['user_name'],$entityBody2['newProfile']['user_email'],$entityBody2['newProfile']['password'],$entityBody2['newProfile']['user_phone'],$entityBody2['newProfile']['user_address'],$entityBody2['newProfile']['user_country_code'],$email,$security);
-
-    if(!$stmt->execute()){
-      Flight::halt(500,$mysqli->error);
-      $stmt->close();
-    }
-      $stmt->close();
-
-      if($entityBody2['newProfile']['authy_id'] & empty($authy_id)){
-        $user_phone = $entityBody2['newProfile']['user_phone'];
-        $user_country_code = filter_var($entityBody2['newProfile']['user_country_code'],FILTER_SANITIZE_NUMBER_INT);
-
-        $authy_api = new Authy\AuthyApi('PXD03tc5vZbC78OJJbOM61WqDPgbldUB');
-        $user = $authy_api->registerUser($email, $user_phone, $user_country_code); //email, cellphone, country_code
-        if($user->ok()){
-          $sql3 = "UPDATE registration SET authy_id = ? WHERE (user_email = ? AND user_security = ?)";
-          $stmt3 = $mysqli->prepare($sql3);
-          $stmt3->bind_param('sss',$user->id(),$email,$security);
-          if(!$stmt3->execute()){
-            Flight::stop(500,$mysqli->error);
-          }
-          $stmt3->close();
-            } else
-              foreach($user->errors() as $field => $message) {
-              Flight::stop(500,printf("$field = $message"));
-              }
-        Flight::halt(200,"Verification");
-      } elseif(!$entityBody2['newProfile']['authy_id'] & !empty($authy_id)){
-        $sql4 = "UPDATE registration SET authy_id = NULL WHERE (user_email = ? AND user_security = ?)";
-        $stmt4 = $mysqli->prepare($sql4);
-        $stmt4->bind_param('ss',$email,$security);
-        if(!$stmt4->execute()){
-          Flight::stop(500,$mysqli->error);
-        }
-        $stmt4->close();
-        Flight::halt(200,"Profile Updated And User Removed From Two Factor Auth");
-      } else {
-       Flight::halt(200,"Profile Updated");
-     }
-
-
-    });
 
 
 Flight::route('POST /verify-email/', function(){

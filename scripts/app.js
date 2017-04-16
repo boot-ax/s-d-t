@@ -117,7 +117,7 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
         templateUrl: 'partials/password-reset.php',
         controller: 'password-resetController'
       })
-      .state('home.help', {
+      .state('help', {
         url: '/help',
         templateUrl: 'partials/help.html',
         controller: 'helpController',
@@ -416,6 +416,9 @@ this.changeDropdown = function($column, $value, $table,db_table,db_ID){
   $location.path('/login');
 }
 
+$scope.homeButton = function(){
+$location.path('/domains');
+}
 
   if($scope.payload.user_type == 'admin' || $scope.payload.user_type == 'superuser'){
     $scope.showTab = true;

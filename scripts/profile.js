@@ -167,19 +167,26 @@ angular.module('SE_App').controller('deleteAccountController', ['$mdDialog','$sc
 
   }]);
 
-  angular.module('SE_App').controller('helpController', ['$mdDialog','$scope', '$mdEditDialog', '$http','$mdToast',
-  '$q','$location','$auth',
-  function ($mdDialog,$scope, $mdEditDialog, $http,$mdToast,$q,$location,$auth) {
-    'use strict';
-
-
-  }]);
-
 
   angular.module('SE_App').controller('profileController', ['$mdDialog','$scope', '$mdEditDialog', '$http','$mdToast',
   '$q','$location','$auth',
   function ($mdDialog,$scope, $mdEditDialog, $http,$mdToast,$q,$location,$auth) {
     'use strict';
+
+    $scope.payload = JSON.parse($auth.getPayload().sub);
+
+    $scope.logout = function(){
+       $auth.logout();
+    $location.path('/login');
+    }
+
+    $scope.helpPage = function(){
+    $location.path('/help');
+    }
+
+    $scope.homePage = function(){
+    $location.path('/domains');
+    }
 
   $scope.sendVerifyEmail = function (event,profile){
   $http.post('/service/verify-email/',{$profile: profile}).then(function(response){

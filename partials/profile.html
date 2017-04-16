@@ -1,127 +1,171 @@
+<md-toolbar class="md-hue-2">
+  <div class="md-toolbar-tools">
+    <span><h2 flex style="margin-left:10px">Lōgïn</h2></span>
 
-<div flex layout="row">
-  <div flex flex-xs="5" layout="row"></div>
-<md-card class="login-form" ng-hide="busy" layout="column" layout-align="center center">
-      <md-toolbar>
-      <div class="md-toolbar-tools">
-        <h2>Lōgïn Profile</h2>
-        <span flex></span>
-        <md-button class="md-icon-button" ng-click="cancel()">
-          <md-icon class="material-icons" aria-label="Close dialog">close</md-icon>
-        </md-button>
+<div flex style="padding-right:20px"></div>
+<span flex></span>
+<span class="flex-child long-and-truncated">{{payload.user_email}}</span>
+    <div class="md-menu-demo" ng-cloak>
+      <div>
+        <md-menu>
+          <md-button class="md-icon-button" aria-label="More" ng-click="$mdOpenMenu()">
+            <md-icon>more_vert</md-icon>
+          </md-button>
+          <md-menu-content width="4">
+            <md-menu-item>
+              <md-button ng-click="homePage()">
+                <i style="color:#0BB9F1" class="material-icons">home</i>
+                Home
+              </md-button>
+            </md-menu-item>
+            <md-menu-divider></md-menu-divider>
+            <md-menu-item>
+              <md-button ng-click="helpPage()">
+                <i style="color:#F8A200" class="material-icons">help</i>
+                Get Support
+              </md-button>
+            </md-menu-item>
+            <md-menu-divider></md-menu-divider>
+
+            <md-menu-item>
+              <md-button ng-click="logout()">
+                <i style="color:green" class="material-icons">&#xE8AC;</i>
+                Logout
+              </md-button>
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
       </div>
-      <section data-ng-if="needVerify" flex layout="row" layout-align="end center" style="background-color:#E2BF79;font-size:0.8em;">
-        <span style="margin-right:20px">Please verify your email</span>
-       <md-button class="md-warn md-raised md-hue-2" ng-click="sendVerifyEmail($event,profile)" type="button">Send Again</md-button>
-     </section>
-    </md-toolbar>
-       <form flex layout="row" name="register.form" style="padding:15px">
-         <span flex ></span>
-           <div layout="column" style="margin-top:25px">
-             <div>
-                 <md-input-container flex layout="row" class="input-row layout-row rowOffset">
-                   <label class="loginLabel">Full Name</label>
-                   <md-icon class="md-icons iconOff">person</md-icon>
-                   <input type="text" ng-model="profile.user_name" autocomplete="off">
-                 </md-input-container>
-             </div>
-             <div>
-                 <md-input-container flex layout="row" class="input-row layout-row rowOffset">
-                   <label class="loginLabel required">Email</label>
-                   <md-icon class="md-icons iconOff">email</md-icon>
-                   <input type="email" ng-model="profile.user_email" autofocus="autofocus" autocomplete="off">
-                 </md-input-container>
-             </div>
-               <div class="md-errors-spacer"></div>
-               <div>
-                 <md-input-container flex layout="row" class="input-row layout-row rowOffset">
-                   <label class="loginLabel">Address</label>
-                   <md-icon class="md-icons iconOff">assignment_ind</md-icon>
-                   <textarea type="text" ng-model="profile.user_address" autocomplete="off"></textarea>
-                 </md-input-container>
-               </div>
-
-
-                      <div layout="row">
-                        <div>
-                                    <md-input-container flex layout="row" class="input-row layout-row rowOffset">
-                                      <md-icon class="md-icons iconOff">phone</md-icon>
-                                      <label ng-class="{'required':profile.authy_id}">Country Code</label>
-                                          <md-select
-                                              ng-model="profile.user_country_code" ng-required="profile.authy_id" placeholder="{{profile.user_country_code}}">
-                                            <md-option ng-value="country+' ('+code+')'"
-                                            ng-repeat="(country,code) in countries">{{country}} ({{ code}})</md-option>
-                                          </md-select>
-
-                                    </md-input-container>
-                                  </div>
-                                  <div>
-                                    <md-input-container flex layout="row" class="input-row layout-row" style="margin-left:10px">
-                                      <label ng-class="{'required':profile.authy_id}">Phone Number</label>
-                                      <input flex type="phone" ng-required="profile.authy_id" ng-model="profile.user_phone" class="rowOffset2 flex" autocomplete="off">
-                                    </md-input-container>
-                                  </div>
-                        </div>
-
-                        <md-switch ng-model="profile.authy_id" layout-align="start" aria-label="active switch">
-                                   Enable two factor identification
-                             </md-switch>
-<div layout="row">
-               <md-switch layout-align="start" ng-click="access = !access" aria-label="active switch">
-                      Change Password
-                </md-switch>
-                <span flex 5></span>
-                <section layout="row" layout-align="right center">
-                 <button class="stripe-button-el" stripe-checkout="stripeChange"
-                          data-key="pk_test_DDqS4Ps7loF2JzJPH5JinfPW"
-
-                          data-zip-code="true"
-                          data-image="https://webwright.io/wp-content/uploads/2016/08/webwright_io-blue-wrench13-300x300.png"
-                          data-name="Lōg&iuml;n"
-                          data-panel-label="Update Card Details"
-                          data-name="Update Card Details"
-                          data-allow-remember-me=false
-                          >
-                          <!-- data-email="{{profile.user_email}}" -->
-                    <span style="display: block; min-height: 30px;">Update Card Details</span>
-              </button>
-                </section>
-</div>
-                <!-- <md-checkbox layout-align="start" ng-model="data.cb1" ng-click="access = !access" aria-label="Checkbox">
-                     Change Password
-               </md-checkbox> -->
-               <div ng-hide="true">
-                 <md-input-container class="input-row layout-row rowOffset">
-                     <label class="loginLabel required">Password</label>
-                     <md-icon class="material-icons iconOff">lock</md-icon>
-                     <input name="fakePassword" type="password">
-                   </md-input-container>
-                 </div>
-               <div ng-show="access">
-                 <md-input-container class="input-row layout-row rowOffset">
-                     <label class="loginLabel required">Password</label>
-                     <md-icon class="material-icons iconOff">lock</md-icon>
-                     <input name="newPassword" type="password" ng-model="profile.password" ng-show="access">
-                   </md-input-container>
-                 </div>
-
-                 <div ng-show="access">
-                   <md-input-container class="input-row layout-row rowOffset">
-                       <label class="loginLabel required">Confirm Password</label>
-                       <md-icon class="material-icons iconOff">lock_outline</md-icon>
-                       <input ng-show="access" match-password="newPassword" type="password" name="confirmPassword" ng-model="profile.password2">
+    </div>
+  </div>
+</md-toolbar>
+<div flex layout="row">
+<div layout="column" flex>
+    <div flex layout="row">
+      <div flex flex-xs="5" layout="row"></div>
+    <md-card class="login-form" ng-hide="busy" layout="column" layout-align="center center">
+          <md-toolbar>
+          <div class="md-toolbar-tools">
+            <h2>Lōgïn Profile</h2>
+            <span flex></span>
+            <md-button class="md-icon-button" ng-click="cancel()">
+              <md-icon class="material-icons" aria-label="Close dialog">close</md-icon>
+            </md-button>
+          </div>
+          <section data-ng-if="needVerify" flex layout="row" layout-align="end center" style="background-color:#E2BF79;font-size:0.8em;">
+            <span style="margin-right:20px">Please verify your email</span>
+           <md-button class="md-warn md-raised md-hue-2" ng-click="sendVerifyEmail($event,profile)" type="button">Send Again</md-button>
+         </section>
+        </md-toolbar>
+           <form flex layout="row" name="register.form" style="padding:15px">
+             <span flex ></span>
+               <div layout="column" style="margin-top:25px">
+                 <div>
+                     <md-input-container flex layout="row" class="input-row layout-row rowOffset">
+                       <label class="loginLabel">Full Name</label>
+                       <md-icon class="md-icons iconOff">person</md-icon>
+                       <input type="text" ng-model="profile.user_name" autocomplete="off">
                      </md-input-container>
-               </div>
+                 </div>
+                 <div>
+                     <md-input-container flex layout="row" class="input-row layout-row rowOffset">
+                       <label class="loginLabel required">Email</label>
+                       <md-icon class="md-icons iconOff">email</md-icon>
+                       <input type="email" ng-model="profile.user_email" autofocus="autofocus" autocomplete="off">
+                     </md-input-container>
+                 </div>
+                   <div class="md-errors-spacer"></div>
+                   <div>
+                     <md-input-container flex layout="row" class="input-row layout-row rowOffset">
+                       <label class="loginLabel">Address</label>
+                       <md-icon class="md-icons iconOff">assignment_ind</md-icon>
+                       <textarea type="text" ng-model="profile.user_address" autocomplete="off"></textarea>
+                     </md-input-container>
+                   </div>
 
-               <section flex style="margin-top:20px" layout="row" layout-align="center center">
-                <md-button ng-disabled="register.form.$invalid" class="md-raised md-primary" ng-click="profileChange($event,profile)" type="button">Change Profile</md-button>
-              </section>
-                <section style="margin: 20px 0 -15px 0">
-                <a id="cancelAccountCss" ng-click="cancelAccount($event)">Cancel Account</a>
-               </section>
-         </div>
-       <span flex></span>
-     </form>
-</md-card>
-<div flex flex-xs="5" layout="row"></div>
+
+                          <div layout="row">
+                            <div>
+                                        <md-input-container flex layout="row" class="input-row layout-row rowOffset">
+                                          <md-icon class="md-icons iconOff">phone</md-icon>
+                                          <label ng-class="{'required':profile.authy_id}">Country Code</label>
+                                              <md-select
+                                                  ng-model="profile.user_country_code" ng-required="profile.authy_id" placeholder="{{profile.user_country_code}}">
+                                                <md-option ng-value="country+' ('+code+')'"
+                                                ng-repeat="(country,code) in countries">{{country}} ({{ code}})</md-option>
+                                              </md-select>
+
+                                        </md-input-container>
+                                      </div>
+                                      <div>
+                                        <md-input-container flex layout="row" class="input-row layout-row" style="margin-left:10px">
+                                          <label ng-class="{'required':profile.authy_id}">Phone Number</label>
+                                          <input flex type="phone" ng-required="profile.authy_id" ng-model="profile.user_phone" class="rowOffset2 flex" autocomplete="off">
+                                        </md-input-container>
+                                      </div>
+                            </div>
+
+                            <md-switch ng-model="profile.authy_id" layout-align="start" aria-label="active switch">
+                                       Enable two factor identification
+                                 </md-switch>
+    <div layout="row">
+                   <md-switch layout-align="start" ng-click="access = !access" aria-label="active switch">
+                          Change Password
+                    </md-switch>
+                    <span flex 5></span>
+                    <section layout="row" layout-align="right center">
+                     <button class="stripe-button-el" stripe-checkout="stripeChange"
+                              data-key="pk_test_DDqS4Ps7loF2JzJPH5JinfPW"
+
+                              data-zip-code="true"
+                              data-image="https://webwright.io/wp-content/uploads/2016/08/webwright_io-blue-wrench13-300x300.png"
+                              data-name="Lōg&iuml;n"
+                              data-panel-label="Update Card Details"
+                              data-name="Update Card Details"
+                              data-allow-remember-me=false
+                              >
+                              <!-- data-email="{{profile.user_email}}" -->
+                        <span style="display: block; min-height: 30px;">Update Card Details</span>
+                  </button>
+                    </section>
+    </div>
+                    <!-- <md-checkbox layout-align="start" ng-model="data.cb1" ng-click="access = !access" aria-label="Checkbox">
+                         Change Password
+                   </md-checkbox> -->
+                   <div ng-hide="true">
+                     <md-input-container class="input-row layout-row rowOffset">
+                         <label class="loginLabel required">Password</label>
+                         <md-icon class="material-icons iconOff">lock</md-icon>
+                         <input name="fakePassword" type="password">
+                       </md-input-container>
+                     </div>
+                   <div ng-show="access">
+                     <md-input-container class="input-row layout-row rowOffset">
+                         <label class="loginLabel required">Password</label>
+                         <md-icon class="material-icons iconOff">lock</md-icon>
+                         <input name="newPassword" type="password" ng-model="profile.password" ng-show="access">
+                       </md-input-container>
+                     </div>
+
+                     <div ng-show="access">
+                       <md-input-container class="input-row layout-row rowOffset">
+                           <label class="loginLabel required">Confirm Password</label>
+                           <md-icon class="material-icons iconOff">lock_outline</md-icon>
+                           <input ng-show="access" match-password="newPassword" type="password" name="confirmPassword" ng-model="profile.password2">
+                         </md-input-container>
+                   </div>
+
+                   <section flex style="margin-top:20px" layout="row" layout-align="center center">
+                    <md-button ng-disabled="register.form.$invalid" class="md-raised md-primary" ng-click="profileChange($event,profile)" type="button">Change Profile</md-button>
+                  </section>
+                    <section style="margin: 20px 0 -15px 0">
+                    <a id="cancelAccountCss" ng-click="cancelAccount($event)">Cancel Account</a>
+                   </section>
+             </div>
+           <span flex></span>
+         </form>
+    </md-card>
+    <div flex flex-xs="5" layout="row"></div>
+    </div>
+</div>
 </div>
