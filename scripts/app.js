@@ -117,6 +117,14 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
         templateUrl: 'partials/password-reset.php',
         controller: 'password-resetController'
       })
+      .state('home.help', {
+        url: '/help',
+        templateUrl: 'partials/help.html',
+        controller: 'helpController',
+        resolve: {
+          loginRequired: loginRequired
+        }
+      })
       .state('profile', {
         url: '/profile',
         templateUrl: 'partials/profile.html',
@@ -420,7 +428,9 @@ $scope.userSettings = function(){
 $location.path('/profile');
 };
 
-
+$scope.helpPage = function(){
+$location.path('/help');
+};
 
 	$scope.toggleLeft = buildToggler('left');
     $scope.toggleRight = buildToggler('right');

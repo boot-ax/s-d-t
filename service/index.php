@@ -1504,6 +1504,39 @@ Flight::route('POST /newprofileinfo/', function(){
   $authy_id = $result['authy_id'];
   $stmt->close();
 
+$user_name = $entityBody2['newProfile']['user_name'];
+
+$user_email = $entityBody2['newProfile']['user_email'];
+
+  if(!empty($user_name)){
+    $mgClientfour = new Mailgun("key-ec9388937d006572057b2b518dab3159");
+    $listAddress = 'list_one@login.webwright.io';
+    $resultfive = $mgClientfour->post("lists/".$listAddress."/members", array(
+    'address'     => $user_email,
+    'name'        => $user_name,
+    'description' => 'lōgïn user',
+    'subscribed'  => true,
+    'vars'        => '{"lōgïn": "yes"}',
+    'upsert'      => 'yes'
+));
+
+          // $mgClientfour = new Mailgun("key-ec9388937d006572057b2b518dab3159");
+          // $listAddress = 'list_one@login.webwright.io';
+          // $memberAddress = $user_email;
+          // $mailgun_url = "lists/";
+          // $mailgun_url .= $listAddress;
+          // $mailgun_url .= "/members/";
+          // $mailgun_url .= $memberAddress;
+          // // Flight::stop(401,var_dump($user_name));
+          //
+          // $resultseven = $mgClientfour->put($mailgun_url, array(
+          //     'subscribed' => true,
+          //     'name' => $user_name
+          // ));
+          // Flight::stop(401,var_dump($resultseven));
+
+  }
+
   if (!empty($entityBody2['newProfile']['password'])) {
     $entityBody2['newProfile']['password'] = md5($entityBody2['newProfile']['password']);
   } else {
@@ -1879,7 +1912,8 @@ Flight::route('POST /signup/', function(){
     $customer = \Stripe\Customer::create(array(
       'email' =>  $user_email,
       'source'    =>  $user_stripe_token,
-      'plan'  =>'LhQ88aKJ4tDKccsYsq68c'
+      'plan'  =>'LhQ88aKJ4tDKccsYsq68c',
+      'coupon' =>'T9Y27N64'
     ));
 
   } catch (Exception $e) {
@@ -1933,6 +1967,16 @@ Flight::route('POST /signup/', function(){
 
     $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
     $domain = "login.webwright.io";
+    $listAddress = 'list_one@login.webwright.io';
+    $result2 = $mg->post("lists/".$listAddress."/members", array(
+    'address'     => $user_email,
+    'name'        => $user_email,
+    'description' => 'lōgïn user',
+    'subscribed'  => true,
+    'vars'        => '{"lōgïn": "yes"}'
+));
+
+
     $link = "https://app.login.webwright.io/service/mailgun-0f5ac2ac043c5665bf3e2f00638dbdce?token=".$token;
     $result = $mg->sendMessage($domain, array(
     // Be sure to replace the from address with the actual email address you're sending from
