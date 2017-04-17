@@ -23588,9 +23588,11 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
           $obj.table = db_table;
           $obj.column = $column;
           $obj.value = $table[$column];
-          $obj.value = $table[$column].getFullYear()+"-"+
-          ("0"+($table[$column].getMonth()+1)).slice(-2)+"-"+
-          ("0"+$table[$column].getDate()).slice(-2);
+          if($obj.value != null){
+            $obj.value = $table[$column].getFullYear()+"-"+
+            ("0"+($table[$column].getMonth()+1)).slice(-2)+"-"+
+            ("0"+$table[$column].getDate()).slice(-2);
+          }
           $obj.identifier = db_ID;
           $obj.id = $table[db_ID];
           $http.post('service/updateItem',$obj).then(function(response){
@@ -24321,7 +24323,7 @@ angular.module('SE_App').factory('$domains', ['$resource', function ($resource) 
 
 angular.module('SE_App').controller('addDomainController', ['$mdDialog', '$domains', '$scope' , '$http', '$q','$mdToast',function ($mdDialog, $domains, $scope, $http, $q,$mdToast) {
   'use strict';
-$scope.myDate = new Date();
+$scope.myDate = null;
 
 $scope.getHostsFunc = function(){
 	$http.get('service/gethosts')
@@ -24375,14 +24377,20 @@ $scope.getRegistrarsFunc = function(){
     $scope.item.form.$setSubmitted();
 
     var data = angular.copy($scope.domains_table);
+    if(data.expiration_date == null){
+      data.expiration_date = null;
+    } else {
     data.date_purchased = data.date_purchased.getFullYear()+"-"+
                           ("0"+(data.date_purchased.getMonth()+1)).slice(-2)+"-"+
                           ("0"+data.date_purchased.getDate()).slice(-2);
-
+          }
+            if(data.expiration_date == null){
+              data.expiration_date = null;
+            } else {
     data.expiration_date = data.expiration_date.getFullYear()+"-"+
                           ("0"+(data.expiration_date.getMonth()+1)).slice(-2)+"-"+
                           ("0"+data.expiration_date.getDate()).slice(-2);
-
+                        }
     if($scope.item.form.$valid) {
       $domains.domains_tables.save({domains_table: data}, success, fedup);
     }
@@ -24488,14 +24496,24 @@ function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q,changeCe
   function success(domains_tables) {
     angular.forEach(domains_tables.data,function(row){
       // row.d
-      var date_purchased_parts = row.date_purchased.split("-");
+
+
+      if(row.date_purchased == null){
+        row.date_purchased = null;
+      } else {
+        var date_purchased_parts = row.date_purchased.split("-");
       row.date_purchased = new Date(parseInt(date_purchased_parts[0]),
                                     parseInt(date_purchased_parts[1])-1,
                                     parseInt(date_purchased_parts[2]));
+                                  }
+      if(row.expiration_date == null){
+        row.expiration_date = null;
+      } else {
       var expiration_date_parts = row.expiration_date.split("-");
       row.expiration_date = new Date(parseInt(expiration_date_parts[0]),
                                     parseInt(expiration_date_parts[1])-1,
                                     parseInt(expiration_date_parts[2]));
+                                  }
     });
     $scope.domains_tables = domains_tables;
   }
@@ -24600,7 +24618,7 @@ angular.module('SE_App').factory('$hosting', ['$resource', function ($resource) 
 
 angular.module('SE_App').controller('addHostingController', ['$mdDialog', '$hosting', '$scope' , '$http', '$mdToast',function ($mdDialog, $hosting, $scope, $http, $mdToast) {
   'use strict';
-$scope.myDate = new Date();
+$scope.myDate = null;
 
   this.cancel = $mdDialog.cancel;
 
@@ -24637,18 +24655,24 @@ $scope.myDate = new Date();
   }
 
 
-this.addItem = function () {
+  this.addItem = function () {
     $scope.item.form.$setSubmitted();
 
     var data = angular.copy($scope.hosting_table);
+    if(data.date_started == null){
+      data.date_started = null;
+    } else {
     data.date_started = data.date_started.getFullYear()+"-"+
                           ("0"+(data.date_started.getMonth()+1)).slice(-2)+"-"+
                           ("0"+data.date_started.getDate()).slice(-2);
-
+          }
+            if(data.expiration_date == null){
+              data.expiration_date = null;
+            } else {
     data.expiration_date = data.expiration_date.getFullYear()+"-"+
                           ("0"+(data.expiration_date.getMonth()+1)).slice(-2)+"-"+
                           ("0"+data.expiration_date.getDate()).slice(-2);
-
+                        }
     if($scope.item.form.$valid) {
       $hosting.hosting_tables.save({hosting_table: data}, success, fedup);
     }
@@ -24751,14 +24775,24 @@ angular.module('SE_App').controller('hostingController', ['$mdDialog','$hosting'
   function success(hosting_tables) {
     angular.forEach(hosting_tables.data,function(row){
       // row.d
-      var date_started_parts = row.date_started.split("-");
+
+
+      if(row.date_started == null){
+        row.date_started = null;
+      } else {
+        var date_started_parts = row.date_started.split("-");
       row.date_started = new Date(parseInt(date_started_parts[0]),
                                     parseInt(date_started_parts[1])-1,
                                     parseInt(date_started_parts[2]));
+                                  }
+      if(row.expiration_date == null){
+        row.expiration_date = null;
+      } else {
       var expiration_date_parts = row.expiration_date.split("-");
       row.expiration_date = new Date(parseInt(expiration_date_parts[0]),
                                     parseInt(expiration_date_parts[1])-1,
                                     parseInt(expiration_date_parts[2]));
+                                  }
     });
     $scope.hosting_tables = hosting_tables;
   }
@@ -26103,7 +26137,7 @@ angular.module('SE_App').factory('$links', ['$resource', function ($resource) {
 angular.module('SE_App').controller('addLinksController', ['$mdDialog', '$links', '$scope' , '$http', '$q','$mdToast',function ($mdDialog, $links, $scope, $http, $q, $mdToast) {
   'use strict';
 
-$scope.myDate = new Date();
+$scope.myDate = null;
 
 $scope.getLinksFunc = function(){
 	$http.get('service/getlinks')
@@ -26151,11 +26185,13 @@ $scope.getLinksFunc = function(){
     $scope.item.form.$setSubmitted();
 
     var data = angular.copy($scope.links_table);
+    if(data.date_created == null){
+      data.date_created = null;
+    } else {
     data.date_created = data.date_created.getFullYear()+"-"+
                           ("0"+(data.date_created.getMonth()+1)).slice(-2)+"-"+
                           ("0"+data.date_created.getDate()).slice(-2);
-
-
+          }
     if($scope.item.form.$valid) {
       $links.links_tables.save({links_table: data}, success, fedup);
     }
@@ -26252,10 +26288,14 @@ angular.module('SE_App').controller('linksController', ['$mdDialog','$links', '$
   function success(links_tables) {
     angular.forEach(links_tables.data,function(row){
       // row.d
-      var date_created_parts = row.date_created.split("-");
+      if(row.date_created == null){
+        row.date_created = null;
+      } else {
+        var date_created_parts = row.date_created.split("-");
       row.date_created = new Date(parseInt(date_created_parts[0]),
                                     parseInt(date_created_parts[1])-1,
                                     parseInt(date_created_parts[2]));
+                                  }
     });
     $scope.links_tables = links_tables;
   }
