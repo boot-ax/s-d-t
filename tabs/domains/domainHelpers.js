@@ -10,7 +10,7 @@ angular.module('SE_App').factory('$domains', ['$resource', function ($resource) 
 
 angular.module('SE_App').controller('addDomainController', ['$mdDialog', '$domains', '$scope' , '$http', '$q','$mdToast',function ($mdDialog, $domains, $scope, $http, $q,$mdToast) {
   'use strict';
-$scope.myDate = new Date();
+$scope.myDate = null;
 
 $scope.getHostsFunc = function(){
 	$http.get('service/gethosts')
@@ -64,14 +64,20 @@ $scope.getRegistrarsFunc = function(){
     $scope.item.form.$setSubmitted();
 
     var data = angular.copy($scope.domains_table);
+    if(data.expiration_date == null){
+      data.expiration_date = null;
+    } else {
     data.date_purchased = data.date_purchased.getFullYear()+"-"+
                           ("0"+(data.date_purchased.getMonth()+1)).slice(-2)+"-"+
                           ("0"+data.date_purchased.getDate()).slice(-2);
-
+          }
+            if(data.expiration_date == null){
+              data.expiration_date = null;
+            } else {
     data.expiration_date = data.expiration_date.getFullYear()+"-"+
                           ("0"+(data.expiration_date.getMonth()+1)).slice(-2)+"-"+
                           ("0"+data.expiration_date.getDate()).slice(-2);
-
+                        }
     if($scope.item.form.$valid) {
       $domains.domains_tables.save({domains_table: data}, success, fedup);
     }

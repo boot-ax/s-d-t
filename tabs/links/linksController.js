@@ -30,10 +30,14 @@ angular.module('SE_App').controller('linksController', ['$mdDialog','$links', '$
   function success(links_tables) {
     angular.forEach(links_tables.data,function(row){
       // row.d
-      var date_created_parts = row.date_created.split("-");
+      if(row.date_created == null){
+        row.date_created = null;
+      } else {
+        var date_created_parts = row.date_created.split("-");
       row.date_created = new Date(parseInt(date_created_parts[0]),
                                     parseInt(date_created_parts[1])-1,
                                     parseInt(date_created_parts[2]));
+                                  }
     });
     $scope.links_tables = links_tables;
   }

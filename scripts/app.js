@@ -289,9 +289,11 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
           $obj.table = db_table;
           $obj.column = $column;
           $obj.value = $table[$column];
-          $obj.value = $table[$column].getFullYear()+"-"+
-          ("0"+($table[$column].getMonth()+1)).slice(-2)+"-"+
-          ("0"+$table[$column].getDate()).slice(-2);
+          if($obj.value != null){
+            $obj.value = $table[$column].getFullYear()+"-"+
+            ("0"+($table[$column].getMonth()+1)).slice(-2)+"-"+
+            ("0"+$table[$column].getDate()).slice(-2);
+          }
           $obj.identifier = db_ID;
           $obj.id = $table[db_ID];
           $http.post('service/updateItem',$obj).then(function(response){

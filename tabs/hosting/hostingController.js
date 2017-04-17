@@ -37,14 +37,24 @@ angular.module('SE_App').controller('hostingController', ['$mdDialog','$hosting'
   function success(hosting_tables) {
     angular.forEach(hosting_tables.data,function(row){
       // row.d
-      var date_started_parts = row.date_started.split("-");
+
+
+      if(row.date_started == null){
+        row.date_started = null;
+      } else {
+        var date_started_parts = row.date_started.split("-");
       row.date_started = new Date(parseInt(date_started_parts[0]),
                                     parseInt(date_started_parts[1])-1,
                                     parseInt(date_started_parts[2]));
+                                  }
+      if(row.expiration_date == null){
+        row.expiration_date = null;
+      } else {
       var expiration_date_parts = row.expiration_date.split("-");
       row.expiration_date = new Date(parseInt(expiration_date_parts[0]),
                                     parseInt(expiration_date_parts[1])-1,
                                     parseInt(expiration_date_parts[2]));
+                                  }
     });
     $scope.hosting_tables = hosting_tables;
   }

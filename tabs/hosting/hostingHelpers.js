@@ -10,7 +10,7 @@ angular.module('SE_App').factory('$hosting', ['$resource', function ($resource) 
 
 angular.module('SE_App').controller('addHostingController', ['$mdDialog', '$hosting', '$scope' , '$http', '$mdToast',function ($mdDialog, $hosting, $scope, $http, $mdToast) {
   'use strict';
-$scope.myDate = new Date();
+$scope.myDate = null;
 
   this.cancel = $mdDialog.cancel;
 
@@ -47,18 +47,24 @@ $scope.myDate = new Date();
   }
 
 
-this.addItem = function () {
+  this.addItem = function () {
     $scope.item.form.$setSubmitted();
 
     var data = angular.copy($scope.hosting_table);
+    if(data.date_started == null){
+      data.date_started = null;
+    } else {
     data.date_started = data.date_started.getFullYear()+"-"+
                           ("0"+(data.date_started.getMonth()+1)).slice(-2)+"-"+
                           ("0"+data.date_started.getDate()).slice(-2);
-
+          }
+            if(data.expiration_date == null){
+              data.expiration_date = null;
+            } else {
     data.expiration_date = data.expiration_date.getFullYear()+"-"+
                           ("0"+(data.expiration_date.getMonth()+1)).slice(-2)+"-"+
                           ("0"+data.expiration_date.getDate()).slice(-2);
-
+                        }
     if($scope.item.form.$valid) {
       $hosting.hosting_tables.save({hosting_table: data}, success, fedup);
     }

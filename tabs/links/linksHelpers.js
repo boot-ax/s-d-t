@@ -11,7 +11,7 @@ angular.module('SE_App').factory('$links', ['$resource', function ($resource) {
 angular.module('SE_App').controller('addLinksController', ['$mdDialog', '$links', '$scope' , '$http', '$q','$mdToast',function ($mdDialog, $links, $scope, $http, $q, $mdToast) {
   'use strict';
 
-$scope.myDate = new Date();
+$scope.myDate = null;
 
 $scope.getLinksFunc = function(){
 	$http.get('service/getlinks')
@@ -59,11 +59,13 @@ $scope.getLinksFunc = function(){
     $scope.item.form.$setSubmitted();
 
     var data = angular.copy($scope.links_table);
+    if(data.date_created == null){
+      data.date_created = null;
+    } else {
     data.date_created = data.date_created.getFullYear()+"-"+
                           ("0"+(data.date_created.getMonth()+1)).slice(-2)+"-"+
                           ("0"+data.date_created.getDate()).slice(-2);
-
-
+          }
     if($scope.item.form.$valid) {
       $links.links_tables.save({links_table: data}, success, fedup);
     }

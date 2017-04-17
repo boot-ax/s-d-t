@@ -40,14 +40,24 @@ function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q,changeCe
   function success(domains_tables) {
     angular.forEach(domains_tables.data,function(row){
       // row.d
-      var date_purchased_parts = row.date_purchased.split("-");
+
+
+      if(row.date_purchased == null){
+        row.date_purchased = null;
+      } else {
+        var date_purchased_parts = row.date_purchased.split("-");
       row.date_purchased = new Date(parseInt(date_purchased_parts[0]),
                                     parseInt(date_purchased_parts[1])-1,
                                     parseInt(date_purchased_parts[2]));
+                                  }
+      if(row.expiration_date == null){
+        row.expiration_date = null;
+      } else {
       var expiration_date_parts = row.expiration_date.split("-");
       row.expiration_date = new Date(parseInt(expiration_date_parts[0]),
                                     parseInt(expiration_date_parts[1])-1,
                                     parseInt(expiration_date_parts[2]));
+                                  }
     });
     $scope.domains_tables = domains_tables;
   }

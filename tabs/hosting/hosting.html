@@ -63,13 +63,13 @@
 		    <td md-cell>
             <md-datepicker ng-change="changeDate('date_started',hosting_table,dbTableInfo.db_table,dbTableInfo.db_ID)"
             md-hide-icons="calendar"
-            ng-model="hosting_table.date_started"
+            ng-model="hosting_table.date_started" md-placeholder="Enter date"
             name="expirationDateField" required=""></md-datepicker>
         </td>
         <td md-cell>
             <md-datepicker ng-change="changeDate('expiration_date',hosting_table,dbTableInfo.db_table,dbTableInfo.db_ID)"
             md-hide-icons="calendar"
-            ng-model="hosting_table.expiration_date"
+            ng-model="hosting_table.expiration_date" md-placeholder="Enter date"
             name="expirationDateField" required=""></md-datepicker>
         </td>
         <td md-cell="" ng-click="changeCellText($event, hosting_table, 'creditcard_last_4',dbTableInfo.db_table,dbTableInfo.db_ID,4)" placeholder="{{hosting_table.creditcard_last_4}} "

@@ -3,12 +3,14 @@
 var gulp = require('gulp'),
   concat = require('gulp-concat'),
   uglify = require('gulp-uglify'),
+  maps   = require('gulp-sourcemaps'),
+  sass   = require('gulp-sass'),
   // uglify = require('gulp-minify'),
 
   rename = require('gulp-rename');
 
 gulp.task("concatScripts", function(){
-  gulp.src([
+  return gulp.src([
   "node_modules/moment/moment.js",
   // "node_modules/angular-material/angular-material.js",
   "node_modules/ng-csv/build/ng-csv.js",
@@ -50,17 +52,27 @@ gulp.task("concatScripts", function(){
     "scripts/profile.js",
     "scripts/help.js"
   ])
+  .pipe(maps.init())
   .pipe(concat('app.js'))
+  .pipe(maps.write('./'))
   .pipe (gulp.dest('dist/js'));
 });
 
-gulp.task('minifyScripts', function(){
-  gulp.src('dist/js/app.js')
+gulp.task('minifyScripts', ["concatScripts"], function(){
+  return gulp.src('dist/js/app.js')
     .pipe(uglify({mangle: false}))
     .pipe(rename('app.min.js'))
     .pipe(gulp.dest('dist/js'));
 });
 
-gulp.task('default', ['hello'], function(){
-  console.log('Shit. this is the default');
+gulp.task('compileSass', function(){
+  return gulp.src('scss/application.scss')
+    .pipe(maps.init())
+    .pipe(sass())
+    .pipe(write('./'))
+    .pipe(gulp.dest('dist/css'));
 });
+
+gulp.task("build", ['minifyScripts']);
+
+gulp.task('default', ['build']);

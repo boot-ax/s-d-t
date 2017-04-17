@@ -96,14 +96,14 @@
     <div layout="row" class="input-row layout-row">
 
           <div layout="column" flex style="font-size:.8em; color:grey">
-            <label>Date Purchased&#42;</label>
-            <md-datepicker md-option-empty ng-init="domains_table.date_purchased = myDate" ng-model="domains_table.date_purchased" name="datePurchasedField" required></md-datepicker>
+            <label>Date Purchased</label>
+            <md-datepicker md-option-empty ng-init="domains_table.date_purchased = myDate" ng-model="domains_table.date_purchased" name="datePurchasedField" md-placeholder="Enter date"></md-datepicker>
           </div>
 
 
           <div layout="column" flex style="font-size:.8em; color:grey">
-            <label>Expiration Date&#42;</label>
-            <md-datepicker ng-model="domains_table.expiration_date" ng-init="domains_table.expiration_date = myDate" name="expirationDateField" required></md-datepicker>
+            <label>Expiration Date</label>
+            <md-datepicker ng-model="domains_table.expiration_date" ng-init="domains_table.expiration_date = myDate" name="expirationDateField" md-placeholder="Enter date"></md-datepicker>
           </div>
 
   </div>

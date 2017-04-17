@@ -294,6 +294,15 @@ Flight::route('POST /domains', function(){
     $value = $mysqli->real_escape_string($value);
     $body3[$key] = $value;
   }
+
+    if(empty($body3['date_purchased'])){
+      unset($body3['date_purchased']);
+    }
+
+    if(empty($body3['expiration_date'])){
+      unset($body3['expiration_date']);
+    }
+
    $sql  = "INSERT INTO domains";
    $sql .= " (`".implode("`, `", array_keys($body3))."`)";
 	 $sql .= " VALUES (\"".implode("\", \"", $body3)."\");";
@@ -478,6 +487,15 @@ Flight::route('POST /hosting', function(){
   $value = $mysqli->real_escape_string($value);
   $body3[$key] = $value;
   }
+
+  if(empty($body3['date_started'])){
+    unset($body3['date_started']);
+  }
+
+  if(empty($body3['expiration_date'])){
+    unset($body3['expiration_date']);
+  }
+
    $sql  = "INSERT INTO hosting";
    $sql .= " (`".implode("`, `", array_keys($body3))."`)";
 	 $sql .= " VALUES (\"".implode("\", \"", $body3)."\");";
@@ -533,6 +551,11 @@ Flight::route('POST /links', function(){
   $value = $mysqli->real_escape_string($value);
   $body3[$key] = $value;
   }
+
+  if(empty($body3['date_created'])){
+    unset($body3['date_created']);
+  }
+
    $sql  = "INSERT INTO links";
    $sql .= " (`".implode("`, `", array_keys($body3))."`)";
 	 $sql .= " VALUES (\"".implode("\", \"", $body3)."\");";
@@ -1373,9 +1396,27 @@ Flight::route('/updateItem', function(){
   $body3[$key] = $value;
   }
 
+
+
+    // person is some object you have defined earlier
+    // $name = $person->name();
+    // $age = $person->age();
+    // $nickname = ($person->nickname() != '') ? $person->nickname() : NULL;
+    //
+    // // prepare the statement
+    // $stmt = $mysqli->prepare("INSERT INTO Name, Age, Nickname VALUES (?, ?, ?)");
+    //
+    // $stmt->bind_param('sis', $name, $age, $nickname);
+
+
   $body3['id'] = filter_var($body3['id'],FILTER_SANITIZE_NUMBER_INT);
   $body3['identifier'] = filter_var($body3['identifier'],FILTER_SANITIZE_STRING);
-
+  if($body3['column'] == 'date_purchased' & empty($body3['value'])){
+    $body3['value'] = NULL;
+  }
+  if($body3['column'] == 'expiration_date' & empty($body3['value'])){
+    $body3['value'] = NULL;
+  }
 
 
   // Flight::stop(500,var_dump($body3));
@@ -1398,19 +1439,29 @@ Flight::route('/updateItem', function(){
     }
 
     if($body3['table'] == 'change_log' || $body3['table'] == 'url_data'){
-     $sql  = "UPDATE " . $body3['table'] . " SET " . $body3['column'] . "=\"" . $body3['value'] . "\"";
-     $sql .= " WHERE " . $body3['identifier']. "=" . $body3['id'];
+      $sql  = "UPDATE " . $body3['table'] . " SET " . $body3['column'] . " = ? ";
+      $sql .= " WHERE " . $body3['identifier']. "= ?";
+      $stmt = $mysqli->prepare($sql);
+      $stmt->bind_param('ss', $body3['value'], $body3['id']);
+      if(!$stmt->execute()){
+        Flight::halt(500,$mysqli->error);
+      }
+      $stmt->close();
+      Flight::halt(200,$entityBody2['column'] . ": Updated");
+
+
    } else {
-     $sql  = "UPDATE " . $body3['table'] . " SET " . $body3['column'] . "=\"" . $body3['value'] . "\"";
-     $sql .= " WHERE " . $body3['identifier']. "=" . $body3['id']." AND (account_ID ".$alpha. ");";
+     $sql  = "UPDATE " . $body3['table'] . " SET " . $body3['column'] . " = ? ";
+     $sql .= " WHERE " . $body3['identifier']. "= ? AND (account_ID ".$alpha. ");";
+     $stmt = $mysqli->prepare($sql);
+     $stmt->bind_param('ss', $body3['value'], $body3['id']);
+    //  Flight::stop(500,var_dump($body3['value']));
+     if(!$stmt->execute()){
+       Flight::halt(500,$mysqli->error);
+     }
+     Flight::halt(200,$entityBody2['column'] . ": Updated");
    }
 
-    $qry_result = $mysqli->query($sql);
-    if($qry_result){
-  	  Flight::halt(200,$entityBody2['column'] . ": Updated");
-    }else{
-  	  Flight::halt(500,$mysqli->error);
-    }
 
 });
 

@@ -10,7 +10,7 @@
 
     <div layout="row" class="input-row layout-row">
       <md-input-container class="flex" flex="">
-        <label>Hosting Name&#42;</label>
+        <label class="required">Hosting Name</label>
         <input style="" ng-trim="false" name="hosting_name" ng-model="hosting_table.hosting_name" required="true">
         <div class="md-errors-spacer">
           <div class="md-char-counter"></div>
@@ -18,7 +18,7 @@
       </md-input-container>
 
       <md-input-container class="flex" flex="">
-        <label>Login URL&#42;</label>
+        <label class="required">Login URL</label>
         <input style="" aria-invalid="true" name="login_url" ng-model="hosting_table.login_url" required="true">
         <div class="md-errors-spacer"></div>
       </md-input-container>
@@ -27,13 +27,13 @@
 
     <div layout="row" class="input-row layout-row">
       <md-input-container class="flex" flex="">
-        <label>Username&#42;</label>
+        <label class="required">Username</label>
         <input style="" aria-invalid="true" name="username" ng-model="hosting_table.username" required="true">
         <div class="md-errors-spacer"></div>
       </md-input-container>
 
             <md-input-container class="flex" flex="">
-        <label>Password&#42;</label>
+        <label class="required">Password</label>
         <input style="" aria-invalid="true" name="password" ng-model="hosting_table.password" required="true">
         <div class="md-errors-spacer"></div>
       </md-input-container>
@@ -48,14 +48,14 @@
       <div layout-gt-xs="row">
 
           <div layout="column" flex style="font-size:.8em; color:grey">
-            <label>Date Purchased&#42;</label>
-            <md-datepicker ng-init="hosting_table.date_started = myDate" ng-model="hosting_table.date_started" name="dateStartedField" required=""></md-datepicker>
+            <label>Date Purchased</label>
+            <md-datepicker md-placeholder="Enter date" ng-init="hosting_table.date_started = myDate" ng-model="hosting_table.date_started" name="dateStartedField"></md-datepicker>
           </div>
         <div class="md-errors-spacer"></div>
 
           <div layout="column" flex style="font-size:.8em; color:grey">
-            <label>Expiration Date&#42;</label>
-            <md-datepicker ng-model="hosting_table.expiration_date" ng-init="hosting_table.expiration_date = myDate" name="expirationDateField" required=""></md-datepicker>
+            <label>Expiration Date</label>
+            <md-datepicker  md-placeholder="Enter date" ng-model="hosting_table.expiration_date" ng-init="hosting_table.expiration_date = myDate" name="expirationDateField"></md-datepicker>
           </div>
 
   </div>

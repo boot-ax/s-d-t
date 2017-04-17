@@ -25,9 +25,9 @@ label { float:right;}
 .md-datepicker-input-container {
   display: block;
 }*/
-.md-datepicker-input[placeholder] {
-  color:red;
-}
+/*.md-datepicker-input[placeholder] {
+  color:#2A2A2A;
+}*/
 .padding-top-0 {
   padding-top: 0px;
 }

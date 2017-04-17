@@ -7,7 +7,7 @@
 
     <div layout="row" class="input-row layout-row">
       <md-input-container class="flex" flex="">
-        <label>Source URL&#42;</label>
+        <label class="required">Source URL</label>
         <input style="" ng-trim="false" name="source_url" ng-model="links_table.source_url" required="true">
         <div class="md-errors-spacer">
           <div class="md-char-counter"></div>
@@ -15,7 +15,7 @@
       </md-input-container>
 
       <md-input-container class="flex" flex="">
-        <label>Target URL&#42;</label>
+        <label class="required">Target URL</label>
         <input style="" aria-invalid="true" name="target_url" ng-model="links_table.target_url" required="true">
         <div class="md-errors-spacer"></div>
       </md-input-container>
@@ -56,8 +56,8 @@
         <!--Add Date-->
 
           <div layout="column" flex style="font-size:.8em; color:grey">
-            <label>Date Created&#42;</label>
-            <md-datepicker ng-init="links_table.date_created = myDate" ng-model="links_table.date_created" name="dateCreatedField" required="true"></md-datepicker>
+            <label>Date Created</label>
+            <md-datepicker md-placeholder="Enter date" ng-init="links_table.date_created = myDate" ng-model="links_table.date_created" name="dateCreatedField"></md-datepicker>
           </div>
 </div>
 <div class="md-errors-spacer"></div>

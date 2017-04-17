@@ -77,13 +77,13 @@
         class="md-cell ng-binding md-clickable" tabindex="0">{{domains_table.ns3_IP}}</td>
         <td md-cell>
             <md-datepicker ng-change="changeDate('date_purchased',domains_table,dbTableInfo.db_table,dbTableInfo.db_ID)"
-            ng-model="domains_table.date_purchased"
+            ng-model="domains_table.date_purchased" md-placeholder="Enter date"
             md-hide-icons="calendar"
-            name="datePurchasedField" required=""></md-datepicker>
+            name="datePurchasedField"></md-datepicker>
       	</td>
         <td md-cell>
             <md-datepicker ng-change="changeDate('expiration_date',domains_table,dbTableInfo.db_table,dbTableInfo.db_ID)"
-            ng-model="domains_table.expiration_date"
+            ng-model="domains_table.expiration_date" md-placeholder="Enter date"
             md-hide-icons="calendar"
             name="expirationDateField"></md-datepicker>
       	</td>
