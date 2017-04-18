@@ -4,18 +4,18 @@
 	</md-card>
 
 	<md-card class="login-form" ng-hide="busy" layout="column" layout-align="center center">
-		       <form layout="column">
-
-		           <div flex="100" layout="column">
-		             <div flex style="margin-top:20px">
-		                 <md-input-container flex layout="row" style="margin-left:-65px">
+		       <form layout="row">
+		         <span flex></span>
+		           <div layout="column">
+		             <div style="margin-top:20px">
+		                 <md-input-container layout="row" style="margin-left:-40px">
 		                   <label class="loginLabel">Email</label>
 		                   <md-icon class="md-icons iconOff">email</md-icon>
 											 <input ng-model="user.email" type="email" ng-required="true" autocomplete="off">
 		                 </md-input-container>
 		             </div>
-		             <div flex>
-		               <md-input-container flex layout="row" style="margin-left:-65px">
+		             <div>
+		               <md-input-container layout="row" style="margin-left:-40px">
 		                   <label class="loginLabel">Password</label>
 		                   <md-icon class="md-icons iconOff">lock</md-icon>
 											 <input ng-model="user.password" type="password" ng-required="true" ng-keydown="$event.which === 13 && login(user)" autocomplete="off">
@@ -27,7 +27,7 @@
 								 <md-button class="md-raised md-primary md-hue-3" ng-click="signUp()">Register</md-button>
 							 </section>
 		         </div>
-
+		       <span flex></span>
 		     </form>
 
 

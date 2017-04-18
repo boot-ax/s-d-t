@@ -158,8 +158,38 @@ Flight::before('start', function(&$params, &$output){
 
 Flight::route('POST /auth/login', function(){
 	global $jwt_key;
+  include "../inc/connection2.php";
+  $request2 = Flight::request();
+  // Flight::stop(500,var_dump($request2->ip));
+  $sql15 = "INSERT INTO login_attempts (ip_address,login_time)
+          VALUES (?, CURTIME())";
+
+  $stmt15 = $mysqli->prepare($sql15);
+  $stmt15->bind_param('s', $request2->ip);
+  if(!$stmt15->execute()){
+    Flight::halt(500,$mysqli->error);
+  }
+  $stmt15->close();
+
+  $sql11 = "SELECT COUNT(*) AS number FROM login_attempts
+            WHERE (login_time > now() - INTERVAL 5 MINUTE)
+            AND ip_address = ?";
+            // Flight::stop(500,var_dump($sql11));
+  $stmt11 = $mysqli->prepare($sql11);
+  $stmt11->bind_param('s', $request2->ip);
+  if(!$stmt11->execute()){
+    Flight::halt(500,$mysqli->error);
+  }
+  $result11 = $stmt11->get_result();
+  $result11 = $result11->fetch_assoc();
+  $stmt11->close();
+  if($result11['number'] > 4){
+    FLight::halt(401,"You have been locked out due to too many failed login attempts.  Wait five minutes before trying again.");
+  }
+
+
+
 	$entityBody = Flight::request()->getBody();
-	include "../inc/connection2.php";
 
 	$entityBody = str_replace('\\u0000', '', $entityBody);
 	$entityBody2 = json_decode($entityBody,true);
@@ -176,7 +206,6 @@ Flight::route('POST /auth/login', function(){
     if(!$stmt->execute()){
       Flight::halt(401,"Token is expired or user not authorized");
     }
-    $sql_array = array();
     $result = $stmt->get_result();
     $user = $result->fetch_assoc();
     $stmt->close();
@@ -184,7 +213,7 @@ Flight::route('POST /auth/login', function(){
       $user['account_owner'] = 'yes';
     } else {
       $user['account_owner'] = 'no';
-    };
+    }
     unset($user['user_stripe_token']);
     // var_dump($result->num_rows);
         $authy_api = new Authy\AuthyApi('PXD03tc5vZbC78OJJbOM61WqDPgbldUB');
@@ -220,19 +249,17 @@ Flight::route('POST /auth/login', function(){
           if(!$stmt->execute()){
             Flight::halt(401,"Token is expired or user not authorized");
           }
-          $sql_array = array();
           $result = $stmt->get_result();
-          // var_dump($result->num_rows);
           $user = $result->fetch_assoc();
           $stmt->close();
-          if(!empty($user['user_stripe_token'])){
-            $user['account_owner'] = 'yes';
-          } else {
-            $user['account_owner'] = 'no';
-          };
-          unset($user['user_stripe_token']);
 
           if($result->num_rows>0 & empty($user['authy_id'])){
+            if(!empty($user['user_stripe_token'])){
+              $user['account_owner'] = 'yes';
+            } else {
+              $user['account_owner'] = 'no';
+            };
+            unset($user['user_stripe_token']);
             $alg = "HS256";
             $token = new \Gamegos\JWT\Token();
             $token->setClaim('sub', json_encode($user));
@@ -1827,155 +1854,163 @@ Flight::route('POST /verify-email/', function(){
            Flight::halt(200,"A verificaion email was sent to you");
         });
 
+        Flight::route('POST /signup/', function(){
+          global $jwt_key;
+          global $stripe;
+          $entityBody = Flight::request()->getBody();
+        	include "../inc/connection2.php";
+        	$entityBody = json_decode($entityBody,true);
+          $accountName = $entityBody['signUp']['accountName'];
+          $user_email = $entityBody['signUp']['email'];
+          $account_name = $entityBody['signUp']['account_name'];
+          $coupon = $entityBody['signUp']['coupon'];
 
-Flight::route('POST /signup/', function(){
-  global $jwt_key;
-  global $stripe;
-  $entityBody = Flight::request()->getBody();
-	include "../inc/connection2.php";
-	$entityBody = json_decode($entityBody,true);
-  $accountName = $entityBody['signUp']['accountName'];
-  $user_email = $entityBody['signUp']['email'];
-  $account_name = $entityBody['signUp']['account_name'];
-  $coupon = $entityBody['signUp']['coupon'];
+          Stripe::setApiKey($stripe['secret_key']);
 
-  Stripe::setApiKey($stripe['secret_key']);
+          if($accountName == 'Individual'){
+            $account_name = $user_email."-account";
+          }
+          $user_password = md5($entityBody['signUp']['password2']);
+          $user_name = $entityBody['signUp']['fullName'];
+          $user_phone= $entityBody['signUp']['phone'];
+          $user_country_code = $entityBody['signUp']['country_code'];
+          $user_address= $entityBody['signUp']['address'];
+          $user_stripe_token = $entityBody['$token']['id'];
+          $user_security = randomPassword();
+          $email_verification = randomPassword();
+          $payload = array('user_email' => $user_email,'email_verification' => $email_verification);
 
-  if(!empty($coupon)){
-    try {
-      $stripe_coupon = \Stripe\Coupon::retrieve($coupon);
-      $dallor_off = sprintf($stripe_coupon->amount_off / 100.0);
-      // Flight::stop(401,var_dump($dollor_off));
-    } catch (Exception $e) {
-      Flight::halt(401,"Unable to retrieve coupon:" . $coupon.
-        "  , error:  " . $e->getMessage()
-      );
-    }
+          $sql4 = "SELECT user_ID FROM registration WHERE user_email = ?";
+          $stmt4 = $mysqli->prepare($sql4);
+          $stmt4->bind_param('s', $user_email);
+          if(!$result = $stmt4->execute()){
+                    Flight::halt(500,$mysqli->error);
+                  }
+          $result = $stmt4->get_result();
+          if($result->num_rows != 0) {
+             Flight::halt(401,"This user email already exists");
+           }
+          $stmt4->close();
+
+          if(!empty($coupon)){
+            try {
+              $stripe_coupon = \Stripe\Coupon::retrieve($coupon);
+              $dallor_off = sprintf($stripe_coupon->amount_off / 100.0);
+              // Flight::stop(401,var_dump($dollor_off));
+            } catch (Exception $e) {
+              Flight::halt(401,"Unable to retrieve coupon:" . $coupon.
+                "  , error:  " . $e->getMessage()
+              );
+            }
+              try {
+                $customer = \Stripe\Customer::create(array(
+                  'email' =>  $user_email,
+                  'source'    =>  $user_stripe_token,
+                  'plan'  =>'LhQ88aKJ4tDKccsYsq68c',
+                  'coupon' => $coupon
+                ));
+
+              } catch (Exception $e) {
+                Flight::halt(401,"Unable to sign up customer:" . $email.
+                  "  , error:  " . $e->getMessage()
+                );
+              }
+
+          } else {
+
+          try {
+            $customer = \Stripe\Customer::create(array(
+              'email' =>  $user_email,
+              'source'    =>  $user_stripe_token,
+              'plan'  =>'LhQ88aKJ4tDKccsYsq68c',
+            ));
+
+          } catch (Exception $e) {
+            Flight::halt(401,"Unable to sign up customer:" . $email.
+              "  , error:  " . $e->getMessage()
+            );
+          }
+        }
+          $sql = "INSERT INTO account (account_name,good_til_date,stripe_customer_ID)
+                  VALUES (?,?,?)";
+
+          $stmt = $mysqli->prepare($sql);
+          $stmt->bind_param('sis', $account_name, $customer->subscriptions->data[0]->current_period_end,$customer->id);
+          if(!$stmt->execute()){
+                    Flight::halt(500,$mysqli->error);
+                  }
+          $stmt->close();
+
+          $sql2 = "SELECT account_ID FROM account WHERE stripe_customer_ID = ?";
+          $stmt2 = $mysqli->prepare($sql2);
+          $stmt2->bind_param('s', $customer->id);
+          if(!$result = $stmt2->execute()){
+                    Flight::halt(500,$mysqli->error);
+                  }
+          $result = $stmt2->get_result();
+          $account_ID = $result->fetch_assoc();
+          $stmt2->close();
+          $account_ID = $account_ID['account_ID'];
 
 
+          $sql3 = "INSERT INTO registration (user_name,user_email,user_password,
+                                user_phone,user_address,user_status,user_stripe_token,
+                                user_type,account_ID,user_security,user_access,email_verification)
+                  VALUES (?,?,?,?,?,2,?,'admin',?,?,'yes',?)";
 
-  }
+          $stmt3 = $mysqli->prepare($sql3);
+          $stmt3->bind_param('ssssssiss', $user_name,$user_email,$user_password,$user_phone,$user_address,$user_stripe_token,$account_ID,$user_security,$email_verification);
 
-
-
-
-  if($accountName == 'Individual'){
-    $account_name = $user_email."-account";
-  }
-  $user_password = md5($entityBody['signUp']['password2']);
-  $user_name = $entityBody['signUp']['fullName'];
-  $user_phone= $entityBody['signUp']['phone'];
-  $user_country_code = $entityBody['signUp']['country_code'];
-  $user_address= $entityBody['signUp']['address'];
-  $user_stripe_token = $entityBody['$token']['id'];
-  $user_security = randomPassword();
-  $email_verification = randomPassword();
-  $payload = array('user_email' => $user_email,'email_verification' => $email_verification);
-
-  $sql4 = "SELECT user_ID FROM registration WHERE user_email = ?";
-  $stmt4 = $mysqli->prepare($sql4);
-  $stmt4->bind_param('s', $user_email);
-  if(!$result = $stmt4->execute()){
+          if(!$stmt3->execute()){
             Flight::halt(500,$mysqli->error);
           }
-  $result = $stmt4->get_result();
-  if($result->num_rows != 0) {
-     Flight::halt(401,"This user email already exists");
-   }
-  $stmt4->close();
+          $stmt3->close();
 
+            $alg = "HS256";
+            $token = new \Gamegos\JWT\Token();
+            $token->setClaim('sub', json_encode($payload));
+            $token->setClaim('exp', time()+60*60*24*7);
+            $encoder = new \Gamegos\JWT\Encoder();
+            $encoder->encode($token, $jwt_key, $alg);
+            $token = $token->getJWT();
 
-  try {
-    $customer = \Stripe\Customer::create(array(
-      'email' =>  $user_email,
-      'source'    =>  $user_stripe_token,
-      'plan'  =>'LhQ88aKJ4tDKccsYsq68c',
-      'coupon' =>'T9Y27N64'
-    ));
+            $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
+            $domain = "login.webwright.io";
+            $listAddress = 'list_one@login.webwright.io';
+            $result2 = $mg->post("lists/".$listAddress."/members", array(
+            'address'     => $user_email,
+            'name'        => $user_email,
+            'description' => 'lōgïn user',
+            'subscribed'  => true,
+            'vars'        => '{"lōgïn": "yes"}'
+        ));
 
-  } catch (Exception $e) {
-    Flight::halt(401,"Unable to sign up customer:" . $email.
-      "  , error:  " . $e->getMessage()
-    );
-  }
+            $link = "https://app.login.webwright.io/service/mailgun-0f5ac2ac043c5665bf3e2f00638dbdce?token=".$token;
+            $result = $mg->sendMessage($domain, array(
+            // Be sure to replace the from address with the actual email address you're sending from
+            'from'    => 'support@login.webwright.io',
+            'to'      => $user_email,
+            'subject' => 'Email Verification',
+            'o:tag'   => array('Email Verification'),
+              // 'o:tracking-clicks' => 'htmlonly',
+            'html'    => 'Click the link below to verify your email.</br></br>
+            <a href="' .$link. '"></br></br>
+            <button>Verify Email</button></a></br><br>
+            Thanks from the loginners-</br>
+            https://app.login.webwright.io/login'
 
-  $sql = "INSERT INTO account (account_name,good_til_date,stripe_customer_ID)
-          VALUES (?,?,?)";
+          ));
 
-  $stmt = $mysqli->prepare($sql);
-  $stmt->bind_param('sis', $account_name, $customer->subscriptions->data[0]->current_period_end,$customer->id);
-  if(!$stmt->execute()){
-            Flight::halt(500,$mysqli->error);
-          }
-  $stmt->close();
+          if(!empty($coupon)){
+          $cost = 13 - $dallor_off;
+        } else {
+          $cost = 13;
+        }
 
-  $sql2 = "SELECT account_ID FROM account WHERE stripe_customer_ID = ?";
-  $stmt2 = $mysqli->prepare($sql2);
-  $stmt2->bind_param('s', $customer->id);
-  if(!$result = $stmt2->execute()){
-            Flight::halt(500,$mysqli->error);
-          }
-  $result = $stmt2->get_result();
-  $account_ID = $result->fetch_assoc();
-  $stmt2->close();
-  $account_ID = $account_ID['account_ID'];
+          Flight::halt(200,"Successfully Signed Up and charged $".$cost.".00!");
 
+        });
 
-  $sql3 = "INSERT INTO registration (user_name,user_email,user_password,
-                        user_phone,user_address,user_status,user_stripe_token,
-                        user_type,account_ID,user_security,user_access,email_verification)
-          VALUES (?,?,?,?,?,2,?,'admin',?,?,'yes',?)";
-
-  $stmt3 = $mysqli->prepare($sql3);
-  $stmt3->bind_param('ssssssiss', $user_name,$user_email,$user_password,$user_phone,$user_address,$user_stripe_token,$account_ID,$user_security,$email_verification);
-
-  if(!$stmt3->execute()){
-    Flight::halt(500,$mysqli->error);
-  }
-  $stmt3->close();
-
-    $alg = "HS256";
-    $token = new \Gamegos\JWT\Token();
-    $token->setClaim('sub', json_encode($payload));
-    $token->setClaim('exp', time()+60*60*24*7);
-    $encoder = new \Gamegos\JWT\Encoder();
-    $encoder->encode($token, $jwt_key, $alg);
-    $token = $token->getJWT();
-
-    $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
-    $domain = "login.webwright.io";
-    $listAddress = 'list_one@login.webwright.io';
-    $result2 = $mg->post("lists/".$listAddress."/members", array(
-    'address'     => $user_email,
-    'name'        => $user_email,
-    'description' => 'lōgïn user',
-    'subscribed'  => true,
-    'vars'        => '{"lōgïn": "yes"}'
-));
-
-
-    $link = "https://app.login.webwright.io/service/mailgun-0f5ac2ac043c5665bf3e2f00638dbdce?token=".$token;
-    $result = $mg->sendMessage($domain, array(
-    // Be sure to replace the from address with the actual email address you're sending from
-    'from'    => 'support@login.webwright.io',
-    'to'      => $user_email,
-    'subject' => 'Email Verification',
-    'o:tag'   => array('Email Verification'),
-      // 'o:tracking-clicks' => 'htmlonly',
-    'html'    => 'Click the link below to verify your email.</br></br>
-    <a href="' .$link. '"></br></br>
-    <button>Verify Email</button></a></br><br>
-    Thanks from the loginners-</br>
-    https://app.login.webwright.io/login'
-
-
-  ));
-
-  $cost = 13 - $dallor_off;
-
-  Flight::halt(200,"Successfully Signed Up and charged $".$cost.".00!");
-
-});
 
 Flight::route('GET /mailgun-0f5ac2ac043c5665bf3e2f00638dbdce', function(){
   global $jwt_key;
