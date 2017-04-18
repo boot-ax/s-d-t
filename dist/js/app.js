@@ -27180,7 +27180,21 @@ angular.module('SE_App').controller('deleteAccountController', ['$mdDialog','$sc
            }
         });
           $mdDialog.hide();
-    }).catch(function($response) {
+    }).catch(function(response) {
+      if(response.data == "That email is not in the system."){
+        $mdToast.show({
+        hideDelay   : 9000,
+        position    : 'top center',
+        controller  : 'ToastCtrl',
+        templateUrl : '/partials/toast-template.html',
+        toastClass  : 'toastWarning',
+        resolve: {
+             $response: function () {
+               return response.data;
+             }
+           }
+        });
+      }else{
       $scope.busy = false;
       $mdDialog.show({
       clickOutsideToClose: true,
@@ -27195,6 +27209,7 @@ angular.module('SE_App').controller('deleteAccountController', ['$mdDialog','$sc
            }
          }
       });
+    }
     });
     }
     this.cancel = function() {
