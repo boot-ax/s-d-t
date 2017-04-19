@@ -157,19 +157,10 @@ Flight::before('start', function(&$params, &$output){
 });
 
 Flight::route('POST /auth/login', function(){
-	global $jwt_key;
+  global $jwt_key;
   include "../inc/connection2.php";
   $request2 = Flight::request();
   // Flight::stop(500,var_dump($request2->ip));
-  $sql15 = "INSERT INTO login_attempts (ip_address,login_time)
-          VALUES (?, CURTIME())";
-
-  $stmt15 = $mysqli->prepare($sql15);
-  $stmt15->bind_param('s', $request2->ip);
-  if(!$stmt15->execute()){
-    Flight::halt(500,$mysqli->error);
-  }
-  $stmt15->close();
 
   $sql11 = "SELECT COUNT(*) AS number FROM login_attempts
             WHERE (login_time > now() - INTERVAL 5 MINUTE)
@@ -183,10 +174,19 @@ Flight::route('POST /auth/login', function(){
   $result11 = $stmt11->get_result();
   $result11 = $result11->fetch_assoc();
   $stmt11->close();
-  if($result11['number'] > 4){
+  if($result11['number'] > 3){
     FLight::halt(401,"You have been locked out due to too many failed login attempts.  Wait five minutes before trying again.");
   }
 
+  $sql15 = "INSERT INTO login_attempts (ip_address,login_time)
+          VALUES (?, CURTIME())";
+
+  $stmt15 = $mysqli->prepare($sql15);
+  $stmt15->bind_param('s', $request2->ip);
+  if(!$stmt15->execute()){
+    Flight::halt(500,$mysqli->error);
+  }
+  $stmt15->close();
 
 
 	$entityBody = Flight::request()->getBody();

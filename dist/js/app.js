@@ -4462,1009 +4462,6 @@ return hooks;
 
 })));
 
-(function(window, document) {
-
-// Create all modules and define dependencies to make sure they exist
-// and are loaded in the correct order to satisfy dependency injection
-// before all nested files are concatenated by Grunt
-
-// Config
-angular.module('ngCsv.config', []).
-  value('ngCsv.config', {
-      debug: true
-  }).
-  config(['$compileProvider', function($compileProvider){
-    if (angular.isDefined($compileProvider.urlSanitizationWhitelist)) {
-      $compileProvider.urlSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|data):/);
-    } else {
-      $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|data):/);
-    }
-  }]);
-
-// Modules
-angular.module('ngCsv.directives', ['ngCsv.services']);
-angular.module('ngCsv.services', []);
-angular.module('ngCsv',
-    [
-        'ngCsv.config',
-        'ngCsv.services',
-        'ngCsv.directives',
-        'ngSanitize'
-    ]);
-
-// Common.js package manager support (e.g. ComponentJS, WebPack)
-if (typeof module !== 'undefined' && typeof exports !== 'undefined' && module.exports === exports) {
-  module.exports = 'ngCsv';
-}
-/**
- * Created by asafdav on 15/05/14.
- */
-angular.module('ngCsv.services').
-  service('CSV', ['$q', function ($q) {
-
-    var EOL = '\r\n';
-    var BOM = "\ufeff";
-
-    var specialChars = {
-      '\\t': '\t',
-      '\\b': '\b',
-      '\\v': '\v',
-      '\\f': '\f',
-      '\\r': '\r'
-    };
-
-    /**
-     * Stringify one field
-     * @param data
-     * @param options
-     * @returns {*}
-     */
-    this.stringifyField = function (data, options) {
-      if (options.decimalSep === 'locale' && this.isFloat(data)) {
-        return data.toLocaleString();
-      }
-
-      if (options.decimalSep !== '.' && this.isFloat(data)) {
-        return data.toString().replace('.', options.decimalSep);
-      }
-
-      if (typeof data === 'string') {
-        data = data.replace(/"/g, '""'); // Escape double qoutes
-
-        if (options.quoteStrings || data.indexOf(',') > -1 || data.indexOf('\n') > -1 || data.indexOf('\r') > -1) {
-            data = options.txtDelim + data + options.txtDelim;
-        }
-
-        return data;
-      }
-
-      if (typeof data === 'boolean') {
-        return data ? 'TRUE' : 'FALSE';
-      }
-
-      return data;
-    };
-
-    /**
-     * Helper function to check if input is float
-     * @param input
-     * @returns {boolean}
-     */
-    this.isFloat = function (input) {
-      return +input === input && (!isFinite(input) || Boolean(input % 1));
-    };
-
-    /**
-     * Creates a csv from a data array
-     * @param data
-     * @param options
-     *  * header - Provide the first row (optional)
-     *  * fieldSep - Field separator, default: ',',
-     *  * addByteOrderMarker - Add Byte order mark, default(false)
-     * @param callback
-     */
-    this.stringify = function (data, options) {
-      var def = $q.defer();
-
-      var that = this;
-      var csv = "";
-      var csvContent = "";
-
-      var dataPromise = $q.when(data).then(function (responseData) {
-        //responseData = angular.copy(responseData);//moved to row creation
-        // Check if there's a provided header array
-        if (angular.isDefined(options.header) && options.header) {
-          var encodingArray, headerString;
-
-          encodingArray = [];
-          angular.forEach(options.header, function (title, key) {
-            this.push(that.stringifyField(title, options));
-          }, encodingArray);
-
-          headerString = encodingArray.join(options.fieldSep ? options.fieldSep : ",");
-          csvContent += headerString + EOL;
-        }
-
-        var arrData = [];
-
-        if (angular.isArray(responseData)) {
-          arrData = responseData;
-        }
-        else if (angular.isFunction(responseData)) {
-          arrData = responseData();
-        }
-
-        // Check if using keys as labels
-        if (angular.isDefined(options.label) && options.label && typeof options.label === 'boolean') {
-            var labelArray, labelString;
-
-            labelArray = [];
-            angular.forEach(arrData[0], function(value, label) {
-                this.push(that.stringifyField(label, options));
-            }, labelArray);
-            labelString = labelArray.join(options.fieldSep ? options.fieldSep : ",");
-            csvContent += labelString + EOL;
-        }
-
-        angular.forEach(arrData, function (oldRow, index) {
-          var row = angular.copy(arrData[index]);
-          var dataString, infoArray;
-
-          infoArray = [];
-
-          var iterator = !!options.columnOrder ? options.columnOrder : row;
-          angular.forEach(iterator, function (field, key) {
-            var val = !!options.columnOrder ? row[field] : field;
-            this.push(that.stringifyField(val, options));
-          }, infoArray);
-
-          dataString = infoArray.join(options.fieldSep ? options.fieldSep : ",");
-          csvContent += index < arrData.length ? dataString + EOL : dataString;
-        });
-
-        // Add BOM if needed
-        if (options.addByteOrderMarker) {
-          csv += BOM;
-        }
-
-        // Append the content and resolve.
-        csv += csvContent;
-        def.resolve(csv);
-      });
-
-      if (typeof dataPromise['catch'] === 'function') {
-        dataPromise['catch'](function (err) {
-          def.reject(err);
-        });
-      }
-
-      return def.promise;
-    };
-
-    /**
-     * Helper function to check if input is really a special character
-     * @param input
-     * @returns {boolean}
-     */
-    this.isSpecialChar = function(input){
-      return specialChars[input] !== undefined;
-    };
-
-    /**
-     * Helper function to get what the special character was supposed to be
-     * since Angular escapes the first backslash
-     * @param input
-     * @returns {special character string}
-     */
-    this.getSpecialChar = function (input) {
-      return specialChars[input];
-    };
-
-
-  }]);
-/**
- * ng-csv module
- * Export Javascript's arrays to csv files from the browser
- *
- * Author: asafdav - https://github.com/asafdav
- */
-angular.module('ngCsv.directives').
-  directive('ngCsv', ['$parse', '$q', 'CSV', '$document', '$timeout', function ($parse, $q, CSV, $document, $timeout) {
-    return {
-      restrict: 'AC',
-      scope: {
-        data: '&ngCsv',
-        filename: '@filename',
-        header: '&csvHeader',
-        columnOrder: '&csvColumnOrder',
-        txtDelim: '@textDelimiter',
-        decimalSep: '@decimalSeparator',
-        quoteStrings: '@quoteStrings',
-        fieldSep: '@fieldSeparator',
-        lazyLoad: '@lazyLoad',
-        addByteOrderMarker: "@addBom",
-        ngClick: '&',
-        charset: '@charset',
-        label: '&csvLabel'
-      },
-      controller: [
-        '$scope',
-        '$element',
-        '$attrs',
-        '$transclude',
-        function ($scope, $element, $attrs, $transclude) {
-          $scope.csv = '';
-
-          if (!angular.isDefined($scope.lazyLoad) || $scope.lazyLoad != "true") {
-            if (angular.isArray($scope.data)) {
-              $scope.$watch("data", function (newValue) {
-                $scope.buildCSV();
-              }, true);
-            }
-          }
-
-          $scope.getFilename = function () {
-            return $scope.filename || 'download.csv';
-          };
-
-          function getBuildCsvOptions() {
-            var options = {
-              txtDelim: $scope.txtDelim ? $scope.txtDelim : '"',
-              decimalSep: $scope.decimalSep ? $scope.decimalSep : '.',
-              quoteStrings: $scope.quoteStrings,
-              addByteOrderMarker: $scope.addByteOrderMarker
-            };
-            if (angular.isDefined($attrs.csvHeader)) options.header = $scope.$eval($scope.header);
-            if (angular.isDefined($attrs.csvColumnOrder)) options.columnOrder = $scope.$eval($scope.columnOrder);
-            if (angular.isDefined($attrs.csvLabel)) options.label = $scope.$eval($scope.label);
-
-            options.fieldSep = $scope.fieldSep ? $scope.fieldSep : ",";
-
-            // Replaces any badly formatted special character string with correct special character
-            options.fieldSep = CSV.isSpecialChar(options.fieldSep) ? CSV.getSpecialChar(options.fieldSep) : options.fieldSep;
-
-            return options;
-          }
-
-          /**
-           * Creates the CSV and updates the scope
-           * @returns {*}
-           */
-          $scope.buildCSV = function () {
-            var deferred = $q.defer();
-
-            $element.addClass($attrs.ngCsvLoadingClass || 'ng-csv-loading');
-
-            CSV.stringify($scope.data(), getBuildCsvOptions()).then(function (csv) {
-              $scope.csv = csv;
-              $element.removeClass($attrs.ngCsvLoadingClass || 'ng-csv-loading');
-              deferred.resolve(csv);
-            });
-            $scope.$apply(); // Old angular support
-
-            return deferred.promise;
-          };
-        }
-      ],
-      link: function (scope, element, attrs) {
-        function doClick() {
-          var charset = scope.charset || "utf-8";
-          var blob = new Blob([scope.csv], {
-            type: "text/csv;charset="+ charset + ";"
-          });
-
-          if (window.navigator.msSaveOrOpenBlob) {
-            navigator.msSaveBlob(blob, scope.getFilename());
-          } else {
-
-            var downloadContainer = angular.element('<div data-tap-disabled="true"><a></a></div>');
-            var downloadLink = angular.element(downloadContainer.children()[0]);
-            downloadLink.attr('href', window.URL.createObjectURL(blob));
-            downloadLink.attr('download', scope.getFilename());
-            downloadLink.attr('target', '_blank');
-
-            $document.find('body').append(downloadContainer);
-            $timeout(function () {
-              downloadLink[0].click();
-              downloadLink.remove();
-            }, null);
-          }
-        }
-
-        element.bind('click', function (e) {
-          scope.buildCSV().then(function (csv) {
-            doClick();
-          });
-          scope.$apply();
-        });
-      }
-    };
-  }]);
-})(window, document);
-/**
- * @license AngularJS v1.4.4
- * (c) 2010-2015 Google, Inc. http://angularjs.org
- * License: MIT
- */
-(function(window, angular, undefined) {'use strict';
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *     Any commits to this file should be reviewed with security in mind.  *
- *   Changes to this file can potentially create security vulnerabilities. *
- *          An approval from 2 Core members with history of modifying      *
- *                         this file is required.                          *
- *                                                                         *
- *  Does the change somehow allow for arbitrary javascript to be executed? *
- *    Or allows for someone to change the prototype of built-in objects?   *
- *     Or gives undesired access to variables likes document or window?    *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-var $sanitizeMinErr = angular.$$minErr('$sanitize');
-
-/**
- * @ngdoc module
- * @name ngSanitize
- * @description
- *
- * # ngSanitize
- *
- * The `ngSanitize` module provides functionality to sanitize HTML.
- *
- *
- * <div doc-module-components="ngSanitize"></div>
- *
- * See {@link ngSanitize.$sanitize `$sanitize`} for usage.
- */
-
-/*
- * HTML Parser By Misko Hevery (misko@hevery.com)
- * based on:  HTML Parser By John Resig (ejohn.org)
- * Original code by Erik Arvidsson, Mozilla Public License
- * http://erik.eae.net/simplehtmlparser/simplehtmlparser.js
- *
- * // Use like so:
- * htmlParser(htmlString, {
- *     start: function(tag, attrs, unary) {},
- *     end: function(tag) {},
- *     chars: function(text) {},
- *     comment: function(text) {}
- * });
- *
- */
-
-
-/**
- * @ngdoc service
- * @name $sanitize
- * @kind function
- *
- * @description
- *   The input is sanitized by parsing the HTML into tokens. All safe tokens (from a whitelist) are
- *   then serialized back to properly escaped html string. This means that no unsafe input can make
- *   it into the returned string, however, since our parser is more strict than a typical browser
- *   parser, it's possible that some obscure input, which would be recognized as valid HTML by a
- *   browser, won't make it through the sanitizer. The input may also contain SVG markup.
- *   The whitelist is configured using the functions `aHrefSanitizationWhitelist` and
- *   `imgSrcSanitizationWhitelist` of {@link ng.$compileProvider `$compileProvider`}.
- *
- * @param {string} html HTML input.
- * @returns {string} Sanitized HTML.
- *
- * @example
-   <example module="sanitizeExample" deps="angular-sanitize.js">
-   <file name="index.html">
-     <script>
-         angular.module('sanitizeExample', ['ngSanitize'])
-           .controller('ExampleController', ['$scope', '$sce', function($scope, $sce) {
-             $scope.snippet =
-               '<p style="color:blue">an html\n' +
-               '<em onmouseover="this.textContent=\'PWN3D!\'">click here</em>\n' +
-               'snippet</p>';
-             $scope.deliberatelyTrustDangerousSnippet = function() {
-               return $sce.trustAsHtml($scope.snippet);
-             };
-           }]);
-     </script>
-     <div ng-controller="ExampleController">
-        Snippet: <textarea ng-model="snippet" cols="60" rows="3"></textarea>
-       <table>
-         <tr>
-           <td>Directive</td>
-           <td>How</td>
-           <td>Source</td>
-           <td>Rendered</td>
-         </tr>
-         <tr id="bind-html-with-sanitize">
-           <td>ng-bind-html</td>
-           <td>Automatically uses $sanitize</td>
-           <td><pre>&lt;div ng-bind-html="snippet"&gt;<br/>&lt;/div&gt;</pre></td>
-           <td><div ng-bind-html="snippet"></div></td>
-         </tr>
-         <tr id="bind-html-with-trust">
-           <td>ng-bind-html</td>
-           <td>Bypass $sanitize by explicitly trusting the dangerous value</td>
-           <td>
-           <pre>&lt;div ng-bind-html="deliberatelyTrustDangerousSnippet()"&gt;
-&lt;/div&gt;</pre>
-           </td>
-           <td><div ng-bind-html="deliberatelyTrustDangerousSnippet()"></div></td>
-         </tr>
-         <tr id="bind-default">
-           <td>ng-bind</td>
-           <td>Automatically escapes</td>
-           <td><pre>&lt;div ng-bind="snippet"&gt;<br/>&lt;/div&gt;</pre></td>
-           <td><div ng-bind="snippet"></div></td>
-         </tr>
-       </table>
-       </div>
-   </file>
-   <file name="protractor.js" type="protractor">
-     it('should sanitize the html snippet by default', function() {
-       expect(element(by.css('#bind-html-with-sanitize div')).getInnerHtml()).
-         toBe('<p>an html\n<em>click here</em>\nsnippet</p>');
-     });
-
-     it('should inline raw snippet if bound to a trusted value', function() {
-       expect(element(by.css('#bind-html-with-trust div')).getInnerHtml()).
-         toBe("<p style=\"color:blue\">an html\n" +
-              "<em onmouseover=\"this.textContent='PWN3D!'\">click here</em>\n" +
-              "snippet</p>");
-     });
-
-     it('should escape snippet without any filter', function() {
-       expect(element(by.css('#bind-default div')).getInnerHtml()).
-         toBe("&lt;p style=\"color:blue\"&gt;an html\n" +
-              "&lt;em onmouseover=\"this.textContent='PWN3D!'\"&gt;click here&lt;/em&gt;\n" +
-              "snippet&lt;/p&gt;");
-     });
-
-     it('should update', function() {
-       element(by.model('snippet')).clear();
-       element(by.model('snippet')).sendKeys('new <b onclick="alert(1)">text</b>');
-       expect(element(by.css('#bind-html-with-sanitize div')).getInnerHtml()).
-         toBe('new <b>text</b>');
-       expect(element(by.css('#bind-html-with-trust div')).getInnerHtml()).toBe(
-         'new <b onclick="alert(1)">text</b>');
-       expect(element(by.css('#bind-default div')).getInnerHtml()).toBe(
-         "new &lt;b onclick=\"alert(1)\"&gt;text&lt;/b&gt;");
-     });
-   </file>
-   </example>
- */
-function $SanitizeProvider() {
-  this.$get = ['$$sanitizeUri', function($$sanitizeUri) {
-    return function(html) {
-      var buf = [];
-      htmlParser(html, htmlSanitizeWriter(buf, function(uri, isImage) {
-        return !/^unsafe/.test($$sanitizeUri(uri, isImage));
-      }));
-      return buf.join('');
-    };
-  }];
-}
-
-function sanitizeText(chars) {
-  var buf = [];
-  var writer = htmlSanitizeWriter(buf, angular.noop);
-  writer.chars(chars);
-  return buf.join('');
-}
-
-
-// Regular Expressions for parsing tags and attributes
-var START_TAG_REGEXP =
-       /^<((?:[a-zA-Z])[\w:-]*)((?:\s+[\w:-]+(?:\s*=\s*(?:(?:"[^"]*")|(?:'[^']*')|[^>\s]+))?)*)\s*(\/?)\s*(>?)/,
-  END_TAG_REGEXP = /^<\/\s*([\w:-]+)[^>]*>/,
-  ATTR_REGEXP = /([\w:-]+)(?:\s*=\s*(?:(?:"((?:[^"])*)")|(?:'((?:[^'])*)')|([^>\s]+)))?/g,
-  BEGIN_TAG_REGEXP = /^</,
-  BEGING_END_TAGE_REGEXP = /^<\//,
-  COMMENT_REGEXP = /<!--(.*?)-->/g,
-  DOCTYPE_REGEXP = /<!DOCTYPE([^>]*?)>/i,
-  CDATA_REGEXP = /<!\[CDATA\[(.*?)]]>/g,
-  SURROGATE_PAIR_REGEXP = /[\uD800-\uDBFF][\uDC00-\uDFFF]/g,
-  // Match everything outside of normal chars and " (quote character)
-  NON_ALPHANUMERIC_REGEXP = /([^\#-~| |!])/g;
-
-
-// Good source of info about elements and attributes
-// http://dev.w3.org/html5/spec/Overview.html#semantics
-// http://simon.html5.org/html-elements
-
-// Safe Void Elements - HTML5
-// http://dev.w3.org/html5/spec/Overview.html#void-elements
-var voidElements = makeMap("area,br,col,hr,img,wbr");
-
-// Elements that you can, intentionally, leave open (and which close themselves)
-// http://dev.w3.org/html5/spec/Overview.html#optional-tags
-var optionalEndTagBlockElements = makeMap("colgroup,dd,dt,li,p,tbody,td,tfoot,th,thead,tr"),
-    optionalEndTagInlineElements = makeMap("rp,rt"),
-    optionalEndTagElements = angular.extend({},
-                                            optionalEndTagInlineElements,
-                                            optionalEndTagBlockElements);
-
-// Safe Block Elements - HTML5
-var blockElements = angular.extend({}, optionalEndTagBlockElements, makeMap("address,article," +
-        "aside,blockquote,caption,center,del,dir,div,dl,figure,figcaption,footer,h1,h2,h3,h4,h5," +
-        "h6,header,hgroup,hr,ins,map,menu,nav,ol,pre,script,section,table,ul"));
-
-// Inline Elements - HTML5
-var inlineElements = angular.extend({}, optionalEndTagInlineElements, makeMap("a,abbr,acronym,b," +
-        "bdi,bdo,big,br,cite,code,del,dfn,em,font,i,img,ins,kbd,label,map,mark,q,ruby,rp,rt,s," +
-        "samp,small,span,strike,strong,sub,sup,time,tt,u,var"));
-
-// SVG Elements
-// https://wiki.whatwg.org/wiki/Sanitization_rules#svg_Elements
-// Note: the elements animate,animateColor,animateMotion,animateTransform,set are intentionally omitted.
-// They can potentially allow for arbitrary javascript to be executed. See #11290
-var svgElements = makeMap("circle,defs,desc,ellipse,font-face,font-face-name,font-face-src,g,glyph," +
-        "hkern,image,linearGradient,line,marker,metadata,missing-glyph,mpath,path,polygon,polyline," +
-        "radialGradient,rect,stop,svg,switch,text,title,tspan,use");
-
-// Special Elements (can contain anything)
-var specialElements = makeMap("script,style");
-
-var validElements = angular.extend({},
-                                   voidElements,
-                                   blockElements,
-                                   inlineElements,
-                                   optionalEndTagElements,
-                                   svgElements);
-
-//Attributes that have href and hence need to be sanitized
-var uriAttrs = makeMap("background,cite,href,longdesc,src,usemap,xlink:href");
-
-var htmlAttrs = makeMap('abbr,align,alt,axis,bgcolor,border,cellpadding,cellspacing,class,clear,' +
-    'color,cols,colspan,compact,coords,dir,face,headers,height,hreflang,hspace,' +
-    'ismap,lang,language,nohref,nowrap,rel,rev,rows,rowspan,rules,' +
-    'scope,scrolling,shape,size,span,start,summary,tabindex,target,title,type,' +
-    'valign,value,vspace,width');
-
-// SVG attributes (without "id" and "name" attributes)
-// https://wiki.whatwg.org/wiki/Sanitization_rules#svg_Attributes
-var svgAttrs = makeMap('accent-height,accumulate,additive,alphabetic,arabic-form,ascent,' +
-    'baseProfile,bbox,begin,by,calcMode,cap-height,class,color,color-rendering,content,' +
-    'cx,cy,d,dx,dy,descent,display,dur,end,fill,fill-rule,font-family,font-size,font-stretch,' +
-    'font-style,font-variant,font-weight,from,fx,fy,g1,g2,glyph-name,gradientUnits,hanging,' +
-    'height,horiz-adv-x,horiz-origin-x,ideographic,k,keyPoints,keySplines,keyTimes,lang,' +
-    'marker-end,marker-mid,marker-start,markerHeight,markerUnits,markerWidth,mathematical,' +
-    'max,min,offset,opacity,orient,origin,overline-position,overline-thickness,panose-1,' +
-    'path,pathLength,points,preserveAspectRatio,r,refX,refY,repeatCount,repeatDur,' +
-    'requiredExtensions,requiredFeatures,restart,rotate,rx,ry,slope,stemh,stemv,stop-color,' +
-    'stop-opacity,strikethrough-position,strikethrough-thickness,stroke,stroke-dasharray,' +
-    'stroke-dashoffset,stroke-linecap,stroke-linejoin,stroke-miterlimit,stroke-opacity,' +
-    'stroke-width,systemLanguage,target,text-anchor,to,transform,type,u1,u2,underline-position,' +
-    'underline-thickness,unicode,unicode-range,units-per-em,values,version,viewBox,visibility,' +
-    'width,widths,x,x-height,x1,x2,xlink:actuate,xlink:arcrole,xlink:role,xlink:show,xlink:title,' +
-    'xlink:type,xml:base,xml:lang,xml:space,xmlns,xmlns:xlink,y,y1,y2,zoomAndPan', true);
-
-var validAttrs = angular.extend({},
-                                uriAttrs,
-                                svgAttrs,
-                                htmlAttrs);
-
-function makeMap(str, lowercaseKeys) {
-  var obj = {}, items = str.split(','), i;
-  for (i = 0; i < items.length; i++) {
-    obj[lowercaseKeys ? angular.lowercase(items[i]) : items[i]] = true;
-  }
-  return obj;
-}
-
-
-/**
- * @example
- * htmlParser(htmlString, {
- *     start: function(tag, attrs, unary) {},
- *     end: function(tag) {},
- *     chars: function(text) {},
- *     comment: function(text) {}
- * });
- *
- * @param {string} html string
- * @param {object} handler
- */
-function htmlParser(html, handler) {
-  if (typeof html !== 'string') {
-    if (html === null || typeof html === 'undefined') {
-      html = '';
-    } else {
-      html = '' + html;
-    }
-  }
-  var index, chars, match, stack = [], last = html, text;
-  stack.last = function() { return stack[stack.length - 1]; };
-
-  while (html) {
-    text = '';
-    chars = true;
-
-    // Make sure we're not in a script or style element
-    if (!stack.last() || !specialElements[stack.last()]) {
-
-      // Comment
-      if (html.indexOf("<!--") === 0) {
-        // comments containing -- are not allowed unless they terminate the comment
-        index = html.indexOf("--", 4);
-
-        if (index >= 0 && html.lastIndexOf("-->", index) === index) {
-          if (handler.comment) handler.comment(html.substring(4, index));
-          html = html.substring(index + 3);
-          chars = false;
-        }
-      // DOCTYPE
-      } else if (DOCTYPE_REGEXP.test(html)) {
-        match = html.match(DOCTYPE_REGEXP);
-
-        if (match) {
-          html = html.replace(match[0], '');
-          chars = false;
-        }
-      // end tag
-      } else if (BEGING_END_TAGE_REGEXP.test(html)) {
-        match = html.match(END_TAG_REGEXP);
-
-        if (match) {
-          html = html.substring(match[0].length);
-          match[0].replace(END_TAG_REGEXP, parseEndTag);
-          chars = false;
-        }
-
-      // start tag
-      } else if (BEGIN_TAG_REGEXP.test(html)) {
-        match = html.match(START_TAG_REGEXP);
-
-        if (match) {
-          // We only have a valid start-tag if there is a '>'.
-          if (match[4]) {
-            html = html.substring(match[0].length);
-            match[0].replace(START_TAG_REGEXP, parseStartTag);
-          }
-          chars = false;
-        } else {
-          // no ending tag found --- this piece should be encoded as an entity.
-          text += '<';
-          html = html.substring(1);
-        }
-      }
-
-      if (chars) {
-        index = html.indexOf("<");
-
-        text += index < 0 ? html : html.substring(0, index);
-        html = index < 0 ? "" : html.substring(index);
-
-        if (handler.chars) handler.chars(decodeEntities(text));
-      }
-
-    } else {
-      // IE versions 9 and 10 do not understand the regex '[^]', so using a workaround with [\W\w].
-      html = html.replace(new RegExp("([\\W\\w]*)<\\s*\\/\\s*" + stack.last() + "[^>]*>", 'i'),
-        function(all, text) {
-          text = text.replace(COMMENT_REGEXP, "$1").replace(CDATA_REGEXP, "$1");
-
-          if (handler.chars) handler.chars(decodeEntities(text));
-
-          return "";
-      });
-
-      parseEndTag("", stack.last());
-    }
-
-    if (html == last) {
-      throw $sanitizeMinErr('badparse', "The sanitizer was unable to parse the following block " +
-                                        "of html: {0}", html);
-    }
-    last = html;
-  }
-
-  // Clean up any remaining tags
-  parseEndTag();
-
-  function parseStartTag(tag, tagName, rest, unary) {
-    tagName = angular.lowercase(tagName);
-    if (blockElements[tagName]) {
-      while (stack.last() && inlineElements[stack.last()]) {
-        parseEndTag("", stack.last());
-      }
-    }
-
-    if (optionalEndTagElements[tagName] && stack.last() == tagName) {
-      parseEndTag("", tagName);
-    }
-
-    unary = voidElements[tagName] || !!unary;
-
-    if (!unary) {
-      stack.push(tagName);
-    }
-
-    var attrs = {};
-
-    rest.replace(ATTR_REGEXP,
-      function(match, name, doubleQuotedValue, singleQuotedValue, unquotedValue) {
-        var value = doubleQuotedValue
-          || singleQuotedValue
-          || unquotedValue
-          || '';
-
-        attrs[name] = decodeEntities(value);
-    });
-    if (handler.start) handler.start(tagName, attrs, unary);
-  }
-
-  function parseEndTag(tag, tagName) {
-    var pos = 0, i;
-    tagName = angular.lowercase(tagName);
-    if (tagName) {
-      // Find the closest opened tag of the same type
-      for (pos = stack.length - 1; pos >= 0; pos--) {
-        if (stack[pos] == tagName) break;
-      }
-    }
-
-    if (pos >= 0) {
-      // Close all the open elements, up the stack
-      for (i = stack.length - 1; i >= pos; i--)
-        if (handler.end) handler.end(stack[i]);
-
-      // Remove the open elements from the stack
-      stack.length = pos;
-    }
-  }
-}
-
-var hiddenPre=document.createElement("pre");
-/**
- * decodes all entities into regular string
- * @param value
- * @returns {string} A string with decoded entities.
- */
-function decodeEntities(value) {
-  if (!value) { return ''; }
-
-  hiddenPre.innerHTML = value.replace(/</g,"&lt;");
-  // innerText depends on styling as it doesn't display hidden elements.
-  // Therefore, it's better to use textContent not to cause unnecessary reflows.
-  return hiddenPre.textContent;
-}
-
-/**
- * Escapes all potentially dangerous characters, so that the
- * resulting string can be safely inserted into attribute or
- * element text.
- * @param value
- * @returns {string} escaped text
- */
-function encodeEntities(value) {
-  return value.
-    replace(/&/g, '&amp;').
-    replace(SURROGATE_PAIR_REGEXP, function(value) {
-      var hi = value.charCodeAt(0);
-      var low = value.charCodeAt(1);
-      return '&#' + (((hi - 0xD800) * 0x400) + (low - 0xDC00) + 0x10000) + ';';
-    }).
-    replace(NON_ALPHANUMERIC_REGEXP, function(value) {
-      return '&#' + value.charCodeAt(0) + ';';
-    }).
-    replace(/</g, '&lt;').
-    replace(/>/g, '&gt;');
-}
-
-/**
- * create an HTML/XML writer which writes to buffer
- * @param {Array} buf use buf.jain('') to get out sanitized html string
- * @returns {object} in the form of {
- *     start: function(tag, attrs, unary) {},
- *     end: function(tag) {},
- *     chars: function(text) {},
- *     comment: function(text) {}
- * }
- */
-function htmlSanitizeWriter(buf, uriValidator) {
-  var ignore = false;
-  var out = angular.bind(buf, buf.push);
-  return {
-    start: function(tag, attrs, unary) {
-      tag = angular.lowercase(tag);
-      if (!ignore && specialElements[tag]) {
-        ignore = tag;
-      }
-      if (!ignore && validElements[tag] === true) {
-        out('<');
-        out(tag);
-        angular.forEach(attrs, function(value, key) {
-          var lkey=angular.lowercase(key);
-          var isImage = (tag === 'img' && lkey === 'src') || (lkey === 'background');
-          if (validAttrs[lkey] === true &&
-            (uriAttrs[lkey] !== true || uriValidator(value, isImage))) {
-            out(' ');
-            out(key);
-            out('="');
-            out(encodeEntities(value));
-            out('"');
-          }
-        });
-        out(unary ? '/>' : '>');
-      }
-    },
-    end: function(tag) {
-        tag = angular.lowercase(tag);
-        if (!ignore && validElements[tag] === true) {
-          out('</');
-          out(tag);
-          out('>');
-        }
-        if (tag == ignore) {
-          ignore = false;
-        }
-      },
-    chars: function(chars) {
-        if (!ignore) {
-          out(encodeEntities(chars));
-        }
-      }
-  };
-}
-
-
-// define ngSanitize module and register $sanitize service
-angular.module('ngSanitize', []).provider('$sanitize', $SanitizeProvider);
-
-/* global sanitizeText: false */
-
-/**
- * @ngdoc filter
- * @name linky
- * @kind function
- *
- * @description
- * Finds links in text input and turns them into html links. Supports http/https/ftp/mailto and
- * plain email address links.
- *
- * Requires the {@link ngSanitize `ngSanitize`} module to be installed.
- *
- * @param {string} text Input text.
- * @param {string} target Window (_blank|_self|_parent|_top) or named frame to open links in.
- * @returns {string} Html-linkified text.
- *
- * @usage
-   <span ng-bind-html="linky_expression | linky"></span>
- *
- * @example
-   <example module="linkyExample" deps="angular-sanitize.js">
-     <file name="index.html">
-       <script>
-         angular.module('linkyExample', ['ngSanitize'])
-           .controller('ExampleController', ['$scope', function($scope) {
-             $scope.snippet =
-               'Pretty text with some links:\n'+
-               'http://angularjs.org/,\n'+
-               'mailto:us@somewhere.org,\n'+
-               'another@somewhere.org,\n'+
-               'and one more: ftp://127.0.0.1/.';
-             $scope.snippetWithTarget = 'http://angularjs.org/';
-           }]);
-       </script>
-       <div ng-controller="ExampleController">
-       Snippet: <textarea ng-model="snippet" cols="60" rows="3"></textarea>
-       <table>
-         <tr>
-           <td>Filter</td>
-           <td>Source</td>
-           <td>Rendered</td>
-         </tr>
-         <tr id="linky-filter">
-           <td>linky filter</td>
-           <td>
-             <pre>&lt;div ng-bind-html="snippet | linky"&gt;<br>&lt;/div&gt;</pre>
-           </td>
-           <td>
-             <div ng-bind-html="snippet | linky"></div>
-           </td>
-         </tr>
-         <tr id="linky-target">
-          <td>linky target</td>
-          <td>
-            <pre>&lt;div ng-bind-html="snippetWithTarget | linky:'_blank'"&gt;<br>&lt;/div&gt;</pre>
-          </td>
-          <td>
-            <div ng-bind-html="snippetWithTarget | linky:'_blank'"></div>
-          </td>
-         </tr>
-         <tr id="escaped-html">
-           <td>no filter</td>
-           <td><pre>&lt;div ng-bind="snippet"&gt;<br>&lt;/div&gt;</pre></td>
-           <td><div ng-bind="snippet"></div></td>
-         </tr>
-       </table>
-     </file>
-     <file name="protractor.js" type="protractor">
-       it('should linkify the snippet with urls', function() {
-         expect(element(by.id('linky-filter')).element(by.binding('snippet | linky')).getText()).
-             toBe('Pretty text with some links: http://angularjs.org/, us@somewhere.org, ' +
-                  'another@somewhere.org, and one more: ftp://127.0.0.1/.');
-         expect(element.all(by.css('#linky-filter a')).count()).toEqual(4);
-       });
-
-       it('should not linkify snippet without the linky filter', function() {
-         expect(element(by.id('escaped-html')).element(by.binding('snippet')).getText()).
-             toBe('Pretty text with some links: http://angularjs.org/, mailto:us@somewhere.org, ' +
-                  'another@somewhere.org, and one more: ftp://127.0.0.1/.');
-         expect(element.all(by.css('#escaped-html a')).count()).toEqual(0);
-       });
-
-       it('should update', function() {
-         element(by.model('snippet')).clear();
-         element(by.model('snippet')).sendKeys('new http://link.');
-         expect(element(by.id('linky-filter')).element(by.binding('snippet | linky')).getText()).
-             toBe('new http://link.');
-         expect(element.all(by.css('#linky-filter a')).count()).toEqual(1);
-         expect(element(by.id('escaped-html')).element(by.binding('snippet')).getText())
-             .toBe('new http://link.');
-       });
-
-       it('should work with the target property', function() {
-        expect(element(by.id('linky-target')).
-            element(by.binding("snippetWithTarget | linky:'_blank'")).getText()).
-            toBe('http://angularjs.org/');
-        expect(element(by.css('#linky-target a')).getAttribute('target')).toEqual('_blank');
-       });
-     </file>
-   </example>
- */
-angular.module('ngSanitize').filter('linky', ['$sanitize', function($sanitize) {
-  var LINKY_URL_REGEXP =
-        /((ftp|https?):\/\/|(www\.)|(mailto:)?[A-Za-z0-9._%+-]+@)\S*[^\s.;,(){}<>"\u201d\u2019]/i,
-      MAILTO_REGEXP = /^mailto:/i;
-
-  return function(text, target) {
-    if (!text) return text;
-    var match;
-    var raw = text;
-    var html = [];
-    var url;
-    var i;
-    while ((match = raw.match(LINKY_URL_REGEXP))) {
-      // We can not end in these as they are sometimes found at the end of the sentence
-      url = match[0];
-      // if we did not match ftp/http/www/mailto then assume mailto
-      if (!match[2] && !match[4]) {
-        url = (match[3] ? 'http://' : 'mailto:') + url;
-      }
-      i = match.index;
-      addText(raw.substr(0, i));
-      addLink(url, match[0].replace(MAILTO_REGEXP, ''));
-      raw = raw.substring(i + match[0].length);
-    }
-    addText(raw);
-    return $sanitize(html.join(''));
-
-    function addText(text) {
-      if (!text) {
-        return;
-      }
-      html.push(sanitizeText(text));
-    }
-
-    function addLink(url, text) {
-      html.push('<a ');
-      if (angular.isDefined(target)) {
-        html.push('target="',
-                  target,
-                  '" ');
-      }
-      html.push('href="',
-                url.replace(/"/g, '&quot;'),
-                '">');
-      addText(text);
-      html.push('</a>');
-    }
-  };
-}]);
-
-
-})(window, window.angular);
-
 /*!
  * jQuery JavaScript Library v3.2.1
  * https://jquery.com/
@@ -23483,7 +22480,7 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
 
     this.changeCellText = function (event, $table, $column,db_table,db_ID,$length) {
         event.stopPropagation();
-
+        var tempValue = $table[$column];
         var success  = function(response){
           $mdToast.show({
           hideDelay   : 4000,
@@ -23500,6 +22497,7 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
         };
 
         var failure  = function(response){
+          $table[$column] = tempValue;
           $mdToast.show({
           hideDelay   : 9000,
           position    : 'top center',
@@ -24311,38 +23309,161 @@ function parseValue(value, type) {
 
 })();
 
-angular.module('SE_App').factory('$domains', ['$resource', function ($resource) {
+angular.module('SE_App').controller('change_logController', ['$mdDialog','$change_log', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $change_log, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
+  'use strict';
+
+  var bookmark;
+  $scope.$firstSpan = '<span class="firstSpan">';
+  $scope.$secondSpan = '<span class="secondSpan">';
+  $scope.$file = 'change_log.csv';
+  $scope.$header = ['issue','date_entered','completed','change_log_ID','person_ID','first_name','last_name'];
+  $scope.$location = '/service/change_log';
+
+
+  $scope.selected = [];
+
+  $scope.filter = {
+    options: {
+      debounce: 500
+    }
+  };
+
+  $scope.query = {
+    filter: '',
+    limit: '15',
+    order: ['date_entered','completed'],
+    page: 1
+  };
+
+  $scope.dbTableInfo = {
+    db_table:'change_log',
+    db_ID:'change_log_ID',
+    //table:hosting_table,
+  };
+
+  function success(change_log_tables) {
+    angular.forEach(change_log_tables.data,function(row){
+      // row.d
+      var date_entered_parts = row.date_entered.split("-");
+      row.date_entered = new Date(parseInt(date_entered_parts[0]),
+                                    parseInt(date_entered_parts[1])-1,
+                                    parseInt(date_entered_parts[2]));
+    });
+    $scope.change_log_tables = change_log_tables;
+  }
+
+  $scope.bulkUpload = function (event) {
+    $mdDialog.show({
+      clickOutsideToClose: true,
+      controller: 'bulkUploadController',
+      controllerAs: 'ctrl',
+      focusOnOpen: false,
+      targetEvent: event,
+      templateUrl: 'inc/bulk_upload.html',
+    }).then($scope.getChangeLog);
+  };
+
+  $scope.addItem = function (event) {
+    $mdDialog.show({
+      clickOutsideToClose: true,
+      controller: 'addChange_logController',
+      controllerAs: 'ctrl',
+      focusOnOpen: false,
+      targetEvent: event,
+      templateUrl: 'tabs/changeLog/addchange_logDialog.html',
+    }).then($scope.getChangeLog);
+  };
+
+  $scope.delete = function (event) {
+    $mdDialog.show({
+      clickOutsideToClose: true,
+      controller: 'deleteChange_logController',
+      controllerAs: 'ctrl',
+      focusOnOpen: false,
+      targetEvent: event,
+      locals: { change_log_tables: $scope.selected },
+      templateUrl: 'inc/delete.html',
+    }).then($scope.getChangeLog);
+  };
+
+  $scope.getChangeLog = function () {
+    $scope.promise = $change_log.change_log_tables.get($scope.query, success).$promise;
+  };
+
+  $scope.removeFilter = function () {
+    $scope.filter.show = false;
+    $scope.query.filter = '';
+
+    if($scope.filter.form.$dirty) {
+      $scope.filter.form.$setPristine();
+    }
+  };
+
+  $scope.$watch('query.filter', function (newValue, oldValue) {
+    if(!oldValue) {
+      bookmark = $scope.query.page;
+    }
+
+    if(newValue !== oldValue) {
+      $scope.query.page = 1;
+    }
+
+    if(!newValue) {
+      $scope.query.page = bookmark;
+    }
+
+    $scope.getChangeLog();
+  });
+
+  $scope.changeCellText = changeCellServices.changeCellText;
+  $scope.changeDate = changeCellServices.changeDate;
+  $scope.changeDropdown = changeCellServices.changeDropdown;
+  $scope.changeSwitchValue = changeCellServices.changeSwitchValue;
+  $scope.bulkDownload = upDownloadService.bulkDownload;
+
+
+  $scope.date_entered = function(change_log_table){
+    var dateFromDataBase = change_log_table.date_entered;
+    dateFromDataBase = new Date(dateFromDataBase);
+    return dateFromDataBase;
+  };
+
+
+  $scope.getOwnersFunc = function(){
+  	$http.get('service/getowners')
+  		.then(function(response){
+  	$scope.getOwners = response.data;
+  	});
+  };
+
+}]);
+
+angular.module('SE_App').factory('$change_log', ['$resource', function ($resource) {
   'use strict';
 
   return {
-    domains_tables: $resource('/service/domains')
+    change_log_tables: $resource('/service/change_log')
   };
 }]);
 
 //===========================================================
 
-angular.module('SE_App').controller('addDomainController', ['$mdDialog', '$domains', '$scope' , '$http', '$q','$mdToast',function ($mdDialog, $domains, $scope, $http, $q,$mdToast) {
+angular.module('SE_App').controller('addChange_logController', ['$mdDialog', '$change_log', '$scope' , '$http', '$q','$mdToast', function ($mdDialog, $change_log, $scope, $http, $q, $mdToast) {
   'use strict';
-$scope.myDate = null;
 
-$scope.getHostsFunc = function(){
-	$http.get('service/gethosts')
-.then(function(response){
-	$scope.getHosts = response.data;
-	});
-};
 
-$scope.getRegistrarsFunc = function(){
-	$http.get('service/getregistrars')
+$scope.myDate = new Date();
+
+$scope.getOwnersFunc = function(){
+	$http.get('service/getowners')
 		.then(function(response){
-
-	$scope.getRegistrars = response.data;
+	$scope.getOwners = response.data;
 	});
 };
 
   this.cancel = $mdDialog.cancel;
 
-  function success(domains_table) {
+  function success(change_log_table) {
     $mdToast.show({
       hideDelay   : 4000,
       position    : 'top center',
@@ -24355,44 +23476,37 @@ $scope.getRegistrarsFunc = function(){
            }
          }
       });
-    $mdDialog.hide(domains_table);
+    $mdDialog.hide(change_log_table);
   }
 
     function fedup(response){
-      $mdToast.show({
-        hideDelay   : 9000,
-        position    : 'top center',
-        controller  : 'ToastCtrl',
-        templateUrl : '/partials/toast-template.html',
-        toastClass  : 'toastDanger',
-        resolve: {
-             $response: function () {
-               return response.data;
-             }
+  	//console.log('FAILED!',data);
+    $mdToast.show({
+      hideDelay   : 9000,
+      position    : 'top center',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      toastClass  : 'toastDanger',
+      resolve: {
+           $response: function () {
+             return response.data;
            }
-        });
+         }
+      });
   }
+
 
   this.addItem = function () {
     $scope.item.form.$setSubmitted();
 
-    var data = angular.copy($scope.domains_table);
-    if(data.expiration_date == null){
-      data.expiration_date = null;
-    } else {
-    data.date_purchased = data.date_purchased.getFullYear()+"-"+
-                          ("0"+(data.date_purchased.getMonth()+1)).slice(-2)+"-"+
-                          ("0"+data.date_purchased.getDate()).slice(-2);
-          }
-            if(data.expiration_date == null){
-              data.expiration_date = null;
-            } else {
-    data.expiration_date = data.expiration_date.getFullYear()+"-"+
-                          ("0"+(data.expiration_date.getMonth()+1)).slice(-2)+"-"+
-                          ("0"+data.expiration_date.getDate()).slice(-2);
-                        }
+    var data = angular.copy($scope.change_log_table);
+    data.date_entered = data.date_entered.getFullYear()+"-"+
+                          ("0"+(data.date_entered.getMonth()+1)).slice(-2)+"-"+
+                          ("0"+data.date_entered.getDate()).slice(-2);
+
+
     if($scope.item.form.$valid) {
-      $domains.domains_tables.save({domains_table: data}, success, fedup);
+      $change_log.change_log_tables.save({change_log_table: data}, success, fedup);
     }
   };
 
@@ -24400,16 +23514,17 @@ $scope.getRegistrarsFunc = function(){
 
 // =======================================================
 
-angular.module('SE_App').controller('deleteDomainController', ['$authorize', 'domains_tables', '$mdDialog', '$domains', '$scope', '$q', '$mdToast',function ($authorize, domains_tables, $mdDialog, $domains, $scope, $q,$mdToast) {
+angular.module('SE_App').controller('deleteChange_logController', ['$authorize', 'change_log_tables', '$mdDialog', '$change_log', '$scope', '$q', '$mdToast',function ($authorize, change_log_tables, $mdDialog, $change_log, $scope, $q,$mdToast) {
   'use strict';
 
   this.cancel = $mdDialog.cancel;
 
-  function deleteDessert(domains_table, index) {
-    var deferred = $domains.domains_tables.remove({id: domains_table.domain_ID}, success, error);
+  function deleteDessert(change_log_table, index) {
+    var deferred = $change_log.change_log_tables.remove({id: change_log_table.change_log_ID}, success, error);
+
 
     deferred.$promise.then(function () {
-      domains_tables.splice(index, 1);
+      change_log_tables.splice(index, 1);
     });
 
     return deferred.$promise;
@@ -24419,40 +23534,301 @@ angular.module('SE_App').controller('deleteDomainController', ['$authorize', 'do
     $mdDialog.hide();
   }
 
-function success() {
-  $mdToast.show({
-    hideDelay   : 4000,
-    position    : 'top center',
-    controller  : 'ToastCtrl',
-    templateUrl : '/partials/toast-template.html',
-    toastClass  : 'toastSuccess',
-    resolve: {
-         $response: function () {
-           return 'Successfully Deleted';
+  function success() {
+    $mdToast.show({
+      hideDelay   : 4000,
+      position    : 'top center',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      toastClass  : 'toastSuccess',
+      resolve: {
+           $response: function () {
+             return 'Successfully Deleted';
+           }
          }
-       }
-    });
+      });
+    }
+
+  function error(response) {
+    $mdToast.show({
+      hideDelay   : 9000,
+      position    : 'top center',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      toastClass  : 'toastDanger',
+      resolve: {
+           $response: function () {
+             return response.data;
+           }
+         }
+      });
+    }
+    this.authorizeUser = function () {
+      $q.all(change_log_tables.forEach(deleteDessert)).then(onComplete);
+    };
+
+  }]);
+
+// =======================================================
+
+angular.module('SE_App').controller('bulkUploadController', ['$mdDialog', '$change_log', '$scope' , '$http', '$q','$mdToast', function ($mdDialog, $change_log, $scope, $http, $q, $mdToast) {
+  'use strict';
+
+  this.cancel = $mdDialog.cancel;
+
+  function success(change_log_table) {
+    $mdToast.create({
+      className: 'success',
+      content: 'Successfully Deleted',
+      dismissButton: 'true'
+      });
+    $mdDialog.hide(change_log_table);
   }
 
-function error(response) {
-  $mdToast.show({
-    hideDelay   : 9000,
-    position    : 'top center',
-    controller  : 'ToastCtrl',
-    templateUrl : '/partials/toast-template.html',
-    toastClass  : 'toastDanger',
-    resolve: {
-         $response: function () {
-           return response.data;
-         }
-       }
-    });
+    function fedup(response){
+  	//console.log('FAILED!',data);
+    $mdToast.create({
+      className: 'danger toasthome',
+      content: response.data,
+      dismissButton: 'true',
+      timeout: 9000
+      });
   }
-  this.authorizeUser = function () {
-    $q.all(domains_tables.forEach(deleteDessert)).then(onComplete);
+
+
+}])
+;
+
+//  =========================================================
+
+angular.module('SE_App').controller('cms_loginController', ['$mdDialog','$cms_login', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $cms_login, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
+  'use strict';
+
+  var bookmark;
+      $scope.$on('locationUpdate', function (event, data) {
+	  if(data.location == 'cms_login'){
+	  	$scope.getDesserts();
+	  }
+  });
+
+  $scope.$file = 'cms_login.csv';
+  $scope.$header = ['install_site_url_name','login_url','username','password','recovery_email','cpanel_url','cpanel_username','cpanel_password','domain_ID','install_site_url_ID','domain_name'];
+  $scope.$location = '/service/cms_login';
+
+  $scope.selected = [];
+
+  $scope.filter = {
+    options: {
+      debounce: 500
+    }
+  };
+
+  $scope.query = {
+    filter: '',
+    limit: '15',
+    order: 'install_site_url_name',
+    page: 1,
+  };
+
+  $scope.dbTableInfo = {
+    db_table:'cms_login',
+    db_ID:'install_site_url_ID',
+    //table:hosting_table,
+  };
+
+  function success(cms_login_tables) {
+    $scope.cms_login_tables = cms_login_tables;
+  }
+
+  $scope.addItem = function (event) {
+    $mdDialog.show({
+      clickOutsideToClose: true,
+      controller: 'addCMSController',
+      controllerAs: 'ctrl',
+      focusOnOpen: false,
+      targetEvent: event,
+      templateUrl: 'tabs/cmsLogin/addCms_loginDialog.html',
+    }).then($scope.getDesserts);
+  };
+
+  $scope.delete = function (event) {
+    $mdDialog.show({
+      clickOutsideToClose: true,
+      controller: 'deleteCMSController',
+      controllerAs: 'ctrl',
+      focusOnOpen: false,
+      targetEvent: event,
+      locals: { cms_login_tables: $scope.selected },
+      templateUrl: 'inc/delete.html',
+    }).then($scope.getDesserts);
+  };
+
+  $scope.getDesserts = function () {
+    $scope.promise = $cms_login.cms_login_tables.get($scope.query, success).$promise;
+  };
+
+  $scope.removeFilter = function () {
+    $scope.filter.show = false;
+    $scope.query.filter = '';
+
+    if($scope.filter.form.$dirty) {
+      $scope.filter.form.$setPristine();
+    }
+  };
+
+  $scope.$watch('query.filter', function (newValue, oldValue) {
+    if(!oldValue) {
+      bookmark = $scope.query.page;
+    }
+
+    if(newValue !== oldValue) {
+      $scope.query.page = 1;
+    }
+
+    if(!newValue) {
+      $scope.query.page = bookmark;
+    }
+
+    $scope.getDesserts();
+  });
+
+  $scope.changeCellText = changeCellServices.changeCellText;
+  $scope.changeDropdown = changeCellServices.changeDropdown;
+  $scope.bulkDownload = upDownloadService.bulkDownload;
+
+$scope.getDomainsFunc = function(){
+	$http.get('service/getdomains')
+.then(function(response){
+	$scope.getDomains = response.data;
+	});
+};
+
+}]);
+
+angular.module('SE_App').factory('$cms_login', ['$resource', function ($resource) {
+  'use strict';
+
+  return {
+    cms_login_tables: $resource('/service/cms_login')
+  };
+}]);
+
+//===========================================================
+
+angular.module('SE_App').controller('addCMSController', ['$mdDialog', '$cms_login', '$scope' , '$http', '$q', '$mdToast',function ($mdDialog, $cms_login, $scope, $http, $q, $mdToast) {
+  'use strict';
+
+
+$scope.myDate = new Date();
+
+$scope.getDomainsFunc = function(){
+	$http.get('service/getdomains')
+.then(function(response){
+	$scope.getDomains = response.data;
+	});
+};
+
+  this.cancel = $mdDialog.cancel;
+
+  function success(cms_login_table) {
+    $mdToast.show({
+      hideDelay   : 4000,
+      position    : 'top center',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      toastClass  : 'toastSuccess',
+      resolve: {
+           $response: function () {
+             return 'New Content Added';
+           }
+         }
+      });
+    $mdDialog.hide(cms_login_table);
+  }
+
+
+    function fedup(response){
+  	//console.log('FAILED!',data);
+    $mdToast.show({
+      hideDelay   : 9000,
+      position    : 'top center',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      toastClass  : 'toastDanger',
+      resolve: {
+           $response: function () {
+             return response.data;
+           }
+         }
+      });
+  }
+
+  this.addItem = function () {
+    $scope.item.form.$setSubmitted();
+    if($scope.item.form.$valid) {
+
+      $cms_login.cms_login_tables.save({cms_login_table: $scope.cms_login_table}, success, fedup);
+    }
   };
 
 }]);
+
+// =======================================================
+
+angular.module('SE_App').controller('deleteCMSController', ['$authorize', 'cms_login_tables', '$mdDialog', '$cms_login', '$scope', '$q', '$mdToast',function ($authorize, cms_login_tables, $mdDialog, $cms_login, $scope, $q, $mdToast) {
+  'use strict';
+
+  this.cancel = $mdDialog.cancel;
+
+  function deleteDessert(cms_login_table, index) {
+    var deferred = $cms_login.cms_login_tables.remove({id: cms_login_table.install_site_url_ID}, success, error);
+
+
+    deferred.$promise.then(function () {
+      cms_login_tables.splice(index, 1);
+    });
+
+    return deferred.$promise;
+  }
+
+  function onComplete() {
+    $mdDialog.hide();
+  }
+
+  function success() {
+    $mdToast.show({
+      hideDelay   : 4000,
+      position    : 'top center',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      toastClass  : 'toastSuccess',
+      resolve: {
+           $response: function () {
+             return 'Successfully Deleted';
+           }
+         }
+      });
+    }
+
+  function error(response) {
+    $mdToast.show({
+      hideDelay   : 9000,
+      position    : 'top center',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      toastClass  : 'toastDanger',
+      resolve: {
+           $response: function () {
+             return response.data;
+           }
+         }
+      });
+    }
+    this.authorizeUser = function () {
+      $q.all(cms_login_tables.forEach(deleteDessert)).then(onComplete);
+    };
+
+  }]);
 
 
 angular.module('SE_App').controller('domainController', ['$mdDialog','$domains', '$scope', '$mdEditDialog', '$http','$mdToast',
@@ -24461,6 +23837,7 @@ function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q,changeCe
   'use strict';
 
   var bookmark;
+
 
   $scope.$file = 'domains.csv';
   $scope.$header = ['domain_name','ip_address','nameserver_1','ns1_IP','nameserver_2','ns2_IP','nameserver_3','ns3_IP','date_purchased','expiration_date','registrar_ID','hosting_ID','registrar_301','registrar_301_target','whois_protected','domain_ID','registrar_name','hosting_name'];
@@ -24606,23 +23983,38 @@ $scope.getRegistrarsFunc = function(){
 
 }]);
 
-angular.module('SE_App').factory('$hosting', ['$resource', function ($resource) {
+angular.module('SE_App').factory('$domains', ['$resource', function ($resource) {
   'use strict';
 
   return {
-    hosting_tables: $resource('/service/hosting')
+    domains_tables: $resource('/service/domains')
   };
 }]);
 
 //===========================================================
 
-angular.module('SE_App').controller('addHostingController', ['$mdDialog', '$hosting', '$scope' , '$http', '$mdToast',function ($mdDialog, $hosting, $scope, $http, $mdToast) {
+angular.module('SE_App').controller('addDomainController', ['$mdDialog', '$domains', '$scope' , '$http', '$q','$mdToast',function ($mdDialog, $domains, $scope, $http, $q,$mdToast) {
   'use strict';
 $scope.myDate = null;
 
+$scope.getHostsFunc = function(){
+	$http.get('service/gethosts')
+.then(function(response){
+	$scope.getHosts = response.data;
+	});
+};
+
+$scope.getRegistrarsFunc = function(){
+	$http.get('service/getregistrars')
+		.then(function(response){
+
+	$scope.getRegistrars = response.data;
+	});
+};
+
   this.cancel = $mdDialog.cancel;
 
-  function success(hosting_table) {
+  function success(domains_table) {
     $mdToast.show({
       hideDelay   : 4000,
       position    : 'top center',
@@ -24635,36 +24027,34 @@ $scope.myDate = null;
            }
          }
       });
-    $mdDialog.hide(hosting_table);
+    $mdDialog.hide(domains_table);
   }
 
     function fedup(response){
-  	//console.log('FAILED!',data);
-    $mdToast.show({
-      hideDelay   : 9000,
-      position    : 'top center',
-      controller  : 'ToastCtrl',
-      templateUrl : '/partials/toast-template.html',
-      toastClass  : 'toastDanger',
-      resolve: {
-           $response: function () {
-             return response.data;
+      $mdToast.show({
+        hideDelay   : 9000,
+        position    : 'top center',
+        controller  : 'ToastCtrl',
+        templateUrl : '/partials/toast-template.html',
+        toastClass  : 'toastDanger',
+        resolve: {
+             $response: function () {
+               return response.data;
+             }
            }
-         }
-      });
+        });
   }
-
 
   this.addItem = function () {
     $scope.item.form.$setSubmitted();
 
-    var data = angular.copy($scope.hosting_table);
-    if(data.date_started == null){
-      data.date_started = null;
+    var data = angular.copy($scope.domains_table);
+    if(data.expiration_date == null){
+      data.expiration_date = null;
     } else {
-    data.date_started = data.date_started.getFullYear()+"-"+
-                          ("0"+(data.date_started.getMonth()+1)).slice(-2)+"-"+
-                          ("0"+data.date_started.getDate()).slice(-2);
+    data.date_purchased = data.date_purchased.getFullYear()+"-"+
+                          ("0"+(data.date_purchased.getMonth()+1)).slice(-2)+"-"+
+                          ("0"+data.date_purchased.getDate()).slice(-2);
           }
             if(data.expiration_date == null){
               data.expiration_date = null;
@@ -24674,7 +24064,7 @@ $scope.myDate = null;
                           ("0"+data.expiration_date.getDate()).slice(-2);
                         }
     if($scope.item.form.$valid) {
-      $hosting.hosting_tables.save({hosting_table: data}, success, fedup);
+      $domains.domains_tables.save({domains_table: data}, success, fedup);
     }
   };
 
@@ -24682,16 +24072,16 @@ $scope.myDate = null;
 
 // =======================================================
 
-angular.module('SE_App').controller('deleteHostingController', ['$authorize', 'hosting_tables', '$mdDialog', '$hosting', '$scope', '$q', '$mdToast',function ($authorize, hosting_tables, $mdDialog, $hosting, $scope, $q, $mdToast) {
+angular.module('SE_App').controller('deleteDomainController', ['$authorize', 'domains_tables', '$mdDialog', '$domains', '$scope', '$q', '$mdToast',function ($authorize, domains_tables, $mdDialog, $domains, $scope, $q,$mdToast) {
   'use strict';
 
   this.cancel = $mdDialog.cancel;
 
-  function deleteDessert(hosting_table, index) {
-    var deferred = $hosting.hosting_tables.remove({id: hosting_table.hosting_ID}, success, error);
+  function deleteDessert(domains_table, index) {
+    var deferred = $domains.domains_tables.remove({id: domains_table.domain_ID}, success, error);
 
     deferred.$promise.then(function () {
-      hosting_tables.splice(index, 1);
+      domains_tables.splice(index, 1);
     });
 
     return deferred.$promise;
@@ -24701,40 +24091,40 @@ angular.module('SE_App').controller('deleteHostingController', ['$authorize', 'h
     $mdDialog.hide();
   }
 
-  function success() {
-    $mdToast.show({
-      hideDelay   : 4000,
-      position    : 'top center',
-      controller  : 'ToastCtrl',
-      templateUrl : '/partials/toast-template.html',
-      toastClass  : 'toastSuccess',
-      resolve: {
-           $response: function () {
-             return 'Successfully Deleted';
-           }
+function success() {
+  $mdToast.show({
+    hideDelay   : 4000,
+    position    : 'top center',
+    controller  : 'ToastCtrl',
+    templateUrl : '/partials/toast-template.html',
+    toastClass  : 'toastSuccess',
+    resolve: {
+         $response: function () {
+           return 'Successfully Deleted';
          }
-      });
-    }
+       }
+    });
+  }
 
-  function error(response) {
-    $mdToast.show({
-      hideDelay   : 9000,
-      position    : 'top center',
-      controller  : 'ToastCtrl',
-      templateUrl : '/partials/toast-template.html',
-      toastClass  : 'toastDanger',
-      resolve: {
-           $response: function () {
-             return response.data;
-           }
+function error(response) {
+  $mdToast.show({
+    hideDelay   : 9000,
+    position    : 'top center',
+    controller  : 'ToastCtrl',
+    templateUrl : '/partials/toast-template.html',
+    toastClass  : 'toastDanger',
+    resolve: {
+         $response: function () {
+           return response.data;
          }
-      });
-    }
-    this.authorizeUser = function () {
-      $q.all(hosting_tables.forEach(deleteDessert)).then(onComplete);
-    };
+       }
+    });
+  }
+  this.authorizeUser = function () {
+    $q.all(domains_tables.forEach(deleteDessert)).then(onComplete);
+  };
 
-  }]);
+}]);
 
 angular.module('SE_App').controller('hostingController', ['$mdDialog','$hosting', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $hosting, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
   'use strict';
@@ -24877,30 +24267,23 @@ $scope.expiration_date = function(hosting_table){
 
 }]);
 
-angular.module('SE_App').factory('$registrar', ['$resource', function ($resource) {
+angular.module('SE_App').factory('$hosting', ['$resource', function ($resource) {
   'use strict';
 
   return {
-    registrar_tables: $resource('/service/registrar')
+    hosting_tables: $resource('/service/hosting')
   };
 }]);
 
 //===========================================================
 
-angular.module('SE_App').controller('addRegistrarController', ['$mdDialog', '$registrar', '$scope' , '$http', '$mdToast',function ($mdDialog, $registrar, $scope, $http, $mdToast) {
+angular.module('SE_App').controller('addHostingController', ['$mdDialog', '$hosting', '$scope' , '$http', '$mdToast',function ($mdDialog, $hosting, $scope, $http, $mdToast) {
   'use strict';
-$scope.myDate = new Date();
-
-$scope.getOwnersFunc = function(){
-	$http.get('service/getowners')
-		.then(function(response){
-	$scope.getOwners = response.data;
-	});
-};
+$scope.myDate = null;
 
   this.cancel = $mdDialog.cancel;
 
-  function success(registrar_table) {
+  function success(hosting_table) {
     $mdToast.show({
       hideDelay   : 4000,
       position    : 'top center',
@@ -24913,10 +24296,11 @@ $scope.getOwnersFunc = function(){
            }
          }
       });
-    $mdDialog.hide(registrar_table);
+    $mdDialog.hide(hosting_table);
   }
 
-  function fedup(response){
+    function fedup(response){
+  	//console.log('FAILED!',data);
     $mdToast.show({
       hideDelay   : 9000,
       position    : 'top center',
@@ -24931,11 +24315,27 @@ $scope.getOwnersFunc = function(){
       });
   }
 
+
   this.addItem = function () {
     $scope.item.form.$setSubmitted();
 
+    var data = angular.copy($scope.hosting_table);
+    if(data.date_started == null){
+      data.date_started = null;
+    } else {
+    data.date_started = data.date_started.getFullYear()+"-"+
+                          ("0"+(data.date_started.getMonth()+1)).slice(-2)+"-"+
+                          ("0"+data.date_started.getDate()).slice(-2);
+          }
+            if(data.expiration_date == null){
+              data.expiration_date = null;
+            } else {
+    data.expiration_date = data.expiration_date.getFullYear()+"-"+
+                          ("0"+(data.expiration_date.getMonth()+1)).slice(-2)+"-"+
+                          ("0"+data.expiration_date.getDate()).slice(-2);
+                        }
     if($scope.item.form.$valid) {
-      $registrar.registrar_tables.save({registrar_table: $scope.registrar_table}, success, fedup);
+      $hosting.hosting_tables.save({hosting_table: data}, success, fedup);
     }
   };
 
@@ -24943,17 +24343,16 @@ $scope.getOwnersFunc = function(){
 
 // =======================================================
 
-angular.module('SE_App').controller('deleteRegistrarController', ['$authorize', 'registrar_tables', '$mdDialog', '$registrar', '$scope', '$q', '$mdToast',function ($authorize, registrar_tables, $mdDialog, $registrar, $scope, $q,$mdToast) {
+angular.module('SE_App').controller('deleteHostingController', ['$authorize', 'hosting_tables', '$mdDialog', '$hosting', '$scope', '$q', '$mdToast',function ($authorize, hosting_tables, $mdDialog, $hosting, $scope, $q, $mdToast) {
   'use strict';
 
   this.cancel = $mdDialog.cancel;
 
-  function deleteDessert(registrar_table, index) {
-    var deferred = $registrar.registrar_tables.remove({id: registrar_table.registrar_ID}, success, error);
-
+  function deleteDessert(hosting_table, index) {
+    var deferred = $hosting.hosting_tables.remove({id: hosting_table.hosting_ID}, success, error);
 
     deferred.$promise.then(function () {
-      registrar_tables.splice(index, 1);
+      hosting_tables.splice(index, 1);
     });
 
     return deferred.$promise;
@@ -24993,23 +24392,18 @@ angular.module('SE_App').controller('deleteRegistrarController', ['$authorize', 
       });
     }
     this.authorizeUser = function () {
-      $q.all(registrar_tables.forEach(deleteDessert)).then(onComplete);
+      $q.all(hosting_tables.forEach(deleteDessert)).then(onComplete);
     };
 
   }]);
 
-
-
-
-angular.module('SE_App').controller('registrarController', ['$mdDialog','$registrar', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $registrar, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
+angular.module('SE_App').controller('linksController', ['$mdDialog','$links', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $links, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
   'use strict';
 
   var bookmark;
-  $scope.$firstSpan = '<span class="firstSpan">';
-  $scope.$secondSpan = '<span class="secondSpan">';
-  $scope.$file = 'registrar.csv';
-  $scope.$header = ['registrar_name','login_url','login_username','login_password','credit_card_last_4','registrar_ID','user_name','user_email'];
-  $scope.$location = '/service/registrar';
+  $scope.$file = 'links.csv';
+  $scope.$header = ['source_url','target_url','anchor_text','alt_text','follow_link','date_created','title','comment','link_ID'];
+  $scope.$location = '/service/links';
 
   $scope.selected = [];
 
@@ -25022,52 +24416,323 @@ angular.module('SE_App').controller('registrarController', ['$mdDialog','$regist
   $scope.query = {
     filter: '',
     limit: '15',
-    order: 'registrar_name',
+    order: 'source_url',
     page: 1,
   };
 
   $scope.dbTableInfo = {
-    db_table:'registrar',
-    db_ID:'registrar_ID',
+    db_table:'links',
+    db_ID:'link_ID',
     //table:hosting_table,
   };
 
-  function success(registrar_tables) {
-    $scope.registrar_tables = registrar_tables;
+  function success(links_tables) {
+    angular.forEach(links_tables.data,function(row){
+      // row.d
+      if(row.date_created == null){
+        row.date_created = null;
+      } else {
+        var date_created_parts = row.date_created.split("-");
+      row.date_created = new Date(parseInt(date_created_parts[0]),
+                                    parseInt(date_created_parts[1])-1,
+                                    parseInt(date_created_parts[2]));
+                                  }
+    });
+    $scope.links_tables = links_tables;
   }
 
   $scope.addItem = function (event) {
     $mdDialog.show({
       clickOutsideToClose: true,
-      controller: 'addRegistrarController',
+      controller: 'addLinksController',
+      controllerAs: 'ctrl',
+      focusOnOpen: false,
+      targetEvent: event,
+      templateUrl: 'tabs/links/addLinksDialog.html',
+    }).then($scope.getDesserts);
+  };
+
+  $scope.delete = function (event) {
+    $mdDialog.show({
+      clickOutsideToClose: true,
+      controller: 'deleteLinksController',
+      controllerAs: 'ctrl',
+      focusOnOpen: false,
+      targetEvent: event,
+      locals: { links_tables: $scope.selected },
+      templateUrl: 'inc/delete.html',
+    }).then($scope.getDesserts);
+  };
+
+  $scope.getDesserts = function () {
+    $scope.promise = $links.links_tables.get($scope.query, success).$promise;
+  };
+
+  $scope.removeFilter = function () {
+    $scope.filter.show = false;
+    $scope.query.filter = '';
+
+    if($scope.filter.form.$dirty) {
+      $scope.filter.form.$setPristine();
+    }
+  };
+
+  $scope.$watch('query.filter', function (newValue, oldValue) {
+    if(!oldValue) {
+      bookmark = $scope.query.page;
+    }
+
+    if(newValue !== oldValue) {
+      $scope.query.page = 1;
+    }
+
+    if(!newValue) {
+      $scope.query.page = bookmark;
+    }
+
+    $scope.getDesserts();
+  });
+
+  $scope.changeCellText = changeCellServices.changeCellText;
+
+  $scope.changeDate = changeCellServices.changeDate;
+
+  $scope.changeSwitchValue = changeCellServices.changeSwitchValue;
+    $scope.bulkDownload = upDownloadService.bulkDownload;
+
+
+  $scope.date_created = function(links_table){
+    var dateFromDataBase = links_table.date_created;
+    dateFromDataBase = new Date(dateFromDataBase);
+    return dateFromDataBase;
+  };
+
+
+}]);
+
+angular.module('SE_App').factory('$links', ['$resource', function ($resource) {
+  'use strict';
+
+  return {
+    links_tables: $resource('/service/links')
+  };
+}]);
+
+//===========================================================
+
+angular.module('SE_App').controller('addLinksController', ['$mdDialog', '$links', '$scope' , '$http', '$q','$mdToast',function ($mdDialog, $links, $scope, $http, $q, $mdToast) {
+  'use strict';
+
+$scope.myDate = null;
+
+$scope.getLinksFunc = function(){
+	$http.get('service/getlinks')
+		.then(function(response){
+	$scope.getLinks = response.data;
+	});
+};
+
+  this.cancel = $mdDialog.cancel;
+
+  function success(links_table) {
+    $mdToast.show({
+      hideDelay   : 4000,
+      position    : 'top center',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      toastClass  : 'toastSuccess',
+      resolve: {
+           $response: function () {
+             return 'New Content Added';
+           }
+         }
+      });
+    $mdDialog.hide(links_table);
+  }
+
+    function fedup(response){
+  	//console.log('FAILED!',data);
+    $mdToast.show({
+      hideDelay   : 9000,
+      position    : 'top center',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      toastClass  : 'toastDanger',
+      resolve: {
+           $response: function () {
+             return response.data;
+           }
+         }
+      });
+  }
+
+
+  this.addItem = function () {
+    $scope.item.form.$setSubmitted();
+
+    var data = angular.copy($scope.links_table);
+    if(data.date_created == null){
+      data.date_created = null;
+    } else {
+    data.date_created = data.date_created.getFullYear()+"-"+
+                          ("0"+(data.date_created.getMonth()+1)).slice(-2)+"-"+
+                          ("0"+data.date_created.getDate()).slice(-2);
+          }
+    if($scope.item.form.$valid) {
+      $links.links_tables.save({links_table: data}, success, fedup);
+    }
+  };
+
+}]);
+
+// =======================================================
+
+angular.module('SE_App').controller('deleteLinksController', ['$authorize', 'links_tables', '$mdDialog', '$links', '$scope', '$q', '$mdToast',function ($authorize, links_tables, $mdDialog, $links, $scope, $q,$mdToast) {
+  'use strict';
+
+  this.cancel = $mdDialog.cancel;
+
+  function deleteDessert(links_table, index) {
+    var deferred = $links.links_tables.remove({id: links_table.link_ID}, success, error);
+
+
+    deferred.$promise.then(function () {
+      links_tables.splice(index, 1);
+    });
+
+    return deferred.$promise;
+  }
+
+  function onComplete() {
+    $mdDialog.hide();
+  }
+
+  function success() {
+    $mdToast.show({
+      hideDelay   : 4000,
+      position    : 'top center',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      toastClass  : 'toastSuccess',
+      resolve: {
+           $response: function () {
+             return 'Successfully Deleted';
+           }
+         }
+      });
+    }
+
+  function error(response) {
+    $mdToast.show({
+      hideDelay   : 9000,
+      position    : 'top center',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      toastClass  : 'toastDanger',
+      resolve: {
+           $response: function () {
+             return response.data;
+           }
+         }
+      });
+    }
+    this.authorizeUser = function () {
+      $q.all(links_tables.forEach(deleteDessert)).then(onComplete);
+    };
+
+  }]);
+
+angular.module('SE_App').controller('personController', ['$mdDialog','$person', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService','$mdToast',function ($mdDialog, $person, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService,$mdToast) {
+  'use strict';
+
+  var bookmark;
+  $scope.$file = 'person.csv';
+  $scope.$header = ['user_name','user_email','user_address','user_phone','user_type','user_ID'];
+
+  $scope.$location = '/service/person';
+
+    $scope.$on('locationUpdate', function (event, data) {
+	  if(data.location == 'person'){
+	  	$scope.getDesserts();
+	  }
+  });
+
+  $scope.selected = [];
+
+  $scope.filter = {
+    options: {
+      debounce: 500
+    }
+  };
+
+  $scope.query = {
+    filter: '',
+    limit: '15',
+    order: 'user_name',
+    page: 1,
+  };
+
+  $scope.dbTableInfo = {
+    db_table:'registration',
+    db_ID:'user_ID',
+    //table:hosting_table,
+  };
+
+  function success(person_tables) {
+    $scope.person_tables = person_tables;
+  }
+
+  $scope.addItem = function (event) {
+    $mdDialog.show({
+      clickOutsideToClose: true,
+      controller: 'addPersonController',
       controllerAs: 'ctrl',
 	  skipHide: true,
       focusOnOpen: false,
       targetEvent: event,
-      templateUrl: 'tabs/registrar/addRegistrarDialog.html',
+      templateUrl: 'tabs/person/addPersonDialog.html',
     }).then($scope.getDesserts);
   };
 
   $scope.delete = function (event) {
     $mdDialog.show({
       clickOutsideToClose: true,
-      controller: 'deleteRegistrarController',
+      controller: 'deletePersonController',
       controllerAs: 'ctrl',
       focusOnOpen: false,
       targetEvent: event,
-      locals: { registrar_tables: $scope.selected },
+      locals: { person_tables: $scope.selected },
       templateUrl: 'inc/delete.html',
     }).then($scope.getDesserts);
   };
 
-  $scope.$on('locationUpdate', function (event, data) {
-	  if(data.location == 'registrars'){
-	  	$scope.getDesserts();
-	  }
-  });
+  $scope.addPwrd = function (event,$table,column,$value,db_table,db_ID,$email) {
+    var $obj = {};
+    $obj.email = $email;
+    $obj.table = db_table;
+    $obj.column = column;
+    $obj.value = $table[$value];
+    $obj.identifier = db_ID;
+    $obj.id = $table[db_ID];
+    $mdDialog.show({
+      clickOutsideToClose: true,
+      controller: 'getPwrdController',
+      controllerAs: 'ctrl',
+      skipHide: true,
+      focusOnOpen: false,
+      targetEvent: event,
+      templateUrl: '/partials/pwrd.html',
+      resolve:{
+        $object: function(){
+          return $obj;
+        }
+      }
+    }).then($scope.getDesserts)
+    ;
+  };
 
   $scope.getDesserts = function () {
-    $scope.promise = $registrar.registrar_tables.get($scope.query, success).$promise;
+    $scope.promise = $person.person_tables.get($scope.query, success).$promise;
   };
 
   $scope.removeFilter = function () {
@@ -25095,250 +24760,16 @@ angular.module('SE_App').controller('registrarController', ['$mdDialog','$regist
     $scope.getDesserts();
   });
 
-  $scope.changeCellText = changeCellServices.changeCellText;
 
-  $scope.changeDropdown = changeCellServices.changeDropdown;
+  $scope.changeCellText = changeCellServices.changeCellText;
     $scope.bulkDownload = upDownloadService.bulkDownload;
 
-//Below is changing the selection and Date Pickers
-
-$scope.getOwnersFunc = function(){
-	$http.get('service/getowners')
-		.then(function(response){
-	$scope.getOwners = response.data;
-	});
-};
-
-}]);
-
-angular.module('SE_App').factory('$W2_accounts', ['$resource', function ($resource) {
-  'use strict';
-
-  return {
-    W2_accounts_tables: $resource('/service/W2_accounts')
-  };
-}]);
-
-//===========================================================
-
-angular.module('SE_App').controller('addW2_AccountsController', ['$mdDialog', '$W2_accounts', '$scope' , '$http','$mdToast',function ($mdDialog, $W2_accounts, $scope, $http,$mdToast) {
-  'use strict';
-$scope.myDate = new Date();
-
-$scope.getOwnersFunc = function(){
-	$http.get('service/getowners')
-		.then(function(response){
-	$scope.getOwners = response.data;
-	});
-};
-
-  this.cancel = $mdDialog.cancel;
-
-  function success(W2_accounts_table) {
-    $mdToast.show({
-      hideDelay   : 4000,
-      position    : 'top center',
-      controller  : 'ToastCtrl',
-      templateUrl : '/partials/toast-template.html',
-      toastClass  : 'toastSuccess',
-      resolve: {
-           $response: function () {
-             return 'New Content Added';
-           }
-         }
-      });
-    $mdDialog.hide(W2_accounts_table);
-  }
-
-    function fedup(response){
-      $mdToast.show({
-      hideDelay   : 9000,
-      position    : 'top left',
-      controller  : 'ToastCtrl',
-      templateUrl : '/partials/toast-template.html',
-      resolve: {
-           $response: function () {
-             return response;
-           }
-         }
-      });
-  }
-
-  this.addItem = function () {
-    $scope.item.form.$setSubmitted();
-
-    if($scope.item.form.$valid) {
-      $W2_accounts.W2_accounts_tables.save({W2_accounts_table: $scope.W2_accounts_table}, success, fedup);
-    }
-  };
-
-}]);
-
-// =======================================================
-
-angular.module('SE_App').controller('deleteW2_AccountsController', ['W2_accounts_tables', '$mdDialog', '$W2_accounts', '$scope', '$q', '$mdToast',function (W2_accounts_tables, $mdDialog, $W2_accounts, $scope, $q,$mdToast) {
-  'use strict';
-
-  this.cancel = $mdDialog.cancel;
-
-  function deleteDessert(W2_accounts_table, index) {
-    var deferred = $W2_accounts.W2_accounts_tables.remove({id: W2_accounts_table.W2_ID}, success, error);
-
-    deferred.$promise.then(function () {
-      W2_accounts_tables.splice(index, 1);
+    $scope.getUserType = function(){
+    	$http.get('service/getusertype')
+    		.then(function(response){
+    	$scope.getUserT = response.data;
     });
-
-    return deferred.$promise;
-  }
-
-  function onComplete() {
-    $mdDialog.hide();
-  }
-
-  function success() {
-    $mdToast.show({
-      hideDelay   : 4000,
-      position    : 'top center',
-      controller  : 'ToastCtrl',
-      templateUrl : '/partials/toast-template.html',
-      toastClass  : 'toastSuccess',
-      resolve: {
-           $response: function () {
-             return 'Successfully Deleted';
-           }
-         }
-      });
-    }
-
-  function error(response) {
-    $mdToast.show({
-      hideDelay   : 9000,
-      position    : 'top center',
-      controller  : 'ToastCtrl',
-      templateUrl : '/partials/toast-template.html',
-      toastClass  : 'toastDanger',
-      resolve: {
-           $response: function () {
-             return response.data;
-           }
-         }
-      });
-    }
-    this.authorizeUser = function () {
-      $q.all(W2_accounts_tables.forEach(deleteDessert)).then(onComplete);
     };
-
-  }]);
-
-angular.module('SE_App').controller('W2_accountsController', ['$mdDialog','$W2_accounts', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $W2_accounts, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
-  'use strict';
-
-  var bookmark;
-  $scope.$firstSpan = '<span class="firstSpan">';
-  $scope.$secondSpan = '<span class="secondSpan">';
-  $scope.$file = 'W2_accounts.csv';
-  $scope.$header = ['login_url_name','login','password','account_url','attached_domain','W2_ID','user_name','user_email'];
-  $scope.$location = '/service/W2_accounts';
-
-    $scope.$on('locationUpdate', function (event, data) {
-	  if(data.location == 'W2_accounts'){
-	  	$scope.getDesserts();
-	  }
-  });
-
-
-  $scope.selected = [];
-
-  $scope.filter = {
-    options: {
-      debounce: 500
-    }
-  };
-
-  $scope.query = {
-    filter: '',
-    limit: '15',
-    order: 'login_url_name',
-    page: 1,
-  };
-
-  $scope.dbTableInfo = {
-    db_table:'W2_accounts',
-    db_ID:'W2_ID',
-    //table:hosting_table,
-  };
-
-  function success(W2_accounts_tables) {
-    $scope.W2_accounts_tables = W2_accounts_tables;
-  }
-
-  $scope.addItem = function (event) {
-    $mdDialog.show({
-      clickOutsideToClose: true,
-      controller: 'addW2_AccountsController',
-      controllerAs: 'ctrl',
-      focusOnOpen: false,
-      targetEvent: event,
-      templateUrl: 'tabs/w2Accounts/addW2_AccountsDialog.html',
-    }).then($scope.getDesserts);
-  };
-
-  $scope.delete = function (event) {
-    $mdDialog.show({
-      clickOutsideToClose: true,
-      controller: 'deleteW2_AccountsController',
-      controllerAs: 'ctrl',
-      focusOnOpen: false,
-      targetEvent: event,
-      locals: { W2_accounts_tables: $scope.selected },
-      templateUrl: 'inc/delete.html',
-    }).then($scope.getDesserts);
-  };
-
-  $scope.getDesserts = function () {
-    $scope.promise = $W2_accounts.W2_accounts_tables.get($scope.query, success).$promise;
-  };
-
-  $scope.removeFilter = function () {
-    $scope.filter.show = false;
-    $scope.query.filter = '';
-
-    if($scope.filter.form.$dirty) {
-      $scope.filter.form.$setPristine();
-    }
-  };
-
-  $scope.$watch('query.filter', function (newValue, oldValue) {
-    if(!oldValue) {
-      bookmark = $scope.query.page;
-    }
-
-    if(newValue !== oldValue) {
-      $scope.query.page = 1;
-    }
-
-    if(!newValue) {
-      $scope.query.page = bookmark;
-    }
-
-    $scope.getDesserts();
-  });
-
-  $scope.changeCellText = changeCellServices.changeCellText;
-
-  $scope.changeDropdown = changeCellServices.changeDropdown;
-    $scope.bulkDownload = upDownloadService.bulkDownload;
-
-//Below is changing the selection and Date Pickers
-
-$scope.getOwnersFunc = function(){
-	$http.get('service/getowners')
-		.then(function(response){
-	$scope.getOwners = response.data;
-	});
-};
-
-
 
 }]);
 
@@ -25530,20 +24961,18 @@ $scope.isHidden = $object.value;
 
 }]);
 
-angular.module('SE_App').controller('personController', ['$mdDialog','$person', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService','$mdToast',function ($mdDialog, $person, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService,$mdToast) {
+
+
+
+angular.module('SE_App').controller('registrarController', ['$mdDialog','$registrar', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $registrar, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
   'use strict';
 
   var bookmark;
-  $scope.$file = 'person.csv';
-  $scope.$header = ['user_name','user_email','user_address','user_phone','user_type','user_ID'];
-
-  $scope.$location = '/service/person';
-
-    $scope.$on('locationUpdate', function (event, data) {
-	  if(data.location == 'person'){
-	  	$scope.getDesserts();
-	  }
-  });
+  $scope.$firstSpan = '<span class="firstSpan">';
+  $scope.$secondSpan = '<span class="secondSpan">';
+  $scope.$file = 'registrar.csv';
+  $scope.$header = ['registrar_name','login_url','login_username','login_password','credit_card_last_4','registrar_ID','user_name','user_email'];
+  $scope.$location = '/service/registrar';
 
   $scope.selected = [];
 
@@ -25556,71 +24985,52 @@ angular.module('SE_App').controller('personController', ['$mdDialog','$person', 
   $scope.query = {
     filter: '',
     limit: '15',
-    order: 'user_name',
+    order: 'registrar_name',
     page: 1,
   };
 
   $scope.dbTableInfo = {
-    db_table:'registration',
-    db_ID:'user_ID',
+    db_table:'registrar',
+    db_ID:'registrar_ID',
     //table:hosting_table,
   };
 
-  function success(person_tables) {
-    $scope.person_tables = person_tables;
+  function success(registrar_tables) {
+    $scope.registrar_tables = registrar_tables;
   }
 
   $scope.addItem = function (event) {
     $mdDialog.show({
       clickOutsideToClose: true,
-      controller: 'addPersonController',
+      controller: 'addRegistrarController',
       controllerAs: 'ctrl',
 	  skipHide: true,
       focusOnOpen: false,
       targetEvent: event,
-      templateUrl: 'tabs/person/addPersonDialog.html',
+      templateUrl: 'tabs/registrar/addRegistrarDialog.html',
     }).then($scope.getDesserts);
   };
 
   $scope.delete = function (event) {
     $mdDialog.show({
       clickOutsideToClose: true,
-      controller: 'deletePersonController',
+      controller: 'deleteRegistrarController',
       controllerAs: 'ctrl',
       focusOnOpen: false,
       targetEvent: event,
-      locals: { person_tables: $scope.selected },
+      locals: { registrar_tables: $scope.selected },
       templateUrl: 'inc/delete.html',
     }).then($scope.getDesserts);
   };
 
-  $scope.addPwrd = function (event,$table,column,$value,db_table,db_ID,$email) {
-    var $obj = {};
-    $obj.email = $email;
-    $obj.table = db_table;
-    $obj.column = column;
-    $obj.value = $table[$value];
-    $obj.identifier = db_ID;
-    $obj.id = $table[db_ID];
-    $mdDialog.show({
-      clickOutsideToClose: true,
-      controller: 'getPwrdController',
-      controllerAs: 'ctrl',
-      skipHide: true,
-      focusOnOpen: false,
-      targetEvent: event,
-      templateUrl: '/partials/pwrd.html',
-      resolve:{
-        $object: function(){
-          return $obj;
-        }
-      }
-    }).then($scope.getDesserts)
-    ;
-  };
+  $scope.$on('locationUpdate', function (event, data) {
+	  if(data.location == 'registrars'){
+	  	$scope.getDesserts();
+	  }
+  });
 
   $scope.getDesserts = function () {
-    $scope.promise = $person.person_tables.get($scope.query, success).$promise;
+    $scope.promise = $registrar.registrar_tables.get($scope.query, success).$promise;
   };
 
   $scope.removeFilter = function () {
@@ -25648,45 +25058,46 @@ angular.module('SE_App').controller('personController', ['$mdDialog','$person', 
     $scope.getDesserts();
   });
 
-
   $scope.changeCellText = changeCellServices.changeCellText;
+
+  $scope.changeDropdown = changeCellServices.changeDropdown;
     $scope.bulkDownload = upDownloadService.bulkDownload;
 
-    $scope.getUserType = function(){
-    	$http.get('service/getusertype')
-    		.then(function(response){
-    	$scope.getUserT = response.data;
-    });
-    };
+//Below is changing the selection and Date Pickers
+
+$scope.getOwnersFunc = function(){
+	$http.get('service/getowners')
+		.then(function(response){
+	$scope.getOwners = response.data;
+	});
+};
 
 }]);
 
-angular.module('SE_App').factory('$cms_login', ['$resource', function ($resource) {
+angular.module('SE_App').factory('$registrar', ['$resource', function ($resource) {
   'use strict';
 
   return {
-    cms_login_tables: $resource('/service/cms_login')
+    registrar_tables: $resource('/service/registrar')
   };
 }]);
 
 //===========================================================
 
-angular.module('SE_App').controller('addCMSController', ['$mdDialog', '$cms_login', '$scope' , '$http', '$q', '$mdToast',function ($mdDialog, $cms_login, $scope, $http, $q, $mdToast) {
+angular.module('SE_App').controller('addRegistrarController', ['$mdDialog', '$registrar', '$scope' , '$http', '$mdToast',function ($mdDialog, $registrar, $scope, $http, $mdToast) {
   'use strict';
-
-
 $scope.myDate = new Date();
 
-$scope.getDomainsFunc = function(){
-	$http.get('service/getdomains')
-.then(function(response){
-	$scope.getDomains = response.data;
+$scope.getOwnersFunc = function(){
+	$http.get('service/getowners')
+		.then(function(response){
+	$scope.getOwners = response.data;
 	});
 };
 
   this.cancel = $mdDialog.cancel;
 
-  function success(cms_login_table) {
+  function success(registrar_table) {
     $mdToast.show({
       hideDelay   : 4000,
       position    : 'top center',
@@ -25699,12 +25110,10 @@ $scope.getDomainsFunc = function(){
            }
          }
       });
-    $mdDialog.hide(cms_login_table);
+    $mdDialog.hide(registrar_table);
   }
 
-
-    function fedup(response){
-  	//console.log('FAILED!',data);
+  function fedup(response){
     $mdToast.show({
       hideDelay   : 9000,
       position    : 'top center',
@@ -25721,9 +25130,9 @@ $scope.getDomainsFunc = function(){
 
   this.addItem = function () {
     $scope.item.form.$setSubmitted();
-    if($scope.item.form.$valid) {
 
-      $cms_login.cms_login_tables.save({cms_login_table: $scope.cms_login_table}, success, fedup);
+    if($scope.item.form.$valid) {
+      $registrar.registrar_tables.save({registrar_table: $scope.registrar_table}, success, fedup);
     }
   };
 
@@ -25731,17 +25140,17 @@ $scope.getDomainsFunc = function(){
 
 // =======================================================
 
-angular.module('SE_App').controller('deleteCMSController', ['$authorize', 'cms_login_tables', '$mdDialog', '$cms_login', '$scope', '$q', '$mdToast',function ($authorize, cms_login_tables, $mdDialog, $cms_login, $scope, $q, $mdToast) {
+angular.module('SE_App').controller('deleteRegistrarController', ['$authorize', 'registrar_tables', '$mdDialog', '$registrar', '$scope', '$q', '$mdToast',function ($authorize, registrar_tables, $mdDialog, $registrar, $scope, $q,$mdToast) {
   'use strict';
 
   this.cancel = $mdDialog.cancel;
 
-  function deleteDessert(cms_login_table, index) {
-    var deferred = $cms_login.cms_login_tables.remove({id: cms_login_table.install_site_url_ID}, success, error);
+  function deleteDessert(registrar_table, index) {
+    var deferred = $registrar.registrar_tables.remove({id: registrar_table.registrar_ID}, success, error);
 
 
     deferred.$promise.then(function () {
-      cms_login_tables.splice(index, 1);
+      registrar_tables.splice(index, 1);
     });
 
     return deferred.$promise;
@@ -25781,24 +25190,27 @@ angular.module('SE_App').controller('deleteCMSController', ['$authorize', 'cms_l
       });
     }
     this.authorizeUser = function () {
-      $q.all(cms_login_tables.forEach(deleteDessert)).then(onComplete);
+      $q.all(registrar_tables.forEach(deleteDessert)).then(onComplete);
     };
 
   }]);
 
-angular.module('SE_App').controller('cms_loginController', ['$mdDialog','$cms_login', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $cms_login, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
+angular.module('SE_App').controller('resource_loginController', ['$mdDialog','$resource_login', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $resource_login, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
   'use strict';
 
   var bookmark;
-      $scope.$on('locationUpdate', function (event, data) {
-	  if(data.location == 'cms_login'){
+  $scope.$firstSpan = '<span class="firstSpan">';
+  $scope.$secondSpan = '<span class="secondSpan">';
+  $scope.$file = 'resource_login.csv';
+  $scope.$header = ['resource_url_name','name_of_product','username','password','product_description','resource_url_ID','user_name','user_email'];
+  $scope.$location = '/service/resource_login';
+
+    $scope.$on('locationUpdate', function (event, data) {
+	  if(data.location == 'resource_login'){
 	  	$scope.getDesserts();
 	  }
   });
 
-  $scope.$file = 'cms_login.csv';
-  $scope.$header = ['install_site_url_name','login_url','username','password','recovery_email','cpanel_url','cpanel_username','cpanel_password','domain_ID','install_site_url_ID','domain_name'];
-  $scope.$location = '/service/cms_login';
 
   $scope.selected = [];
 
@@ -25811,45 +25223,45 @@ angular.module('SE_App').controller('cms_loginController', ['$mdDialog','$cms_lo
   $scope.query = {
     filter: '',
     limit: '15',
-    order: 'install_site_url_name',
+    order: 'resource_url_name',
     page: 1,
   };
 
   $scope.dbTableInfo = {
-    db_table:'cms_login',
-    db_ID:'install_site_url_ID',
+    db_table:'resource_login',
+    db_ID:'resource_url_ID',
     //table:hosting_table,
   };
 
-  function success(cms_login_tables) {
-    $scope.cms_login_tables = cms_login_tables;
+  function success(resource_login_tables) {
+    $scope.resource_login_tables = resource_login_tables;
   }
 
   $scope.addItem = function (event) {
     $mdDialog.show({
       clickOutsideToClose: true,
-      controller: 'addCMSController',
+      controller: 'addResource_loginController',
       controllerAs: 'ctrl',
       focusOnOpen: false,
       targetEvent: event,
-      templateUrl: 'tabs/cmsLogin/addCms_loginDialog.html',
+      templateUrl: 'tabs/resourceLogin/addResource_loginDialog.html',
     }).then($scope.getDesserts);
   };
 
   $scope.delete = function (event) {
     $mdDialog.show({
       clickOutsideToClose: true,
-      controller: 'deleteCMSController',
+      controller: 'deleteResource_loginController',
       controllerAs: 'ctrl',
       focusOnOpen: false,
       targetEvent: event,
-      locals: { cms_login_tables: $scope.selected },
+      locals: { resource_login_tables: $scope.selected },
       templateUrl: 'inc/delete.html',
     }).then($scope.getDesserts);
   };
 
   $scope.getDesserts = function () {
-    $scope.promise = $cms_login.cms_login_tables.get($scope.query, success).$promise;
+    $scope.promise = $resource_login.resource_login_tables.get($scope.query, success).$promise;
   };
 
   $scope.removeFilter = function () {
@@ -25878,13 +25290,18 @@ angular.module('SE_App').controller('cms_loginController', ['$mdDialog','$cms_lo
   });
 
   $scope.changeCellText = changeCellServices.changeCellText;
-  $scope.changeDropdown = changeCellServices.changeDropdown;
-  $scope.bulkDownload = upDownloadService.bulkDownload;
 
-$scope.getDomainsFunc = function(){
-	$http.get('service/getdomains')
-.then(function(response){
-	$scope.getDomains = response.data;
+  $scope.changeDropdown = changeCellServices.changeDropdown;
+    $scope.bulkDownload = upDownloadService.bulkDownload;
+
+
+//Below is changing the selection and Date Pickers
+
+
+$scope.getOwnersFunc = function(){
+	$http.get('service/getowners')
+		.then(function(response){
+	$scope.getOwners = response.data;
 	});
 };
 
@@ -26012,18 +25429,18 @@ angular.module('SE_App').controller('deleteResource_loginController', ['$authori
 
   }]);
 
-angular.module('SE_App').controller('resource_loginController', ['$mdDialog','$resource_login', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $resource_login, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
+angular.module('SE_App').controller('software_keysController', ['$mdDialog','$software_keys', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $software_keys, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
   'use strict';
 
   var bookmark;
   $scope.$firstSpan = '<span class="firstSpan">';
   $scope.$secondSpan = '<span class="secondSpan">';
-  $scope.$file = 'resource_login.csv';
-  $scope.$header = ['resource_url_name','name_of_product','username','password','product_description','resource_url_ID','user_name','user_email'];
-  $scope.$location = '/service/resource_login';
+  $scope.$file = 'software_keys.csv';
+  $scope.$header = ['software_name','license_key','serial_number','comments','software_keys_ID','first_name','last_name'];
+  $scope.$location = '/service/software_keys';
 
     $scope.$on('locationUpdate', function (event, data) {
-	  if(data.location == 'resource_login'){
+	  if(data.location == 'software_keys'){
 	  	$scope.getDesserts();
 	  }
   });
@@ -26040,45 +25457,45 @@ angular.module('SE_App').controller('resource_loginController', ['$mdDialog','$r
   $scope.query = {
     filter: '',
     limit: '15',
-    order: 'resource_url_name',
+    order: 'software_name',
     page: 1,
   };
 
   $scope.dbTableInfo = {
-    db_table:'resource_login',
-    db_ID:'resource_url_ID',
+    db_table:'software_keys',
+    db_ID:'software_keys_ID',
     //table:hosting_table,
   };
 
-  function success(resource_login_tables) {
-    $scope.resource_login_tables = resource_login_tables;
+  function success(software_keys_tables) {
+    $scope.software_keys_tables = software_keys_tables;
   }
 
   $scope.addItem = function (event) {
     $mdDialog.show({
       clickOutsideToClose: true,
-      controller: 'addResource_loginController',
+      controller: 'addSoftware_keysController',
       controllerAs: 'ctrl',
       focusOnOpen: false,
       targetEvent: event,
-      templateUrl: 'tabs/resourceLogin/addResource_loginDialog.html',
+      templateUrl: 'tabs/softwareKeys/addSoftware_keysDialog.html',
     }).then($scope.getDesserts);
   };
 
   $scope.delete = function (event) {
     $mdDialog.show({
       clickOutsideToClose: true,
-      controller: 'deleteResource_loginController',
+      controller: 'deleteSoftware_keysController',
       controllerAs: 'ctrl',
       focusOnOpen: false,
       targetEvent: event,
-      locals: { resource_login_tables: $scope.selected },
+      locals: { software_keys_tables: $scope.selected },
       templateUrl: 'inc/delete.html',
     }).then($scope.getDesserts);
   };
 
   $scope.getDesserts = function () {
-    $scope.promise = $resource_login.resource_login_tables.get($scope.query, success).$promise;
+    $scope.promise = $software_keys.software_keys_tables.get($scope.query, success).$promise;
   };
 
   $scope.removeFilter = function () {
@@ -26121,543 +25538,6 @@ $scope.getOwnersFunc = function(){
 	$scope.getOwners = response.data;
 	});
 };
-
-}]);
-
-angular.module('SE_App').factory('$links', ['$resource', function ($resource) {
-  'use strict';
-
-  return {
-    links_tables: $resource('/service/links')
-  };
-}]);
-
-//===========================================================
-
-angular.module('SE_App').controller('addLinksController', ['$mdDialog', '$links', '$scope' , '$http', '$q','$mdToast',function ($mdDialog, $links, $scope, $http, $q, $mdToast) {
-  'use strict';
-
-$scope.myDate = null;
-
-$scope.getLinksFunc = function(){
-	$http.get('service/getlinks')
-		.then(function(response){
-	$scope.getLinks = response.data;
-	});
-};
-
-  this.cancel = $mdDialog.cancel;
-
-  function success(links_table) {
-    $mdToast.show({
-      hideDelay   : 4000,
-      position    : 'top center',
-      controller  : 'ToastCtrl',
-      templateUrl : '/partials/toast-template.html',
-      toastClass  : 'toastSuccess',
-      resolve: {
-           $response: function () {
-             return 'New Content Added';
-           }
-         }
-      });
-    $mdDialog.hide(links_table);
-  }
-
-    function fedup(response){
-  	//console.log('FAILED!',data);
-    $mdToast.show({
-      hideDelay   : 9000,
-      position    : 'top center',
-      controller  : 'ToastCtrl',
-      templateUrl : '/partials/toast-template.html',
-      toastClass  : 'toastDanger',
-      resolve: {
-           $response: function () {
-             return response.data;
-           }
-         }
-      });
-  }
-
-
-  this.addItem = function () {
-    $scope.item.form.$setSubmitted();
-
-    var data = angular.copy($scope.links_table);
-    if(data.date_created == null){
-      data.date_created = null;
-    } else {
-    data.date_created = data.date_created.getFullYear()+"-"+
-                          ("0"+(data.date_created.getMonth()+1)).slice(-2)+"-"+
-                          ("0"+data.date_created.getDate()).slice(-2);
-          }
-    if($scope.item.form.$valid) {
-      $links.links_tables.save({links_table: data}, success, fedup);
-    }
-  };
-
-}]);
-
-// =======================================================
-
-angular.module('SE_App').controller('deleteLinksController', ['$authorize', 'links_tables', '$mdDialog', '$links', '$scope', '$q', '$mdToast',function ($authorize, links_tables, $mdDialog, $links, $scope, $q,$mdToast) {
-  'use strict';
-
-  this.cancel = $mdDialog.cancel;
-
-  function deleteDessert(links_table, index) {
-    var deferred = $links.links_tables.remove({id: links_table.link_ID}, success, error);
-
-
-    deferred.$promise.then(function () {
-      links_tables.splice(index, 1);
-    });
-
-    return deferred.$promise;
-  }
-
-  function onComplete() {
-    $mdDialog.hide();
-  }
-
-  function success() {
-    $mdToast.show({
-      hideDelay   : 4000,
-      position    : 'top center',
-      controller  : 'ToastCtrl',
-      templateUrl : '/partials/toast-template.html',
-      toastClass  : 'toastSuccess',
-      resolve: {
-           $response: function () {
-             return 'Successfully Deleted';
-           }
-         }
-      });
-    }
-
-  function error(response) {
-    $mdToast.show({
-      hideDelay   : 9000,
-      position    : 'top center',
-      controller  : 'ToastCtrl',
-      templateUrl : '/partials/toast-template.html',
-      toastClass  : 'toastDanger',
-      resolve: {
-           $response: function () {
-             return response.data;
-           }
-         }
-      });
-    }
-    this.authorizeUser = function () {
-      $q.all(links_tables.forEach(deleteDessert)).then(onComplete);
-    };
-
-  }]);
-
-angular.module('SE_App').controller('linksController', ['$mdDialog','$links', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $links, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
-  'use strict';
-
-  var bookmark;
-  $scope.$file = 'links.csv';
-  $scope.$header = ['source_url','target_url','anchor_text','alt_text','follow_link','date_created','title','comment','link_ID'];
-  $scope.$location = '/service/links';
-
-  $scope.selected = [];
-
-  $scope.filter = {
-    options: {
-      debounce: 500
-    }
-  };
-
-  $scope.query = {
-    filter: '',
-    limit: '15',
-    order: 'source_url',
-    page: 1,
-  };
-
-  $scope.dbTableInfo = {
-    db_table:'links',
-    db_ID:'link_ID',
-    //table:hosting_table,
-  };
-
-  function success(links_tables) {
-    angular.forEach(links_tables.data,function(row){
-      // row.d
-      if(row.date_created == null){
-        row.date_created = null;
-      } else {
-        var date_created_parts = row.date_created.split("-");
-      row.date_created = new Date(parseInt(date_created_parts[0]),
-                                    parseInt(date_created_parts[1])-1,
-                                    parseInt(date_created_parts[2]));
-                                  }
-    });
-    $scope.links_tables = links_tables;
-  }
-
-  $scope.addItem = function (event) {
-    $mdDialog.show({
-      clickOutsideToClose: true,
-      controller: 'addLinksController',
-      controllerAs: 'ctrl',
-      focusOnOpen: false,
-      targetEvent: event,
-      templateUrl: 'tabs/links/addLinksDialog.html',
-    }).then($scope.getDesserts);
-  };
-
-  $scope.delete = function (event) {
-    $mdDialog.show({
-      clickOutsideToClose: true,
-      controller: 'deleteLinksController',
-      controllerAs: 'ctrl',
-      focusOnOpen: false,
-      targetEvent: event,
-      locals: { links_tables: $scope.selected },
-      templateUrl: 'inc/delete.html',
-    }).then($scope.getDesserts);
-  };
-
-  $scope.getDesserts = function () {
-    $scope.promise = $links.links_tables.get($scope.query, success).$promise;
-  };
-
-  $scope.removeFilter = function () {
-    $scope.filter.show = false;
-    $scope.query.filter = '';
-
-    if($scope.filter.form.$dirty) {
-      $scope.filter.form.$setPristine();
-    }
-  };
-
-  $scope.$watch('query.filter', function (newValue, oldValue) {
-    if(!oldValue) {
-      bookmark = $scope.query.page;
-    }
-
-    if(newValue !== oldValue) {
-      $scope.query.page = 1;
-    }
-
-    if(!newValue) {
-      $scope.query.page = bookmark;
-    }
-
-    $scope.getDesserts();
-  });
-
-  $scope.changeCellText = changeCellServices.changeCellText;
-
-  $scope.changeDate = changeCellServices.changeDate;
-
-  $scope.changeSwitchValue = changeCellServices.changeSwitchValue;
-    $scope.bulkDownload = upDownloadService.bulkDownload;
-
-
-  $scope.date_created = function(links_table){
-    var dateFromDataBase = links_table.date_created;
-    dateFromDataBase = new Date(dateFromDataBase);
-    return dateFromDataBase;
-  };
-
-
-}]);
-
-angular.module('SE_App').factory('$change_log', ['$resource', function ($resource) {
-  'use strict';
-
-  return {
-    change_log_tables: $resource('/service/change_log')
-  };
-}]);
-
-//===========================================================
-
-angular.module('SE_App').controller('addChange_logController', ['$mdDialog', '$change_log', '$scope' , '$http', '$q','$mdToast', function ($mdDialog, $change_log, $scope, $http, $q, $mdToast) {
-  'use strict';
-
-
-$scope.myDate = new Date();
-
-$scope.getOwnersFunc = function(){
-	$http.get('service/getowners')
-		.then(function(response){
-	$scope.getOwners = response.data;
-	});
-};
-
-  this.cancel = $mdDialog.cancel;
-
-  function success(change_log_table) {
-    $mdToast.show({
-      hideDelay   : 4000,
-      position    : 'top center',
-      controller  : 'ToastCtrl',
-      templateUrl : '/partials/toast-template.html',
-      toastClass  : 'toastSuccess',
-      resolve: {
-           $response: function () {
-             return 'New Content Added';
-           }
-         }
-      });
-    $mdDialog.hide(change_log_table);
-  }
-
-    function fedup(response){
-  	//console.log('FAILED!',data);
-    $mdToast.show({
-      hideDelay   : 9000,
-      position    : 'top center',
-      controller  : 'ToastCtrl',
-      templateUrl : '/partials/toast-template.html',
-      toastClass  : 'toastDanger',
-      resolve: {
-           $response: function () {
-             return response.data;
-           }
-         }
-      });
-  }
-
-
-  this.addItem = function () {
-    $scope.item.form.$setSubmitted();
-
-    var data = angular.copy($scope.change_log_table);
-    data.date_entered = data.date_entered.getFullYear()+"-"+
-                          ("0"+(data.date_entered.getMonth()+1)).slice(-2)+"-"+
-                          ("0"+data.date_entered.getDate()).slice(-2);
-
-
-    if($scope.item.form.$valid) {
-      $change_log.change_log_tables.save({change_log_table: data}, success, fedup);
-    }
-  };
-
-}]);
-
-// =======================================================
-
-angular.module('SE_App').controller('deleteChange_logController', ['$authorize', 'change_log_tables', '$mdDialog', '$change_log', '$scope', '$q', '$mdToast',function ($authorize, change_log_tables, $mdDialog, $change_log, $scope, $q,$mdToast) {
-  'use strict';
-
-  this.cancel = $mdDialog.cancel;
-
-  function deleteDessert(change_log_table, index) {
-    var deferred = $change_log.change_log_tables.remove({id: change_log_table.change_log_ID}, success, error);
-
-
-    deferred.$promise.then(function () {
-      change_log_tables.splice(index, 1);
-    });
-
-    return deferred.$promise;
-  }
-
-  function onComplete() {
-    $mdDialog.hide();
-  }
-
-  function success() {
-    $mdToast.show({
-      hideDelay   : 4000,
-      position    : 'top center',
-      controller  : 'ToastCtrl',
-      templateUrl : '/partials/toast-template.html',
-      toastClass  : 'toastSuccess',
-      resolve: {
-           $response: function () {
-             return 'Successfully Deleted';
-           }
-         }
-      });
-    }
-
-  function error(response) {
-    $mdToast.show({
-      hideDelay   : 9000,
-      position    : 'top center',
-      controller  : 'ToastCtrl',
-      templateUrl : '/partials/toast-template.html',
-      toastClass  : 'toastDanger',
-      resolve: {
-           $response: function () {
-             return response.data;
-           }
-         }
-      });
-    }
-    this.authorizeUser = function () {
-      $q.all(change_log_tables.forEach(deleteDessert)).then(onComplete);
-    };
-
-  }]);
-
-// =======================================================
-
-angular.module('SE_App').controller('bulkUploadController', ['$mdDialog', '$change_log', '$scope' , '$http', '$q','$mdToast', function ($mdDialog, $change_log, $scope, $http, $q, $mdToast) {
-  'use strict';
-
-  this.cancel = $mdDialog.cancel;
-
-  function success(change_log_table) {
-    $mdToast.create({
-      className: 'success',
-      content: 'Successfully Deleted',
-      dismissButton: 'true'
-      });
-    $mdDialog.hide(change_log_table);
-  }
-
-    function fedup(response){
-  	//console.log('FAILED!',data);
-    $mdToast.create({
-      className: 'danger toasthome',
-      content: response.data,
-      dismissButton: 'true',
-      timeout: 9000
-      });
-  }
-
-
-}])
-;
-
-//  =========================================================
-
-angular.module('SE_App').controller('change_logController', ['$mdDialog','$change_log', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $change_log, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
-  'use strict';
-
-  var bookmark;
-  $scope.$firstSpan = '<span class="firstSpan">';
-  $scope.$secondSpan = '<span class="secondSpan">';
-  $scope.$file = 'change_log.csv';
-  $scope.$header = ['issue','date_entered','completed','change_log_ID','person_ID','first_name','last_name'];
-  $scope.$location = '/service/change_log';
-
-
-  $scope.selected = [];
-
-  $scope.filter = {
-    options: {
-      debounce: 500
-    }
-  };
-
-  $scope.query = {
-    filter: '',
-    limit: '15',
-    order: ['date_entered','completed'],
-    page: 1
-  };
-
-  $scope.dbTableInfo = {
-    db_table:'change_log',
-    db_ID:'change_log_ID',
-    //table:hosting_table,
-  };
-
-  function success(change_log_tables) {
-    angular.forEach(change_log_tables.data,function(row){
-      // row.d
-      var date_entered_parts = row.date_entered.split("-");
-      row.date_entered = new Date(parseInt(date_entered_parts[0]),
-                                    parseInt(date_entered_parts[1])-1,
-                                    parseInt(date_entered_parts[2]));
-    });
-    $scope.change_log_tables = change_log_tables;
-  }
-
-  $scope.bulkUpload = function (event) {
-    $mdDialog.show({
-      clickOutsideToClose: true,
-      controller: 'bulkUploadController',
-      controllerAs: 'ctrl',
-      focusOnOpen: false,
-      targetEvent: event,
-      templateUrl: 'inc/bulk_upload.html',
-    }).then($scope.getChangeLog);
-  };
-
-  $scope.addItem = function (event) {
-    $mdDialog.show({
-      clickOutsideToClose: true,
-      controller: 'addChange_logController',
-      controllerAs: 'ctrl',
-      focusOnOpen: false,
-      targetEvent: event,
-      templateUrl: 'tabs/changeLog/addchange_logDialog.html',
-    }).then($scope.getChangeLog);
-  };
-
-  $scope.delete = function (event) {
-    $mdDialog.show({
-      clickOutsideToClose: true,
-      controller: 'deleteChange_logController',
-      controllerAs: 'ctrl',
-      focusOnOpen: false,
-      targetEvent: event,
-      locals: { change_log_tables: $scope.selected },
-      templateUrl: 'inc/delete.html',
-    }).then($scope.getChangeLog);
-  };
-
-  $scope.getChangeLog = function () {
-    $scope.promise = $change_log.change_log_tables.get($scope.query, success).$promise;
-  };
-
-  $scope.removeFilter = function () {
-    $scope.filter.show = false;
-    $scope.query.filter = '';
-
-    if($scope.filter.form.$dirty) {
-      $scope.filter.form.$setPristine();
-    }
-  };
-
-  $scope.$watch('query.filter', function (newValue, oldValue) {
-    if(!oldValue) {
-      bookmark = $scope.query.page;
-    }
-
-    if(newValue !== oldValue) {
-      $scope.query.page = 1;
-    }
-
-    if(!newValue) {
-      $scope.query.page = bookmark;
-    }
-
-    $scope.getChangeLog();
-  });
-
-  $scope.changeCellText = changeCellServices.changeCellText;
-  $scope.changeDate = changeCellServices.changeDate;
-  $scope.changeDropdown = changeCellServices.changeDropdown;
-  $scope.changeSwitchValue = changeCellServices.changeSwitchValue;
-  $scope.bulkDownload = upDownloadService.bulkDownload;
-
-
-  $scope.date_entered = function(change_log_table){
-    var dateFromDataBase = change_log_table.date_entered;
-    dateFromDataBase = new Date(dateFromDataBase);
-    return dateFromDataBase;
-  };
-
-
-  $scope.getOwnersFunc = function(){
-  	$http.get('service/getowners')
-  		.then(function(response){
-  	$scope.getOwners = response.data;
-  	});
-  };
 
 }]);
 
@@ -26782,18 +25662,17 @@ angular.module('SE_App').controller('deleteSoftware_keysController', ['$authoriz
 
   }]);
 
-angular.module('SE_App').controller('software_keysController', ['$mdDialog','$software_keys', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $software_keys, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
+angular.module('SE_App').controller('url_dataController', ['$mdDialog','$url_data', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $url_data, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
   'use strict';
 
   var bookmark;
-  $scope.$firstSpan = '<span class="firstSpan">';
-  $scope.$secondSpan = '<span class="secondSpan">';
-  $scope.$file = 'software_keys.csv';
-  $scope.$header = ['software_name','license_key','serial_number','comments','software_keys_ID','first_name','last_name'];
-  $scope.$location = '/service/software_keys';
+
+  $scope.$file = 'url_data.csv';
+  $scope.$header = ['url_name','crawl_frequency','da','pa','tf','cf','status_code','ose_num_links','majestic_num_links','url_hash'];
+  $scope.$location = '/service/url_data';
 
     $scope.$on('locationUpdate', function (event, data) {
-	  if(data.location == 'software_keys'){
+	  if(data.location == 'url_data'){
 	  	$scope.getDesserts();
 	  }
   });
@@ -26810,45 +25689,45 @@ angular.module('SE_App').controller('software_keysController', ['$mdDialog','$so
   $scope.query = {
     filter: '',
     limit: '15',
-    order: 'software_name',
-    page: 1,
+    order: 'url_name',
+    page: 1
   };
 
   $scope.dbTableInfo = {
-    db_table:'software_keys',
-    db_ID:'software_keys_ID',
+    db_table:'url_data',
+    db_ID:'url_hash',
     //table:hosting_table,
   };
 
-  function success(software_keys_tables) {
-    $scope.software_keys_tables = software_keys_tables;
+  function success(url_data_tables) {
+    $scope.url_data_tables = url_data_tables;
   }
 
   $scope.addItem = function (event) {
     $mdDialog.show({
       clickOutsideToClose: true,
-      controller: 'addSoftware_keysController',
+      controller: 'addUrl_dataController',
       controllerAs: 'ctrl',
       focusOnOpen: false,
       targetEvent: event,
-      templateUrl: 'tabs/softwareKeys/addSoftware_keysDialog.html',
+      templateUrl: 'tabs/urlData/addUrl_dataDialog.html',
     }).then($scope.getDesserts);
   };
 
   $scope.delete = function (event) {
     $mdDialog.show({
       clickOutsideToClose: true,
-      controller: 'deleteSoftware_keysController',
+      controller: 'deleteUrl_dataController',
       controllerAs: 'ctrl',
       focusOnOpen: false,
       targetEvent: event,
-      locals: { software_keys_tables: $scope.selected },
+      locals: { url_data_tables: $scope.selected },
       templateUrl: 'inc/delete.html',
     }).then($scope.getDesserts);
   };
 
   $scope.getDesserts = function () {
-    $scope.promise = $software_keys.software_keys_tables.get($scope.query, success).$promise;
+    $scope.promise = $url_data.url_data_tables.get($scope.query, success).$promise;
   };
 
   $scope.removeFilter = function () {
@@ -26885,11 +25764,10 @@ angular.module('SE_App').controller('software_keysController', ['$mdDialog','$so
 //Below is changing the selection and Date Pickers
 
 
-$scope.getOwnersFunc = function(){
-	$http.get('service/getowners')
-		.then(function(response){
-	$scope.getOwners = response.data;
-	});
+$scope.getFrequencyFunc = function(){
+  $frequencies = ['Daily','Weekly','Monthly','Quartly'];
+	$scope.getFreq = $frequencies;
+
 };
 
 }]);
@@ -27016,17 +25894,18 @@ angular.module('SE_App').controller('deleteUrl_dataController', ['$authorize', '
 
   }]);
 
-angular.module('SE_App').controller('url_dataController', ['$mdDialog','$url_data', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $url_data, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
+angular.module('SE_App').controller('W2_accountsController', ['$mdDialog','$W2_accounts', '$scope', '$mdEditDialog', '$http','$q','changeCellServices','upDownloadService',function ($mdDialog, $W2_accounts, $scope, $mdEditDialog, $http,$q,changeCellServices,upDownloadService) {
   'use strict';
 
   var bookmark;
-
-  $scope.$file = 'url_data.csv';
-  $scope.$header = ['url_name','crawl_frequency','da','pa','tf','cf','status_code','ose_num_links','majestic_num_links','url_hash'];
-  $scope.$location = '/service/url_data';
+  $scope.$firstSpan = '<span class="firstSpan">';
+  $scope.$secondSpan = '<span class="secondSpan">';
+  $scope.$file = 'W2_accounts.csv';
+  $scope.$header = ['login_url_name','login','password','account_url','attached_domain','W2_ID','user_name','user_email'];
+  $scope.$location = '/service/W2_accounts';
 
     $scope.$on('locationUpdate', function (event, data) {
-	  if(data.location == 'url_data'){
+	  if(data.location == 'W2_accounts'){
 	  	$scope.getDesserts();
 	  }
   });
@@ -27043,45 +25922,45 @@ angular.module('SE_App').controller('url_dataController', ['$mdDialog','$url_dat
   $scope.query = {
     filter: '',
     limit: '15',
-    order: 'url_name',
-    page: 1
+    order: 'login_url_name',
+    page: 1,
   };
 
   $scope.dbTableInfo = {
-    db_table:'url_data',
-    db_ID:'url_hash',
+    db_table:'W2_accounts',
+    db_ID:'W2_ID',
     //table:hosting_table,
   };
 
-  function success(url_data_tables) {
-    $scope.url_data_tables = url_data_tables;
+  function success(W2_accounts_tables) {
+    $scope.W2_accounts_tables = W2_accounts_tables;
   }
 
   $scope.addItem = function (event) {
     $mdDialog.show({
       clickOutsideToClose: true,
-      controller: 'addUrl_dataController',
+      controller: 'addW2_AccountsController',
       controllerAs: 'ctrl',
       focusOnOpen: false,
       targetEvent: event,
-      templateUrl: 'tabs/urlData/addUrl_dataDialog.html',
+      templateUrl: 'tabs/w2Accounts/addW2_AccountsDialog.html',
     }).then($scope.getDesserts);
   };
 
   $scope.delete = function (event) {
     $mdDialog.show({
       clickOutsideToClose: true,
-      controller: 'deleteUrl_dataController',
+      controller: 'deleteW2_AccountsController',
       controllerAs: 'ctrl',
       focusOnOpen: false,
       targetEvent: event,
-      locals: { url_data_tables: $scope.selected },
+      locals: { W2_accounts_tables: $scope.selected },
       templateUrl: 'inc/delete.html',
     }).then($scope.getDesserts);
   };
 
   $scope.getDesserts = function () {
-    $scope.promise = $url_data.url_data_tables.get($scope.query, success).$promise;
+    $scope.promise = $W2_accounts.W2_accounts_tables.get($scope.query, success).$promise;
   };
 
   $scope.removeFilter = function () {
@@ -27114,17 +25993,137 @@ angular.module('SE_App').controller('url_dataController', ['$mdDialog','$url_dat
   $scope.changeDropdown = changeCellServices.changeDropdown;
     $scope.bulkDownload = upDownloadService.bulkDownload;
 
-
 //Below is changing the selection and Date Pickers
 
-
-$scope.getFrequencyFunc = function(){
-  $frequencies = ['Daily','Weekly','Monthly','Quartly'];
-	$scope.getFreq = $frequencies;
-
+$scope.getOwnersFunc = function(){
+	$http.get('service/getowners')
+		.then(function(response){
+	$scope.getOwners = response.data;
+	});
 };
 
+
+
 }]);
+
+angular.module('SE_App').factory('$W2_accounts', ['$resource', function ($resource) {
+  'use strict';
+
+  return {
+    W2_accounts_tables: $resource('/service/W2_accounts')
+  };
+}]);
+
+//===========================================================
+
+angular.module('SE_App').controller('addW2_AccountsController', ['$mdDialog', '$W2_accounts', '$scope' , '$http','$mdToast',function ($mdDialog, $W2_accounts, $scope, $http,$mdToast) {
+  'use strict';
+$scope.myDate = new Date();
+
+$scope.getOwnersFunc = function(){
+	$http.get('service/getowners')
+		.then(function(response){
+	$scope.getOwners = response.data;
+	});
+};
+
+  this.cancel = $mdDialog.cancel;
+
+  function success(W2_accounts_table) {
+    $mdToast.show({
+      hideDelay   : 4000,
+      position    : 'top center',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      toastClass  : 'toastSuccess',
+      resolve: {
+           $response: function () {
+             return 'New Content Added';
+           }
+         }
+      });
+    $mdDialog.hide(W2_accounts_table);
+  }
+
+    function fedup(response){
+      $mdToast.show({
+      hideDelay   : 9000,
+      position    : 'top left',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      resolve: {
+           $response: function () {
+             return response;
+           }
+         }
+      });
+  }
+
+  this.addItem = function () {
+    $scope.item.form.$setSubmitted();
+
+    if($scope.item.form.$valid) {
+      $W2_accounts.W2_accounts_tables.save({W2_accounts_table: $scope.W2_accounts_table}, success, fedup);
+    }
+  };
+
+}]);
+
+// =======================================================
+
+angular.module('SE_App').controller('deleteW2_AccountsController', ['W2_accounts_tables', '$mdDialog', '$W2_accounts', '$scope', '$q', '$mdToast',function (W2_accounts_tables, $mdDialog, $W2_accounts, $scope, $q,$mdToast) {
+  'use strict';
+
+  this.cancel = $mdDialog.cancel;
+
+  function deleteDessert(W2_accounts_table, index) {
+    var deferred = $W2_accounts.W2_accounts_tables.remove({id: W2_accounts_table.W2_ID}, success, error);
+
+    deferred.$promise.then(function () {
+      W2_accounts_tables.splice(index, 1);
+    });
+
+    return deferred.$promise;
+  }
+
+  function onComplete() {
+    $mdDialog.hide();
+  }
+
+  function success() {
+    $mdToast.show({
+      hideDelay   : 4000,
+      position    : 'top center',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      toastClass  : 'toastSuccess',
+      resolve: {
+           $response: function () {
+             return 'Successfully Deleted';
+           }
+         }
+      });
+    }
+
+  function error(response) {
+    $mdToast.show({
+      hideDelay   : 9000,
+      position    : 'top center',
+      controller  : 'ToastCtrl',
+      templateUrl : '/partials/toast-template.html',
+      toastClass  : 'toastDanger',
+      resolve: {
+           $response: function () {
+             return response.data;
+           }
+         }
+      });
+    }
+    this.authorizeUser = function () {
+      $q.all(W2_accounts_tables.forEach(deleteDessert)).then(onComplete);
+    };
+
+  }]);
 
 angular.module('SE_App').factory('$authorize', ['$resource', function ($resource) {
   'use strict';

@@ -184,7 +184,7 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
 
     this.changeCellText = function (event, $table, $column,db_table,db_ID,$length) {
         event.stopPropagation();
-
+        var tempValue = $table[$column];
         var success  = function(response){
           $mdToast.show({
           hideDelay   : 4000,
@@ -201,6 +201,7 @@ angular.module('SE_App', ['ngMaterial', 'md.data.table', 'ngResource', 'ngRoute'
         };
 
         var failure  = function(response){
+          $table[$column] = tempValue;
           $mdToast.show({
           hideDelay   : 9000,
           position    : 'top center',

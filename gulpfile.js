@@ -13,10 +13,12 @@ gulp.task("concatScripts", function(){
   return gulp.src([
   "node_modules/moment/moment.js",
   // "node_modules/angular-material/angular-material.js",
-  "node_modules/ng-csv/build/ng-csv.js",
-  "node_modules/angular-sanitize/angular-sanitize.js",
-  "bower_components/jquery/dist/jquery.js",
+  // "node_modules/ng-csv/build/ng-csv.js",
+  // "node_modules/angular-sanitize/angular-sanitize.js",
+    "bower_components/jquery/dist/jquery.js",
     "node_modules/ngclipboard/dist/ngclipboard.js",
+    // "node_modules/clipboard/dist/clipboard.js",
+    // "node_modules/angular-messages/angular-messages.js",
     "bower_components/satellizer/dist/satellizer.js",
     "bower_components/angular-ui-router/release/angular-ui-router.js",
     "bower_components/angular-loading-bar/build/loading-bar.js",
@@ -26,31 +28,13 @@ gulp.task("concatScripts", function(){
     "scripts/authcontroller.js",
     "scripts/stripe-mailgun-authyController.js",
     "node_modules/angular-stripe-checkout/angular-stripe-checkout.js",
-    "tabs/domains/domainHelpers.js",
-    "tabs/domains/domainController.js",
-    "tabs/hosting/hostingHelpers.js",
-    "tabs/hosting/hostingController.js",
-    "tabs/registrar/registrarHelpers.js",
-    "tabs/registrar/registrarController.js",
-    "tabs/w2Accounts/W2_AccountsHelpers.js",
-    "tabs/w2Accounts/W2_AccountsController.js",
-    "tabs/person/personHelpers.js",
-    "tabs/person/personController.js",
-    "tabs/cmsLogin/cms_loginHelpers.js",
-    "tabs/cmsLogin/cms_loginController.js",
-    "tabs/resourceLogin/resource_loginHelpers.js",
-    "tabs/resourceLogin/resource_loginController.js",
-    "tabs/links/linksHelpers.js",
-    "tabs/links/linksController.js",
-    "tabs/changeLog/change_logHelpers.js",
-    "tabs/changeLog/change_logController.js",
-    "tabs/softwareKeys/software_keysHelpers.js",
-    "tabs/softwareKeys/software_keysController.js",
-    "tabs/urlData/url_dataHelpers.js",
-    "tabs/urlData/url_dataController.js",
+    "tabs/**/*.js",
     "scripts/authorizeResource.js",
     "scripts/profile.js",
     "scripts/help.js"
+
+
+
   ])
   .pipe(maps.init())
   .pipe(concat('app.js'))

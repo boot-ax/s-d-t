@@ -6,6 +6,7 @@ function ($mdDialog, $domains, $scope, $mdEditDialog, $http,$mdToast,$q,changeCe
 
   var bookmark;
 
+
   $scope.$file = 'domains.csv';
   $scope.$header = ['domain_name','ip_address','nameserver_1','ns1_IP','nameserver_2','ns2_IP','nameserver_3','ns3_IP','date_purchased','expiration_date','registrar_ID','hosting_ID','registrar_301','registrar_301_target','whois_protected','domain_ID','registrar_name','hosting_name'];
     $scope.$location = '/service/domains';
