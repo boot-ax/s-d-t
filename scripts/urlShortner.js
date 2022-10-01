@@ -81,7 +81,7 @@ $("#shortener").on("click", function() {
   var urls = $("#urls").val().replace("\r\n", "\n").split("\n");
   $("#shres").html('<tr><th colspan="4"><h3 class="center">Goo.gl URL Conversion Results</h3></th></tr><tr><th class="thl">Short URL</th><th>Long URL</th><th id="keyword">Keyword</th><th id="new_url">New URL</th></tr>');
   disableMe();
-  var APIKEYS = 'AIzaSyD8DXc0OUz3uxR4OCtvc4BSqGDYzh6kqQI';
+  var APIKEYS = 'AI more here';
   if ($("#gkey").val().trim() != "") {
     APIKEYS = $("#gkey").val()
   }
