@@ -139,7 +139,7 @@ Flight::before('start', function(&$params, &$output){
 
     $request = Flight::request();
     $url = $request->url;
-    if($url !== '/auth/login' & $url !== '/signup/' & $url !== '/stripe-991c8971ff31a83c454f371f55c85be5' & strpos($url, '/mailgun-0f5ac2ac043c5665bf3e2f00638dbdce') === false & strpos($url, '/password-reset') === false  & strpos($url, '/verify-out-email') === false){
+    if($url !== '/auth/login' & $url !== '/signup/' & $url !== '/stripe-99' & strpos($url, '/mailgun-0f5a') === false & strpos($url, '/password-reset') === false  & strpos($url, '/verify-out-email') === false){
       $jwt = substr($_SERVER['HTTP_AUTHORIZATION'],7);
       try{
 				$validator = new \Gamegos\JWT\Validator();
@@ -216,7 +216,7 @@ Flight::route('POST /auth/login', function(){
     }
     unset($user['user_stripe_token']);
     // var_dump($result->num_rows);
-        $authy_api = new Authy\AuthyApi('PXD03tc5vZbC78OJJbOM61WqDPgbldUB');
+        $authy_api = new Authy\AuthyApi('PXD');
         $verification = $authy_api->verifyToken($user['authy_id'], $authy, array("force" => "true"));
 
         if($verification->ok()){
@@ -271,7 +271,7 @@ Flight::route('POST /auth/login', function(){
 
       		elseif($result->num_rows>0 & empty($authy) & !empty($user['authy_id'])){
                   // FLight::halt(401,"Here We Are");
-              $authy_api = new Authy\AuthyApi('PXD03tc5vZbC78OJJbOM61WqDPgbldUB');
+              $authy_api = new Authy\AuthyApi('PXD03');
               $sms = $authy_api->requestSms($user['authy_id'], array("force" => "true"));
               FLight::halt(200,"Need Verification");
             } else {
@@ -349,9 +349,9 @@ Flight::route('POST /url_data', function(){
 
   $mg = new Mailgun("key-ec9");
   $domain = "login.webwright.io";
-  $token ="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ7XCJ1c2VyX2VtYWlsXCI6XCJhbm90aGVyRHZAbWFjLmNvbVwiLFwiZW1haWxfdmVyaWZpY2F0aW9uXCI6XCIxMDNmMmYzNDk4MDk5OGQwZjJkZmMzMDE0NjhjOTEyNlwifSIsImV4cCI6MTQ5MTM0MTY0Mn0.1dEz4FrCcB4xA9dIbAdJtBmMONT8_waTvEeEeihtt4c";
+  $token ="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1Nimore here";
   // $link = "https://app.login.webwright.io/service/mailgun-0f5ac2ac043c5665bf3e2f00638dbdce?token=";
-  $link = "https://app.login.webwright.io/service/mailgun-0f5ac2ac043c5665bf3e2f00638dbdce?token=".$token;
+  $link = "https://app.login.webwright.io/service/mailgun-0f5ac2more heredbdce?token=".$token;
 
   $result = $mg->sendMessage($domain, array(
   // Be sure to replace the from address with the actual email address you're sending from
@@ -374,7 +374,7 @@ Flight::route('POST /url_data', function(){
   //
   // # Now, compose and send your message.
   // $mg->sendMessage($domain, array('from'    => 'holyCow@example.com',
-  //                                 'to'      => 'jkolnik@mac.com',
+  //                                 'to'      => 'jkome@mac.com',
   //                                 'subject' => 'The PHP SDK is awesome!',
   //
   //
