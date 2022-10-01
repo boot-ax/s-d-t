@@ -347,7 +347,7 @@ Flight::route('POST /url_data', function(){
 
 
 
-  $mg = new Mailgun("key-ec9388937d006572057b2b518dab3159");
+  $mg = new Mailgun("key-ec9");
   $domain = "login.webwright.io";
   $token ="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ7XCJ1c2VyX2VtYWlsXCI6XCJhbm90aGVyRHZAbWFjLmNvbVwiLFwiZW1haWxfdmVyaWZpY2F0aW9uXCI6XCIxMDNmMmYzNDk4MDk5OGQwZjJkZmMzMDE0NjhjOTEyNlwifSIsImV4cCI6MTQ5MTM0MTY0Mn0.1dEz4FrCcB4xA9dIbAdJtBmMONT8_waTvEeEeihtt4c";
   // $link = "https://app.login.webwright.io/service/mailgun-0f5ac2ac043c5665bf3e2f00638dbdce?token=";
@@ -356,7 +356,7 @@ Flight::route('POST /url_data', function(){
   $result = $mg->sendMessage($domain, array(
   // Be sure to replace the from address with the actual email address you're sending from
   'from'    => 'support@login.webwright.io',
-  'to'      => 'jkolnik@mac.com',
+  'to'      => 'something@mac.com',
   'subject' => 'Email Verification',
   'o:tag'   => array('Email Verification'),
     // 'o:tracking-clicks' => 'htmlonly',
