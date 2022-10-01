@@ -10,10 +10,10 @@ use Authy\AuthyApi;
 
 //date_default_timezone_set('UTC');
 
-$jwt_key = "joelikeshisinflatablebal$22A2Ux7qcu3jXFdcczEc77c";
+$jwt_key = "Something here";
 $stripe = array(
-  "secret_key"      =>  "sk_test_tN4uGQsemjKrJ2tLpqg3VgIe",
-  "publishable_key" =>  "pk_test_DDqS4Ps7loF2JzJPH5JinfPW"
+  "secret_key"      =>  "sk_test_more here",
+  "publishable_key" =>  "pk_test_more here"
 );
 
 // Map your method
